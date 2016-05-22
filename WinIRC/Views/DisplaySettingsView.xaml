@@ -1,0 +1,30 @@
+﻿<ui:BaseSettingsPage
+    x:Class="WinIRC.DisplaySettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC"
+    xmlns:ui="using:WinIRC.Ui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid>
+            <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
+                <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" />
+
+                <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
+
+                <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>
+
+                <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
+
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</ui:BaseSettingsPage>

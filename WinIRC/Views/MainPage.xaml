@@ -1,0 +1,201 @@
+﻿<Page
+    x:Class="WinIRC.MainPage"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:WinIRC.Ui"
+    mc:Ignorable="d" >
+
+    <Grid x:Name="mainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HamburgerButton.Width" Value="0" />
+                        <Setter Target="SplitView.DisplayMode" Value="Inline" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="True" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="Overlay" />
+                        <Setter Target="SidebarSplitView.DisplayMode" Value="Overlay" />
+                        <Setter Target="PinButton.Width" Value="0" />
+
+                        <Setter Target="ChannelInfoFlyout.Placement" Value="Bottom" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="False" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240">
+            <SplitView.Pane>
+                <Grid>
+                    <ComboBox x:Name="serversCombo" Height="48" HorizontalAlignment="Stretch" PlaceholderText="Currently not connected" SelectionChanged="serversList_SelectionChanged" Style="{StaticResource CustomComboBox}"/>
+                    <ScrollViewer Margin="0,48,0,0">
+                        <ListBox x:Name="channelList" ItemsSource="{Binding}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}" >
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0">
+                                        <TextBlock FontSize="12" Text="{Binding}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                        </ListBox>
+                    </ScrollViewer>
+                </Grid>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right">
+                    <SplitView.Pane>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0" Background="{ThemeResource SystemChromeMediumColor}" Height="48" VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Background="{ThemeResource SystemChromeMediumColor}" Grid.Column="0" >
+                                    <ui:HeaderBlock x:Name="SidebarHeader" ShowBackButton="False" BackButtonClicked="HeaderBlock_BackButtonClicked"/>
+                                </Grid>
+
+                                <Button Grid.Column="1" x:Name="PinButton" Content="&#xE840;" Style="{StaticResource IconButtonStyle}" Click="PinSidebar" />
+                            </Grid>
+
+                            <Frame Grid.Row="1" x:Name="SidebarFrame" BorderThickness="1,0,0,0" BorderBrush="{ThemeResource SystemChromeMediumColor}">
+                            </Frame>
+                        </Grid>
+                    </SplitView.Pane>
+                    <SplitView.Content>
+                        <Grid>
+                            <CommandBar Height="48" VerticalAlignment="Top" ClosedDisplayMode="Compact">
+                                <CommandBar.Content>
+                                    <AppBarButton Height="48" x:Name="HamburgerButton" Style="{StaticResource AppbarButtonStyle}" Click="ToggleSplitView" >
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE700;" FontWeight="Bold" />
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                </CommandBar.Content>
+                                <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Add" ToolTipService.ToolTip="Connect" Click="ShowConnectPopup"/>
+                                <AppBarSeparator />
+                                <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Important" ToolTipService.ToolTip="Channel Topic">
+                                    <AppBarButton.Flyout>
+                                        <Flyout x:Name="ChannelInfoFlyout" Placement="Left">
+                                            <StackPanel Orientation="Vertical" MaxWidth="300">
+                                                <TextBlock x:Name="TopicText" ui:HyperlinkedTextBlock.Text="{Binding ElementName=Root, Path=currentTopic}" TextWrapping="WrapWholeWords" LineHeight="8"/>
+                                            </StackPanel>
+                                        </Flyout>
+                                    </AppBarButton.Flyout>
+                                </AppBarButton>
+                                <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="People" ToolTipService.ToolTip="Channel Users" Click="PeopleButton_Click"/>
+
+                                <CommandBar.SecondaryCommands>
+                                    <AppBarButton Label="Settings" Click="SettingsButton_Click"/>
+                                </CommandBar.SecondaryCommands>
+                            </CommandBar>
+
+                            <Grid Margin="0,48,0,0">
+                                <ScrollViewer Canvas.ZIndex="0" x:Name="messagesScroll" Margin="5,0,5,48" VerticalScrollMode="Enabled" >
+                                    <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock IsTextSelectionEnabled="True" ui:HyperlinkedTextBlock.Text="{Binding messageText}" TextWrapping="WrapWholeWords" LineHeight="8" Foreground="{Binding messageColour}" FontStyle="{Binding messageFormat}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </ScrollViewer>
+
+                                <Grid Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" x:Name="TabButton"  Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="20" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" />
+
+                                    <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </SplitView.Content>
+                </SplitView>
+            </SplitView.Content>
+        </SplitView>
+
+        <Popup x:Name="serverConnect" IsLightDismissEnabled="True" Loaded="ConnectDialog_Loaded" >
+            <Popup.ChildTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True" />
+                </TransitionCollection>
+            </Popup.ChildTransitions>
+            <Grid Height="Auto" Width="Auto" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
+                <Grid Margin="0" Background="{ThemeResource SystemChromeMediumColor}" Height="44" VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" x:Name="CloseButton"  Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" Click="CloseDialogClick" />
+                    <Grid Background="{ThemeResource SystemChromeMediumColor}" Grid.Column="1" >
+                        <TextBlock Text="Connect" Style="{StaticResource AppTitleTextBlockStyle}" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" />
+                    </Grid>
+                    <Button Grid.Column="2" x:Name="SaveButton"  Content="&#xE105;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Save Server" Click="SaveButtonClick" />
+                    <Button Grid.Column="3" x:Name="DeleteButton"  Content="&#xE107;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Remove Server" Click="DeleteButtonClick" />
+                    <Button Grid.Column="4" x:Name="ConnectButton"  Content="&#xE122;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Connect" Click="ConnectButtonClick" />
+
+                </Grid>
+
+                <StackPanel Orientation="Vertical"  x:Name="pop" BorderThickness="0" Margin="0,44,0,0" Padding="10,0" >
+                    <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,10"/>
+
+                    <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
+
+                    <TextBox  x:Name="server"  Margin="5,10"  Width="290" PlaceholderText="Server Name"  />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10" >
+                        <TextBox x:Name="hostname" IsSpellCheckEnabled="True" Margin="5,1" Width="190" InputScope="Url" PlaceholderText="Hostname or IP"/>
+                        <TextBox x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" Width="90" InputScope="Number" PlaceholderText="Port"/>
+                    </StackPanel>
+
+                    <ToggleSwitch Margin="5,1" x:Name="ssl" OffContent="Insecure Connection" OnContent="Secure Connection"  />
+
+                    <TextBox  x:Name="username"  Margin="5,10"  Width="290" PlaceholderText="Username"  />
+                    <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,10"  Width="290" PlaceholderText="Server Password" />
+
+                    <TextBox x:Name="channels"  Margin="5,10"  Width="290" PlaceholderText="Channels to Join"  />
+
+                    <ToggleSwitch Margin="5,1" x:Name="webSocket" OffContent="Direct IRC Connection" OnContent="Connect via Websocket" Toggled="webSocket_Toggled" />
+
+                </StackPanel>
+            </Grid>
+        </Popup>
+
+
+
+    </Grid>
+
+</Page>

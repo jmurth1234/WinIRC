@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+  <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.1.29.0" />
+  <mp:PhoneIdentity PhoneProductId="bb51c926-30e9-4d89-a340-efd3e12cfc01" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Properties>
+    <DisplayName>WinIRC</DisplayName>
+    <PublisherDisplayName>rymate1234</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="WinIRC.App">
+      <uap:VisualElements DisplayName="WinIRC" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="WinIRC" BackgroundColor="transparent">
+        <uap:DefaultTile ShortName="Win IRC">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo" />
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#171717" />
+      </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="ircs">
+            <uap:DisplayName>SSL IRC Protocol</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="WinIRCBackgroundComponent.IRCBackground">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="irc">
+            <uap:DisplayName>IRC Protocol</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
