@@ -501,6 +501,11 @@ namespace WinIRC.Net
 
             await Task.Delay(1);
 
+            if (!Config.Contains(Config.SwitchOnJoin))
+            {
+                Config.SetBoolean(Config.SwitchOnJoin, true);
+            }
+
             if (channelList.Contains(channel) && Config.GetBoolean(Config.SwitchOnJoin))
             {
                 MainPage.instance.GetChannelList().SelectedItem = channel;

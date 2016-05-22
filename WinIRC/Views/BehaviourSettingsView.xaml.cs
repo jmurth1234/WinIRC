@@ -55,8 +55,8 @@ namespace WinIRC
             } 
             else
             {
-                Config.SetBoolean(Config.SwitchOnJoin, false);
-                this.AutoChannelSwitch.IsOn = false;
+                Config.SetBoolean(Config.SwitchOnJoin, true);
+                this.AutoChannelSwitch.IsOn = true;
             }
 
             this.SettingsLoaded = true;
