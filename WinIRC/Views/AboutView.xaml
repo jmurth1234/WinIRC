@@ -12,6 +12,8 @@
         <TextBlock Text="Made by rymate1234." Margin="0,0,0,20"  />
 
         <Button Content="Visit my Website" Margin="0,0,0,10" Click="VisitWebsite" />
+        
+        <Button Content="View the source on GitHub" Margin="0,0,0,10" Click="VisitGithub" />
 
         <Button Content="Rate this app on the Store" Margin="0,0,0,10" Click="RateApp" />
 

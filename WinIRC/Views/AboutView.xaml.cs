@@ -63,5 +63,11 @@ namespace WinIRC
 
             MainPage.instance.IrcPrompt(server);
         }
+
+        private async void VisitGithub(object sender, RoutedEventArgs e)
+        {
+            var uri = new Uri("https://github.com/rymate1234/WinIRC");
+            await Windows.System.Launcher.LaunchUriAsync(uri);
+        }
     }
 }
