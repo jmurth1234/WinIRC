@@ -604,6 +604,7 @@ namespace WinIRC
 
         private void DeleteButtonClick(object sender, RoutedEventArgs e)
         {
+            if (serversSavedCombo.SelectedItem == null) return; 
             foreach (var ircServer in serversList)
             {
                 if (ircServer.name == serversSavedCombo.SelectedItem.ToString())
