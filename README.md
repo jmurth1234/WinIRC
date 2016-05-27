@@ -15,9 +15,11 @@ WinIRC is a C# IRC Client for Windows 10. It's written as a UWP application, so 
 
 ## How do I get it?
 
-For autoupdating, the easiest way to get it is from the [Microsoft Store](https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf). I intend to have a sideloadable appx package up on the website if / when I get around to making one.
+For autoupdating, the easiest way to get it is from the [Microsoft Store](https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf). 
 
-## Building fom source
+If you downloaded the sideloadable package, make sure you enabled developer mode in Settings -> Update & Security -> For developers -> Developer mode. Once this is done, extract the zip to a new folder, right click the powershell file and click "Run with PowerShell"
+
+## Building from source
 
 You'll need the following:
 
