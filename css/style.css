@@ -1,0 +1,56 @@
+* {
+	font-family: "Segoe UI", sans-serif;
+}
+
+.content,
+#app {
+	height: 100%;
+}
+
+#app .win-splitviewpanetoggle {
+	float: left;
+}
+
+/* SplitView pane content style*/
+#app .header {
+	white-space: nowrap;
+}
+
+#app .title {
+	font-size: 25px;
+	left: 50px;
+	margin-top: 6px;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+#app .nav-commands {
+	margin-top: 20px;
+}
+
+.win-splitviewcommand-button {
+	background-color: transparent;
+}
+
+#app .win-splitview-pane-closed .win-splitviewcommand-label {
+	/*  Make sure pane content doesn't scroll if
+    SplitViewCommand label receives focus while pane is closed.
+    */
+	visibility: hidden;
+}
+
+/*SplitView content style*/
+#app .win-splitview-content {
+	background-color: rgb(55, 55, 55);
+}
+
+#app .contenttext {
+	padding-left: 20px;
+	padding-right: 20px;
+	overflow: auto;
+	max-height: 100vh;
+}
+
+#app .contenttext a {
+	color: cyan;
+}

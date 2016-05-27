@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>WinIRC</title>
+
+	<link href="./css/ui-dark.css" rel="stylesheet"/>
+	<link href="./css/style.css" rel="stylesheet"/>
+	<script src="./js/base.js"></script>
+	<script src="./js/ui.js"></script>
+
+	<script src="./js/showdown.min.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+	<div class="splitView" data-win-control="WinJS.UI.SplitView">
+		<!-- Pane area -->
+		<div>
+			<div class="header">
+				<button
+						class="win-splitviewpanetoggle"
+						data-win-control="WinJS.UI.SplitViewPaneToggle"
+						data-win-options="{ splitView: select('.splitView') }">
+
+				</button>
+				<div class="title"><h3 class="win-h3">WinIRC</h3></div>
+			</div>
+
+			<div class="nav-commands">
+				<a href="https://github.com/rymate1234/WinIRC" data-win-control="WinJS.UI.SplitViewCommand"
+				   data-win-options="{ label: 'GitHub', icon: 'url(\'img/github.png\')'}"></a>
+
+				<a href="https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf"
+				   data-win-control="WinJS.UI.SplitViewCommand"
+				   data-win-options="{ label: 'Store Link', icon: 'shop'}"></a>
+
+				<a href="WinIRC_1.2.8.0_Debug_Test.zip"
+					data-win-control="WinJS.UI.SplitViewCommand"
+				   data-win-options="{ label: 'Direct Download', icon: 'download'}"></a>
+			</div>
+		</div>
+
+		<!-- Content area -->
+		<div id="content" class="contenttext"></div>
+	</div>
+</div>
+
+<script>
+	WinJS.UI.processAll().done(function () {
+		var splitView = document.querySelector(".splitView").winControl;
+		//splitView.openedDisplayMode = WinJS.UI.SplitView.OpenedDisplayMode.inline;
+		new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+	});
+
+	var request = new XMLHttpRequest();
+	request.open('GET', 'https://raw.githubusercontent.com/rymate1234/WinIRC/master/README.md', true);
+
+	request.onload = function () {
+		if (request.status >= 200 && request.status < 400) {
+			// Success!
+			var data = request.responseText;
+			var content = document.getElementById("content");
+
+			var converter = new showdown.Converter();
+			content.innerHTML = converter.makeHtml(data);
+		} else {
+			// We reached our target server, but it returned an error
+
+		}
+	};
+
+	request.onerror = function () {
+		// There was a connection error of some sort
+	};
+
+	request.send();
+
+</script>
+
+</body>
+</html>
