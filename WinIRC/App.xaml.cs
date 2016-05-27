@@ -152,16 +152,37 @@ namespace WinIRC
             // Get the root frame
             Frame rootFrame = Window.Current.Content as Frame;
 
+            var loaded = true;
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                this.SetTheme();
+
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+                loaded = false;
+            }
+
             if (rootFrame.Content == null)
             {
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
                 rootFrame.Navigate(typeof(MainPage));
+
+                // Ensure the current window is active
+                Window.Current.Activate();
+                loaded = false;
             }
 
             // Handle toast activation
-            if (e.Kind == ActivationKind.ToastNotification)
+            if (e.Kind == ActivationKind.ToastNotification && loaded)
             {
                 var args = e as ToastNotificationActivatedEventArgs;
                 var toastActivationArgs = args;
@@ -179,11 +200,17 @@ namespace WinIRC
                     var message = args.UserInput["tbReply"];
 
                     var mainPage = (MainPage)rootFrame.Content;
+
+                    if (!mainPage.connectedServersList.Contains(server))
+                    {
+                        return;
+                    }
+
                     if (mainPage != null)
                         mainPage.MentionReply(server, channel, username + ": " + message);
 
-                    if (!(rootFrame.Content as MainPage).currentChannel.Equals(channel))
-                        ((MainPage)rootFrame.Content).SwitchChannel(server, channel);
+                    if (mainPage.currentChannel.Equals(channel))
+                        mainPage.SwitchChannel(server, channel);
                 }
                 else if (qryStr["action"] == "viewConversation")
                 { 
@@ -191,8 +218,17 @@ namespace WinIRC
                     string channel = qryStr["channel"];
                     string server = qryStr["server"];
 
+                    var mainPage = (MainPage)rootFrame.Content;
+
+                    if (mainPage == null) return;
+
+                    if (!mainPage.connectedServersList.Contains(server))
+                    {
+                        return;
+                    }
+
                     // If we're already viewing that channel, do nothing
-                    if (rootFrame.Content is MainPage && !(rootFrame.Content as MainPage).currentChannel.Equals(channel))
+                    if (mainPage.currentChannel.Equals(channel))
                         ((MainPage) rootFrame.Content).SwitchChannel(server, channel);
 
                 }
