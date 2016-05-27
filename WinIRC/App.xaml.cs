@@ -209,7 +209,7 @@ namespace WinIRC
                     if (mainPage != null)
                         mainPage.MentionReply(server, channel, username + ": " + message);
 
-                    if (mainPage.currentChannel.Equals(channel))
+                    if (!mainPage.currentChannel.Equals(channel))
                         mainPage.SwitchChannel(server, channel);
                 }
                 else if (qryStr["action"] == "viewConversation")
@@ -228,8 +228,8 @@ namespace WinIRC
                     }
 
                     // If we're already viewing that channel, do nothing
-                    if (mainPage.currentChannel.Equals(channel))
-                        ((MainPage) rootFrame.Content).SwitchChannel(server, channel);
+                    if (!mainPage.currentChannel.Equals(channel))
+                        mainPage.SwitchChannel(server, channel);
 
                 }
 

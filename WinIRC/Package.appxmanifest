@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.2.6.0" />
+  <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.2.7.0" />
   <mp:PhoneIdentity PhoneProductId="bb51c926-30e9-4d89-a340-efd3e12cfc01" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>WinIRC</DisplayName>
@@ -25,8 +25,8 @@
       </uap:VisualElements>
       <Extensions>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="irc">
-            <uap:DisplayName>IRC Protocol</uap:DisplayName>
+          <uap:Protocol Name="ircs">
+            <uap:DisplayName>SSL IRC Protocol</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
         <Extension Category="windows.backgroundTasks" EntryPoint="WinIRCBackgroundComponent.IRCBackground">
@@ -35,8 +35,8 @@
           </BackgroundTasks>
         </Extension>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="ircs">
-            <uap:DisplayName>SSL IRC Protocol</uap:DisplayName>
+          <uap:Protocol Name="irc">
+            <uap:DisplayName>IRC Protocol</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
       </Extensions>
