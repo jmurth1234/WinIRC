@@ -18,11 +18,12 @@
 
 #app .title {
 	font-size: 25px;
-	left: 50px;
+	left: 55px;
 	margin-top: 6px;
 	vertical-align: middle;
 	display: inline-block;
 }
+
 
 #app .nav-commands {
 	margin-top: 20px;
@@ -53,4 +54,9 @@
 
 #app .contenttext a {
 	color: cyan;
+}
+
+
+.win-splitviewcommand-icon {
+	background-size: 16px;
 }
