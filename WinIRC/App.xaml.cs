@@ -190,6 +190,8 @@ namespace WinIRC
                 // Parse the query string
                 QueryString qryStr = QueryString.Parse(toastActivationArgs.Argument);
 
+                if (!qryStr.Contains("action")) return;
+
                 // See what action is being requested 
                 if (qryStr["action"] == "reply")
                 {

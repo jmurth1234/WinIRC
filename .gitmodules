@@ -1,0 +1,3 @@
+[submodule "IRCForwarder"]
+	path = IRCForwarder
+	url = https://github.com/rymate1234/IRCForwarder
