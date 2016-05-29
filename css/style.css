@@ -48,15 +48,27 @@
 #app .contenttext {
 	padding-left: 20px;
 	padding-right: 20px;
-	overflow: auto;
 	max-height: 100vh;
+	margin: 0 auto;
+	max-width: 60vw;
 }
 
 #app .contenttext a {
 	color: cyan;
 }
 
+.content-wrapper {
+	overflow: auto;
+}
+
 
 .win-splitviewcommand-icon {
 	background-size: 16px;
+}
+
+@media(max-width: 768px) {
+	#app .contenttext {
+		max-width: 100vw;
+	}
+
 }
