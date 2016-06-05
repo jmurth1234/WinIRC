@@ -239,7 +239,6 @@ namespace WinIRC
                 StatusBar statusBar = StatusBar.GetForCurrentView();
                 statusBar.HideAsync();
             }
-
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
@@ -828,6 +827,22 @@ namespace WinIRC
             {
                 ((BaseSettingsPage)SidebarFrame.Content).UpdateUi += UpdateUi;
             }
+        }
+
+        private void ChannelListItem_ChannelCloseClicked(object sender, EventArgs e)
+        {
+            var channelArgs = e as ChannelEventArgs;
+            var channel = channelArgs.Channel;
+
+            CommandHandler.PartCommandHandler(GetCurrentServer(), new string[] { "PART ", channel });
+        }
+
+        private void ChannelListItem_ChannelJoinClicked(object sender, EventArgs e)
+        {
+            var channelArgs = e as ChannelEventArgs;
+            var channel = channelArgs.Channel;
+
+            GetCurrentServer().JoinChannel(channel);
         }
 
     }

@@ -114,6 +114,9 @@
     <Compile Include="Net\IrcSocket.cs" />
     <Compile Include="Net\IrcWebSocket.cs" />
     <Compile Include="Net\Message.cs" />
+    <Compile Include="Ui\ChannelListItem.xaml.cs">
+      <DependentUpon>ChannelListItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
@@ -169,6 +172,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Ui\ChannelListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AboutView.xaml">
       <SubType>Designer</SubType>

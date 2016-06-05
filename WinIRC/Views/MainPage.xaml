@@ -47,9 +47,7 @@
                         <ListBox x:Name="channelList" ItemsSource="{Binding}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}" >
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="0">
-                                        <TextBlock FontSize="12" Text="{Binding}"/>
-                                    </StackPanel>
+                                    <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding}" ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" ChannelCloseClicked="ChannelListItem_ChannelCloseClicked"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
 

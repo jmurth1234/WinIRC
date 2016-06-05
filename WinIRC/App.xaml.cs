@@ -89,6 +89,13 @@ namespace WinIRC
             // just ensure that the window is active
             if (rootFrame == null)
             {
+                var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
+                applicationView.SetPreferredMinSize(new Windows.Foundation.Size
+                {
+                    Width = 320,
+                    Height = 240
+                });
+
                 this.SetTheme();
 
                 // Create a Frame to act as the navigation context and navigate to the first page

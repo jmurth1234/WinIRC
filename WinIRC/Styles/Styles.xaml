@@ -27,6 +27,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
     </Style>
+    
 
     <Style x:Key="ListViewItemStyle" TargetType="ListViewItem">
         <Setter Property="Padding" Value="10" />

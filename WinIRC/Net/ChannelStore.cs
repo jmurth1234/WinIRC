@@ -114,6 +114,8 @@ namespace WinIRC.Net
         public Boolean HasUser(string nick)
         {
             nick = nick.Replace("@", "").Replace("+", "");
+            if (nick == "") return true;
+
             return Users.Any(user => user.Nick == nick);
         }
 

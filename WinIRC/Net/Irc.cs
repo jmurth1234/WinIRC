@@ -520,6 +520,7 @@ namespace WinIRC.Net
             {
                 channelBuffers.Remove(channel);
                 channelList.Remove(channel);
+                channelStore.Remove(channel);
 
                 if (currentChannel == channel)
                 {
