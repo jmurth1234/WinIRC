@@ -17,6 +17,10 @@
                 <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
 
+                <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
+
+
                 <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>
 

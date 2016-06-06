@@ -15,7 +15,8 @@ namespace WinIRC
         public const string FontFamily = "fontfamily";
         public const string FontSize = "fontsize";
         public const string ReducedPadding = "reducedpadding";
-        
+        public const string HideStatusBar = "hidestatusbar";
+
         public static bool Contains(string key)
         {
             return roamingSettings.Values.ContainsKey(key);

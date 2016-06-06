@@ -218,6 +218,20 @@ namespace WinIRC
                 this.channelList.ItemContainerStyle = style;
             }
 
+            if (Config.Contains(Config.HideStatusBar))
+            {
+                var isStatusBarPresent = ApiInformation.IsTypePresent(typeof(StatusBar).ToString());
+                if (isStatusBarPresent)
+                {
+                    StatusBar statusBar = StatusBar.GetForCurrentView();
+                    if (Config.GetBoolean(Config.HideStatusBar))
+                        statusBar.HideAsync();
+                    else
+                        statusBar.ShowAsync();
+                }
+
+            }
+
         }
 
         public TextBox GetInputBox()
@@ -233,12 +247,6 @@ namespace WinIRC
 
         private void ManageTitleBar()
         {
-            var isStatusBarPresent = ApiInformation.IsTypePresent(typeof(StatusBar).ToString());
-            if (isStatusBarPresent)
-            {
-                StatusBar statusBar = StatusBar.GetForCurrentView();
-                statusBar.HideAsync();
-            }
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;

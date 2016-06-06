@@ -81,6 +81,16 @@ namespace WinIRC
                 this.Padding.IsOn = false;
             }
 
+            if (Config.Contains(Config.HideStatusBar))
+            {
+                this.HideStatusBar.IsOn = Config.GetBoolean(Config.HideStatusBar);
+            }
+            else
+            {
+                Config.SetBoolean(Config.HideStatusBar, false);
+                this.HideStatusBar.IsOn = false;
+            }
+
             this.SettingsLoaded = true;
         }
 
@@ -121,6 +131,16 @@ namespace WinIRC
             if (!SettingsLoaded)
                 return;
             Config.SetBoolean(Config.ReducedPadding, Padding.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void HideStatusBar_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.HideStatusBar, HideStatusBar.IsOn);
 
             base.UpdateUi();
         }
