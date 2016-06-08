@@ -25,6 +25,7 @@ namespace WinIRC.Commands
             RegisterCommand("/part", PartCommandHandler);
             RegisterCommand("/quit", QuitCommandHandler);
             RegisterCommand("/query", QueryCommandHandler);
+            RegisterCommand("/msg", MsgCommandHandler);
             RegisterCommand("/whois", WhoisCommandHandler);
 
             RegisterCommand("/mode", ModeCommandHandler);
@@ -130,6 +131,22 @@ namespace WinIRC.Commands
 
             irc.WriteLine(kick);
         }
+
+        internal void MsgCommandHandler(Irc irc, string[] args)
+        {
+            if (args.Length < 3)
+            {
+                return;
+            }
+
+            var nick = args[1];
+            var msg = "PRIVMSG " + nick;
+
+            msg += " :" + String.Join(" ", args, 2, args.Length - 2);
+
+            irc.WriteLine(msg);
+        }
+
 
         internal void RawCommandHandler(Irc irc, string[] args)
         {
