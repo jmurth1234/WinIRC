@@ -320,6 +320,11 @@ namespace WinIRC
 
         private void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
+            {
+                return;
+            }
+
             if ((e.Key == Windows.System.VirtualKey.Enter) && (ircMsgBox.Text != ""))
             {
                 CommandHandler.HandleCommand(connectedServers[currentServer], ircMsgBox.Text);
