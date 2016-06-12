@@ -23,8 +23,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using WinIRC.Handlers;
 using WinIRC.Net;
-using WinRtUtility;
 
 namespace WinIRC
 {
@@ -199,6 +199,9 @@ namespace WinIRC
 
                 if (!qryStr.Contains("action")) return;
 
+                var ircHandler = IrcUiHandler.Instance;
+                if (ircHandler == null) return;
+
                 // See what action is being requested 
                 if (qryStr["action"] == "reply")
                 {
@@ -210,7 +213,7 @@ namespace WinIRC
 
                     var mainPage = (MainPage)rootFrame.Content;
 
-                    if (!mainPage.connectedServersList.Contains(server))
+                    if (!ircHandler.connectedServersList.Contains(server))
                     {
                         return;
                     }
@@ -231,7 +234,7 @@ namespace WinIRC
 
                     if (mainPage == null) return;
 
-                    if (!mainPage.connectedServersList.Contains(server))
+                    if (!ircHandler.connectedServersList.Contains(server))
                     {
                         return;
                     }

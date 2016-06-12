@@ -5,7 +5,6 @@
     "Microsoft.ApplicationInsights.WindowsApps": "1.0.0",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "NotificationsExtensions.Win10": "10586.0.0",
-    "ObjectStorageHelper": "5.0.0",
     "QueryString.NET": "1.0.0"
   },
   "frameworks": {

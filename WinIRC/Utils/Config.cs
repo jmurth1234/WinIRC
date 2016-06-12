@@ -17,6 +17,11 @@ namespace WinIRC
         public const string ReducedPadding = "reducedpadding";
         public const string HideStatusBar = "hidestatusbar";
 
+        // handles for server storage
+        public static string ServersStore = "serversstore";
+        public static string ServersListStore = "serversliststore";
+
+
         public static bool Contains(string key)
         {
             return roamingSettings.Values.ContainsKey(key);

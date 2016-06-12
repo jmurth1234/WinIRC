@@ -13,7 +13,6 @@ using Windows.ApplicationModel.Core;
 using Windows.UI;
 using System.Globalization;
 using System.Collections.ObjectModel;
-using WinRtUtility;
 using WinIRC.Net;
 using Windows.UI.Popups;
 using Windows.UI.Notifications;
@@ -23,6 +22,10 @@ using WinIRC.Commands;
 using System.Diagnostics;
 using WinIRC.Ui;
 using System.Threading.Tasks;
+using WinIRC.Views;
+using WinIRC.Handlers;
+using WinIRC.Utils;
+using Windows.Storage;
 
 namespace WinIRC
 {
@@ -36,8 +39,6 @@ namespace WinIRC
 
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
-        public Dictionary<string, Net.Irc> connectedServers { get; set; }
-        public ObservableCollection<String> connectedServersList { get; set; }
 
         public ObservableCollection<String> servers { get; set; }
         public List<Net.IrcServer> serversList { get; set; }
@@ -63,63 +64,18 @@ namespace WinIRC
 
         public CommandHandler CommandHandler { get; private set; }
 
-        public async void IrcPrompt(IrcServer server)
-        {
-            var dialog = new ContentDialog()
-            {
-                Title = "Join " + server.hostname,
-                RequestedTheme = ElementTheme.Dark,
-                //FullSizeDesired = true,
-                MaxWidth = this.ActualWidth // Required for Mobile!
-            };
-
-            // Setup Content
-            var panel = new StackPanel();
-
-            panel.Children.Add(new TextBlock
-            {
-                Text = "To connect to this irc server, enter in a username first.",
-                TextWrapping = TextWrapping.Wrap,
-                Padding = new Thickness
-                {
-                    Bottom = 8,
-                },
-            });
-
-            var username = new TextBox
-            {
-                PlaceholderText = "Username",
-                Text = "winircuser-" + (new Random()).Next(100, 1000)
-            };
-
-            panel.Children.Add(username);
-            dialog.Content = panel;
-
-            // Add Buttons
-            dialog.PrimaryButtonText = "Join";
-            dialog.PrimaryButtonClick += delegate
-            {
-                server.username = username.Text;
-
-                var irc = new Net.IrcSocket();
-                irc.server = server;
-                MainPage.instance.Connect(irc);
-            };
-
-            dialog.SecondaryButtonText = "Cancel";
-            dialog.ShowAsync();
-        }
+        internal IrcUiHandler IrcHandler { get; private set; }
 
         public static MainPage instance;
 
         public MainPage()
         {
             this.InitializeComponent();
-            this.LoadSettings();
-            this.DataContext = this;
+            this.IrcHandler = new IrcUiHandler();
 
-            connectedServers = new Dictionary<string, Net.Irc>();
-            connectedServersList = new ObservableCollection<string>();
+            this.LoadSettings();
+
+            this.DataContext = IrcHandler;
 
             currentChannel = "";
             currentServer = "";
@@ -136,7 +92,7 @@ namespace WinIRC
             SidebarFrame.Navigated += SidebarFrame_Navigated;
 
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
-            this.CommandHandler = new CommandHandler();
+            this.CommandHandler = IrcHandler.CommandHandler;
 
             var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
 
@@ -172,7 +128,7 @@ namespace WinIRC
                 this.RequestedTheme = ElementTheme.Dark;
             }
 
-            ManageTitleBar();
+            IrcHandler.ManageTitleBar();
             SettingsLoaded = true;
 
         }
@@ -229,9 +185,7 @@ namespace WinIRC
                     else
                         statusBar.ShowAsync();
                 }
-
             }
-
         }
 
         public TextBox GetInputBox()
@@ -244,38 +198,31 @@ namespace WinIRC
             return channelList;
         }
 
-
-        private void ManageTitleBar()
-        {
-            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-
-            var darkTheme = Config.GetBoolean(Config.DarkTheme);
-
-            var background = darkTheme ? ParseColor("#FF1F1F1F") : ParseColor("#FFE6E6E6");
-            var backgroundInactive = darkTheme ? ParseColor("#FF2B2B2B") : ParseColor("#FFF2F2F2");
-            var foreground = darkTheme ? ParseColor("#FFFFFFFF") : ParseColor("#FF000000");
-
-            titleBar.BackgroundColor = background;
-            titleBar.InactiveBackgroundColor = backgroundInactive;
-            titleBar.ButtonHoverBackgroundColor = backgroundInactive;
-            titleBar.ButtonBackgroundColor = background;
-            titleBar.ButtonInactiveBackgroundColor = backgroundInactive;
-            titleBar.ButtonForegroundColor = foreground;
-        }
-
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            serversCombo.ItemsSource = connectedServersList;
-
             try
             {
                 serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-                servers = await serversOSH.LoadAsync();
-
                 serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-                serversList = await serversListOSH.LoadAsync();
+
+                var folder = serversOSH.GetFolder(StorageType.Roaming);
+
+                if (await serversOSH.FileExists(folder, "migrated"))
+                {
+                    servers = await serversOSH.LoadAsync(Config.ServersStore);
+                    serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+                }
+                else
+                {
+                    servers = await serversOSH.LoadAsync();
+                    await serversOSH.MigrateAsync(servers, Config.ServersStore);
+
+                    serversList = await serversListOSH.LoadAsync();
+                    await serversListOSH.MigrateAsync(serversList, Config.ServersListStore);
+
+                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+                }
+
             }
             catch (Exception ex)
             {
@@ -284,8 +231,6 @@ namespace WinIRC
             }
 
             UpdateUi();
-
-            serversSavedCombo.ItemsSource = servers;
         }
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
@@ -306,11 +251,16 @@ namespace WinIRC
                 this.mainGrid.Margin = new Thickness(0, -48, 0, args.OccludedRect.Height);
                 args.EnsuredFocusedElementInView = true;
             }
-            ScrollToBottom();
+            ScrollToBottom(currentServer, currentChannel);
         }
 
-        private async void ScrollToBottom()
+        internal async void ScrollToBottom(string server, string channel)
         {
+            if (channel != currentChannel || server != currentServer)
+            {
+                return;
+            }
+
             if (messagesScroll != null)
             {
                 await Task.Delay(1); // wait a millisecond to render first
@@ -318,66 +268,25 @@ namespace WinIRC
             }
         }
 
-        private void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        public void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
             {
                 return;
             }
 
-            if ((e.Key == Windows.System.VirtualKey.Enter) && (ircMsgBox.Text != ""))
-            {
-                CommandHandler.HandleCommand(connectedServers[currentServer], ircMsgBox.Text);
-
-                ircMsgBox.Text = "";
-            }
-            else if ((e.Key == Windows.System.VirtualKey.Tab) && (ircMsgBox.Text != ""))
-            {
-                e.Handled = true;
-
-                TabComplete();
-            }
+            IrcHandler.IrcTextBoxHandler(ircMsgBox, e, currentServer, currentChannel);
         }
 
-        private void TabComplete()
-        {
-            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "") 
-            {
-                return;
-            }
-
-            var users = connectedServers[currentServer].GetRawUsers(currentChannel);
-            var words = ircMsgBox.Text.Split(' ');
-            var word = words[words.Length - 1];
-            var isFirst = (words.Length == 1);
-
-            if (word.Length == 0)
-                return;
-
-            foreach (var user in users)
-            {
-                if (user.StartsWith(word))
-                {
-                    if (isFirst)
-                    {
-                        ircMsgBox.Text = user + ": ";
-                    }
-                    else
-                    {
-                        words[words.Length - 1] = words[words.Length - 1].Replace(word, user);
-                        ircMsgBox.Text = String.Join(" ", words) + " ";
-                    }
-                    ircMsgBox.SelectionStart = ircMsgBox.Text.Length;
-                    ircMsgBox.SelectionLength = 0;
-                    ircMsgBox.Focus(FocusState.Keyboard);
-                    break;
-                }
-            }
-        }
 
         private void TabButton_Clicked(object sender, RoutedEventArgs e)
         {
-            TabComplete();
+            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
+            {
+                return;
+            }
+
+            IrcHandler.TabComplete(ircMsgBox, currentServer, currentChannel);
         }
 
         private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -389,7 +298,7 @@ namespace WinIRC
 
                 var channel = channelList.SelectedItem.ToString();
                 SwitchChannel(currentServer, channel);
-                UpdateUsers();
+                IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
             }
             catch (Exception ex)
             {
@@ -406,28 +315,32 @@ namespace WinIRC
                 serversCombo.SelectedItem = server;
             }
 
-            connectedServers[currentServer].SwitchChannel(channel);
+            IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
             currentChannel = channel;
-            messagesView.ItemsSource = connectedServers[currentServer].channelBuffers[channel];
-            connectedServers[currentServer].channelBuffers[channel].CollectionChanged += (s, args) => ScrollToBottom();
-            ScrollToBottom();
+            messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[channel];
+
+            IrcHandler.connectedServers[currentServer].channelBuffers[channel].CollectionChanged += (s, args) => {
+                ScrollToBottom(server, channel);
+            };
+
+            ScrollToBottom(server, channel);
 
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
 
             channelList.SelectedValue = channel;
-            if (connectedServers[currentServer].GetChannelTopic(channel) != null)
-                TopicText.Text = connectedServers[currentServer].GetChannelTopic(channel);
+            if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
+                TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
         }
 
         public Irc GetCurrentServer()
         {
-            return connectedServers[currentServer];
+            return IrcHandler.connectedServers[currentServer];
         }
 
         public void MentionReply(string ircserver, string channel, string message)
         {
-            connectedServers[ircserver].MentionReply(channel, message);
+            IrcHandler.connectedServers[ircserver].MentionReply(channel, message);
         }
 
         private void ToggleSplitView(object sender, RoutedEventArgs e)
@@ -442,49 +355,17 @@ namespace WinIRC
 
         private void ConnectDialog_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!(ConnectFrame.Content is ConnectView))
+                ConnectFrame.Navigate(typeof(ConnectView));
+
             serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
             serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
         }
 
-        private void CloseDialogClick(object sender, RoutedEventArgs e)
-        {
-            serverConnect.IsOpen = !serverConnect.IsOpen;
-        }
-
-        private void ConnectButtonClick(object sender, RoutedEventArgs e)
-        {
-            if (connectedServersList.Contains(server.Text) || connectedServersList.Contains(hostname.Text))
-            {
-                serverConnect.IsOpen = !serverConnect.IsOpen;
-                return;
-            }
-
-            // create the irc object 
-            var ircServer = CreateIrcServer();
-
-            if (ircServer.invalid)
-            {
-                return;
-            }
-
-            Net.Irc irc;
-            if (webSocket.IsOn)
-                irc = new Net.IrcWebSocket();
-            else
-                irc = new Net.IrcSocket();
-
-            irc.server = ircServer;
-
-            Connect(irc);
-
-            // close the dialog
-            serverConnect.IsOpen = !serverConnect.IsOpen;
-        }
-
         public void Connect(Irc irc)
         {
-            if (connectedServersList.Contains(irc.server.name)) return;
-            if (connectedServersList.Contains(irc.server.hostname)) return;
+            if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
+            if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
 
             irc.HandleDisconnect += HandleDisconnect;
 
@@ -492,11 +373,11 @@ namespace WinIRC
             irc.Connect();
 
             // link the server up to the lists
-            connectedServers.Add(irc.server.name, irc);
-            connectedServersList.Add(irc.server.name);
+            IrcHandler.connectedServers.Add(irc.server.name, irc);
+            IrcHandler.connectedServersList.Add(irc.server.name);
             serversCombo.SelectedItem = irc.server.name;
             currentServer = irc.server.name;
-            channelList.ItemsSource = connectedServers[currentServer].channelList;
+            channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
         }
 
         private void serversList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -505,233 +386,31 @@ namespace WinIRC
                 return;
 
             currentServer = serversCombo.SelectedItem.ToString();
-            channelList.ItemsSource = connectedServers[currentServer].channelList;
-            if (connectedServers[currentServer].channelList.Contains("Server"))
+            channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
+            if (IrcHandler.connectedServers[currentServer].channelList.Contains("Server"))
                 SwitchChannel(currentServer, "Server");
-            UpdateUsers(true);
-        }
 
-        private void SaveButtonClick(object sender, RoutedEventArgs e)
-        {
-            var ircServer = CreateIrcServer();
-
-            if (ircServer.invalid)
-            {
-                return;
-            }
-
-            if (servers == null)
-            {
-                servers = new ObservableCollection<string>();
-                serversList = new List<IrcServer>();
-                serversSavedCombo.ItemsSource = servers;
-            }
-
-            foreach (var serverCheck in serversList)
-            {
-                if (serverCheck.name == server.Text)
-                {
-                    var name = serverCheck.name;
-                    serversList.Remove(serverCheck);
-                    servers.Remove(name);
-
-                    serversListOSH.SaveAsync(serversList);
-                    serversOSH.SaveAsync(servers);
-                    break;
-                }
-            }
-
-            servers.Add(ircServer.name);
-            serversList.Add(ircServer);
-
-            serversSavedCombo.SelectedItem = ircServer.name;
-
-            serversListOSH.SaveAsync(serversList);
-            serversOSH.SaveAsync(servers);
-        }
-
-        internal IrcServer CreateIrcServer()
-        {
-            Net.IrcServer ircServer = new Net.IrcServer();
-
-            if (hostname.Text == "")
-            {
-                return ShowFormError("No hostname entered!");
-            }
-
-            if (Uri.CheckHostName(hostname.Text) == UriHostNameType.Unknown)
-            {
-                return ShowFormError("Hostname is incorrect!");
-            }
-
-            int portInt;
-
-            if (port.Text == "")
-            {
-                return ShowFormError("No port entered!");
-            }
-
-            if (!int.TryParse(port.Text, out portInt))
-            {
-                return ShowFormError("Port is not a number!");
-            }
-
-            if (username.Text == "")
-            {
-                return ShowFormError("No username entered!");
-            }
-
-            if (username.Text.Contains(" "))
-            {
-                return ShowFormError("Usernames cannot contain spaces!");
-            }
-
-            ircServer.hostname = hostname.Text;
-            ircServer.port = portInt;
-            ircServer.ssl = ssl.IsOn;
-            ircServer.username = username.Text;
-            ircServer.password = password.Password;
-            ircServer.name = server.Text;
-            ircServer.webSocket = webSocket.IsOn;
-            ircServer.channels = channels.Text;
-            ircServer.invalid = false;
-
-            formError.Height = 0;
-
-            if (ircServer.name == "") ircServer.name = ircServer.hostname;
-
-            return ircServer;
-        }
-
-        // kek
-        private IrcServer ShowFormError(string error)
-        {
-            formError.Height = 19;
-            formError.Text = error;
-            return new IrcServer
-            {
-                invalid = true
-            };
-        }
-
-        private void DeleteButtonClick(object sender, RoutedEventArgs e)
-        {
-            if (serversSavedCombo.SelectedItem == null) return; 
-            foreach (var ircServer in serversList)
-            {
-                if (ircServer.name == serversSavedCombo.SelectedItem.ToString())
-                {
-                    var name = ircServer.name;
-                    serversList.Remove(ircServer);
-                    servers.Remove(name);
-
-                    serversListOSH.SaveAsync(serversList);
-                    serversOSH.SaveAsync(servers);
-                    break;
-                }
-            }
-        }
-
-        private async void savedServersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            loadedSavedServer = true;
-            if (serversSavedCombo.SelectedItem == null)
-            {
-                return;
-            }
-
-            if (serversList == null)
-            {
-                var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them");
-                await dialog.ShowAsync();
-
-                servers = new ObservableCollection<string>();
-                serversList = new List<IrcServer>();
-                serversSavedCombo.ItemsSource = servers;
-                return;
-            }
-
-            if (!serversList.Any(server => server.name == serversSavedCombo.SelectedItem.ToString())) return;
-            var ircServer = serversList.First(server => server.name == serversSavedCombo.SelectedItem.ToString());
-
-            hostname.Text = ircServer.hostname;
-
-            port.Text = ircServer.port.ToString();
-            ssl.IsOn = ircServer.ssl;
-            username.Text = ircServer.username;
-            password.Password = ircServer.password;
-            server.Text = ircServer.name;
-            webSocket.IsOn = ircServer.webSocket;
-            if (ircServer.channels != null)
-                channels.Text = ircServer.channels;               
-
-        }
-
-        private Color ParseColor(string hexCode)
-        {
-            var color = new Color();
-            color.A = byte.Parse(hexCode.Substring(1, 2), NumberStyles.AllowHexSpecifier);
-            color.R = byte.Parse(hexCode.Substring(3, 2), NumberStyles.AllowHexSpecifier);
-            color.G = byte.Parse(hexCode.Substring(5, 2), NumberStyles.AllowHexSpecifier);
-            color.B = byte.Parse(hexCode.Substring(7, 2), NumberStyles.AllowHexSpecifier);
-            return color;
+            IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel, true);
         }
 
         public async void HandleDisconnect(Irc irc)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                if (connectedServersList.Count > 1)
+                if (IrcHandler.connectedServersList.Count > 1)
                 {
-                    serversCombo.SelectedItem = connectedServersList[0];
-                    currentServer = connectedServersList[0];
-                    channelList.ItemsSource = connectedServers.Values.First().channelList;
+                    serversCombo.SelectedItem = IrcHandler.connectedServersList[0];
+                    currentServer = IrcHandler.connectedServersList[0];
+                    channelList.ItemsSource = IrcHandler.connectedServers.Values.First().channelList;
                 }
 
-                connectedServers.Remove(irc.server.name);
-                connectedServersList.Remove(irc.server.name);
+                IrcHandler.connectedServers.Remove(irc.server.name);
+                IrcHandler.connectedServersList.Remove(irc.server.name);
                 channelList.ItemsSource = null;
                 messagesView.ItemsSource = null;
             });
         }
 
-        private async void webSocket_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (loadedSavedServer)
-                return;
-
-            if (webSocket.IsOn)
-            {
-                // Create the message dialog and set its content
-                var messageDialog = new MessageDialog("To use this feature, you'll need to setup an IRCForwarder on a server to forward an irc server to a websocket.");
-
-                // Add commands and set their callbacks; both buttons use the same callback function instead of inline event handlers
-                messageDialog.Commands.Add(new UICommand(
-                    "Show Me How",
-                    new UICommandInvokedHandler(this.CommandInvokedHandler)));
-                messageDialog.Commands.Add(new UICommand(
-                    "Close",
-                    new UICommandInvokedHandler(this.CommandInvokedHandler)));
-
-                // Set the command that will be invoked by default
-                messageDialog.DefaultCommandIndex = 0;
-
-                // Set the command to be invoked when escape is pressed
-                messageDialog.CancelCommandIndex = 1;
-
-                // Show the message dialog
-                await messageDialog.ShowAsync();
-            }
-        }
-
-        private async void CommandInvokedHandler(IUICommand command)
-        {
-            if (command.Label == "Show Me How")
-            {
-                var uri = new Uri("https://rymate.co.uk/using-ircforwarder");
-                await Windows.System.Launcher.LaunchUriAsync(uri);
-            }
-        }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -752,40 +431,16 @@ namespace WinIRC
 
         private void PeopleButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentChannel == "" || currentServer == "" || !connectedServers.ContainsKey(currentServer))
+            if (currentChannel == "" || currentServer == "" || !IrcHandler.connectedServers.ContainsKey(currentServer))
             {
                 return;
             }
             SidebarFrame.BackStack.Clear();
             SidebarHeader.ShowBackButton = false;
 
-            UpdateUsers();
+            IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
             SidebarHeader.Title = "Channel Users";
             ToggleSidebar();
-        }
-
-        private void UpdateUsers(bool clear = false)
-        {
-            if (currentChannel == "" || currentServer == "" || !connectedServers.ContainsKey(currentServer))
-            {
-                return;
-            }
-
-            var users = new ObservableCollection<string>();
-
-            if (!clear)
-                users = connectedServers[currentServer].GetChannelUsers(currentChannel);
-
-            if (!(SidebarFrame.Content is UsersView))
-            {
-                SidebarFrame.Navigate(typeof(UsersView));
-            }
-
-            var usersView = (UsersView)SidebarFrame.Content;
-
-            if (usersView != null)
-                usersView.UpdateUsers(users);
-
         }
 
         private void PinSidebar(object sender, RoutedEventArgs e)
@@ -856,6 +511,58 @@ namespace WinIRC
             var channel = channelArgs.Channel;
 
             GetCurrentServer().JoinChannel(channel);
+        }
+
+        internal void CloseConnectView()
+        {
+            serverConnect.IsOpen = !serverConnect.IsOpen;
+        }
+
+        public async void IrcPrompt(IrcServer server)
+        {
+            var dialog = new ContentDialog()
+            {
+                Title = "Join " + server.hostname,
+                RequestedTheme = ElementTheme.Dark,
+                //FullSizeDesired = true,
+                MaxWidth = this.ActualWidth // Required for Mobile!
+            };
+
+            // Setup Content
+            var panel = new StackPanel();
+
+            panel.Children.Add(new TextBlock
+            {
+                Text = "To connect to this irc server, enter in a username first.",
+                TextWrapping = TextWrapping.Wrap,
+                Padding = new Thickness
+                {
+                    Bottom = 8,
+                },
+            });
+
+            var username = new TextBox
+            {
+                PlaceholderText = "Username",
+                Text = "winircuser-" + (new Random()).Next(100, 1000)
+            };
+
+            panel.Children.Add(username);
+            dialog.Content = panel;
+
+            // Add Buttons
+            dialog.PrimaryButtonText = "Join";
+            dialog.PrimaryButtonClick += delegate
+            {
+                server.username = username.Text;
+
+                var irc = new Net.IrcSocket();
+                irc.server = server;
+                MainPage.instance.Connect(irc);
+            };
+
+            dialog.SecondaryButtonText = "Cancel";
+            dialog.ShowAsync();
         }
 
     }

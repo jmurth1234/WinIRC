@@ -42,7 +42,7 @@
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240">
             <SplitView.Pane>
                 <Grid>
-                    <ComboBox x:Name="serversCombo" Height="48" HorizontalAlignment="Stretch" PlaceholderText="Currently not connected" SelectionChanged="serversList_SelectionChanged" Style="{StaticResource CustomComboBox}"/>
+                    <ComboBox x:Name="serversCombo" ItemsSource="{Binding connectedServersList}" Height="48" HorizontalAlignment="Stretch" PlaceholderText="Currently not connected" SelectionChanged="serversList_SelectionChanged" Style="{StaticResource CustomComboBox}"/>
                     <ScrollViewer Margin="0,48,0,0">
                         <ListBox x:Name="channelList" ItemsSource="{Binding}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}" >
                             <ListBox.ItemTemplate>
@@ -92,7 +92,7 @@
                                     </AppBarButton>
                                 </CommandBar.Content>
                                 <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Add" ToolTipService.ToolTip="Connect" Click="ShowConnectPopup"/>
-                                <AppBarSeparator />
+                                <AppBarSeparator Width="32" Margin="-10,0" />
                                 <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Important" ToolTipService.ToolTip="Channel Topic">
                                     <AppBarButton.Flyout>
                                         <Flyout x:Name="ChannelInfoFlyout" Placement="Left">
@@ -148,47 +148,7 @@
                 </TransitionCollection>
             </Popup.ChildTransitions>
             <Grid Height="Auto" Width="Auto" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
-                <Grid Margin="0" Background="{ThemeResource SystemChromeMediumColor}" Height="44" VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0" x:Name="CloseButton"  Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" Click="CloseDialogClick" />
-                    <Grid Background="{ThemeResource SystemChromeMediumColor}" Grid.Column="1" >
-                        <TextBlock Text="Connect" Style="{StaticResource AppTitleTextBlockStyle}" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" />
-                    </Grid>
-                    <Button Grid.Column="2" x:Name="SaveButton"  Content="&#xE105;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Save Server" Click="SaveButtonClick" />
-                    <Button Grid.Column="3" x:Name="DeleteButton"  Content="&#xE107;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Remove Server" Click="DeleteButtonClick" />
-                    <Button Grid.Column="4" x:Name="ConnectButton"  Content="&#xE122;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Connect" Click="ConnectButtonClick" />
-
-                </Grid>
-
-                <StackPanel Orientation="Vertical"  x:Name="pop" BorderThickness="0" Margin="0,44,0,0" Padding="10,0" >
-                    <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,10"/>
-
-                    <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
-
-                    <TextBox  x:Name="server"  Margin="5,10"  Width="290" PlaceholderText="Server Name"  />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,10" >
-                        <TextBox x:Name="hostname" IsSpellCheckEnabled="True" Margin="5,1" Width="190" InputScope="Url" PlaceholderText="Hostname or IP"/>
-                        <TextBox x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" Width="90" InputScope="Number" PlaceholderText="Port"/>
-                    </StackPanel>
-
-                    <ToggleSwitch Margin="5,1" x:Name="ssl" OffContent="Insecure Connection" OnContent="Secure Connection"  />
-
-                    <TextBox  x:Name="username"  Margin="5,10"  Width="290" PlaceholderText="Username"  />
-                    <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,10"  Width="290" PlaceholderText="Server Password" />
-
-                    <TextBox x:Name="channels"  Margin="5,10"  Width="290" PlaceholderText="Channels to Join"  />
-
-                    <ToggleSwitch Margin="5,1" x:Name="webSocket" OffContent="Direct IRC Connection" OnContent="Connect via Websocket" Toggled="webSocket_Toggled" />
-
-                </StackPanel>
+                <Frame x:Name="ConnectFrame" />
             </Grid>
         </Popup>
 
