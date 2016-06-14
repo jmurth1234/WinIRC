@@ -17,7 +17,7 @@ WinIRC is a C# IRC Client for Windows 10. It's written as a UWP application, so 
 
 For autoupdating, the easiest way to get it is from the [Microsoft Store](https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf). 
 
-If you downloaded the sideloadable package, make sure you enabled developer mode in `Settings -> Update & Security -> For developers -> Developer mode`. Once this is done, extract the zip to a new folder, right click the powershell file and click "Run with PowerShell"
+If you downloaded the sideloadable package, make sure you enabled developer mode in `Settings -> Update & Security -> For developers -> Developer mode`. Once this is done, on the latest insider builds and on Windows 10 phones you should be able to double click the appxbundle to install it.
 
 ## Building from source
 
