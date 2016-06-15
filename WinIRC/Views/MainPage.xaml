@@ -109,32 +109,8 @@
                                 </CommandBar.SecondaryCommands>
                             </CommandBar>
 
-                            <Grid Margin="0,48,0,0">
-                                <ScrollViewer Canvas.ZIndex="0" x:Name="messagesScroll" Margin="5,0,5,48" VerticalScrollMode="Enabled" >
-                                    <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock IsTextSelectionEnabled="True" ui:HyperlinkedTextBlock.Text="{Binding messageText}" TextWrapping="WrapWholeWords" LineHeight="8" Foreground="{Binding messageColour}" FontStyle="{Binding messageFormat}"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Vertical"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
-                                </ScrollViewer>
+                            <Frame x:Name="ChannelFrame" Margin="0,48,0,0" />
 
-                                <Grid Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <Button Grid.Column="0" x:Name="TabButton"  Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="20" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" />
-
-                                    <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
-                                </Grid>
-                            </Grid>
                         </Grid>
                     </SplitView.Content>
                 </SplitView>

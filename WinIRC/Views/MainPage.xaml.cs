@@ -94,17 +94,6 @@ namespace WinIRC
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
             this.CommandHandler = IrcHandler.CommandHandler;
 
-            var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
-
-            if (uiMode == Windows.UI.ViewManagement.UserInteractionMode.Touch)
-            {
-                TabButton.Width = 48;
-            }
-            else
-            {
-                TabButton.Width = 0;
-            }
-
             instance = this;
         }
 
@@ -135,16 +124,6 @@ namespace WinIRC
 
         internal void UpdateUi()
         {
-            if (Config.Contains(Config.FontFamily))
-            {
-                this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
-            }
-
-            if (Config.Contains(Config.FontSize))
-            {
-                this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
-            }
-
             if (Config.Contains(Config.ReducedPadding))
             {
                 Thickness padding = new Thickness();
@@ -188,9 +167,14 @@ namespace WinIRC
             }
         }
 
+        public ChannelView GetCurrentChannelView()
+        {
+            return ChannelFrame.Content as ChannelView;
+        }
+
         public TextBox GetInputBox()
         {
-            return ircMsgBox;
+            return GetCurrentChannelView().GetInputBox(); ;
         }
 
         public ListBox GetChannelList()
@@ -202,6 +186,8 @@ namespace WinIRC
         {
             try
             {
+                ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
+
                 serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
                 serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
 
@@ -246,47 +232,12 @@ namespace WinIRC
 
         private void InputPaneShowing(InputPane sender, InputPaneVisibilityEventArgs args)
         {
-            if (ircMsgBox.FocusState != FocusState.Unfocused)
+            if (GetInputBox().FocusState != FocusState.Unfocused)
             {
                 this.mainGrid.Margin = new Thickness(0, -48, 0, args.OccludedRect.Height);
                 args.EnsuredFocusedElementInView = true;
             }
-            ScrollToBottom(currentServer, currentChannel);
-        }
-
-        internal async void ScrollToBottom(string server, string channel)
-        {
-            if (channel != currentChannel || server != currentServer)
-            {
-                return;
-            }
-
-            if (messagesScroll != null)
-            {
-                await Task.Delay(1); // wait a millisecond to render first
-                messagesScroll.ChangeView(null, messagesScroll.ScrollableHeight, null, false);
-            }
-        }
-
-        public void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
-            {
-                return;
-            }
-
-            IrcHandler.IrcTextBoxHandler(ircMsgBox, e, currentServer, currentChannel);
-        }
-
-
-        private void TabButton_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
-            {
-                return;
-            }
-
-            IrcHandler.TabComplete(ircMsgBox, currentServer, currentChannel);
+            GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
         }
 
         private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -317,13 +268,8 @@ namespace WinIRC
 
             IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
             currentChannel = channel;
-            messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[channel];
 
-            IrcHandler.connectedServers[currentServer].channelBuffers[channel].CollectionChanged += (s, args) => {
-                ScrollToBottom(server, channel);
-            };
-
-            ScrollToBottom(server, channel);
+            ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
 
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
@@ -407,7 +353,7 @@ namespace WinIRC
                 IrcHandler.connectedServers.Remove(irc.server.name);
                 IrcHandler.connectedServersList.Remove(irc.server.name);
                 channelList.ItemsSource = null;
-                messagesView.ItemsSource = null;
+                ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
             });
         }
 
