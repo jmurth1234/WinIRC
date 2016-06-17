@@ -90,7 +90,7 @@
                                 <Pivot.Resources>
                                     <DataTemplate x:Key="TabTemplate">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding}" FontSize="16" VerticalAlignment="Center" Margin="0,-4,5,0"  />
+                                            <TextBlock Text="{Binding}"  MaxWidth="150" FontSize="16" VerticalAlignment="Center" Margin="0,-4,5,0"  />
                                             <Button x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="12" >
                                                 <Button.Flyout>
                                                     <Flyout Placement="Bottom">
