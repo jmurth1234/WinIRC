@@ -82,15 +82,52 @@
                         </Grid>
                     </SplitView.Pane>
                     <SplitView.Content>
-                        <Grid>
-                            <CommandBar Height="48" VerticalAlignment="Top" ClosedDisplayMode="Compact">
-                                <CommandBar.Content>
-                                    <AppBarButton Height="48" x:Name="HamburgerButton" Style="{StaticResource AppbarButtonStyle}" Click="ToggleSplitView" >
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xE700;" FontWeight="Bold" />
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                </CommandBar.Content>
+                        <Grid x:Name="MainGrid">
+
+                            <Rectangle VerticalAlignment="Top" Height="48" Fill="{ThemeResource SystemChromeMediumColor}" />
+
+                            <Pivot x:Name="Tabs" >
+                                <Pivot.Resources>
+                                    <DataTemplate x:Key="TabTemplate">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding}" FontSize="16" VerticalAlignment="Center" Margin="0,-4,5,0"  />
+                                            <Button x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="12" >
+                                                <Button.Flyout>
+                                                    <Flyout Placement="Bottom">
+                                                        <StackPanel Width="240">
+                                                            <TextBlock Text="Are you sure you want to close this tab? This won't leave the channel." Margin="0,0,0,10" TextWrapping="Wrap"/>
+                                                            <Button Click="CloseTab_Click" Content="Close Tab" Background="{ThemeResource SystemControlForegroundAccentBrush}" />
+                                                        </StackPanel>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </Pivot.Resources>
+                                <Pivot.HeaderTemplate>
+                                    <StaticResource ResourceKey="TabTemplate"/>
+                                </Pivot.HeaderTemplate>
+
+                                <Pivot.LeftHeader>
+                                    <Grid>
+                                        <Button x:Name="HamburgerButton" Style="{StaticResource IconButtonStyle}" Click="ToggleSplitView">
+                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE700;" />
+                                        </Button>
+                                    </Grid>
+                                </Pivot.LeftHeader>
+
+                                <Pivot.RightHeader>
+                                    <Grid x:Name="RightGrid" >
+                                        <Button x:Name="MenuButton" Style="{StaticResource IconButtonStyle}" Click="MenuButton_Click">
+                                            <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE10C;" FontSize="16" />
+                                        </Button>
+                                    </Grid>
+                                </Pivot.RightHeader>
+
+                            </Pivot>
+
+                            <CommandBar x:Name="MenuBar" Height="48" VerticalAlignment="Top" ClosedDisplayMode="Compact">
+
                                 <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Add" ToolTipService.ToolTip="Connect" Click="ShowConnectPopup"/>
                                 <AppBarSeparator Width="32" Margin="-10,0" />
                                 <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Important" ToolTipService.ToolTip="Channel Topic">
@@ -108,8 +145,6 @@
                                     <AppBarButton Label="Settings" Click="SettingsButton_Click"/>
                                 </CommandBar.SecondaryCommands>
                             </CommandBar>
-
-                            <Frame x:Name="ChannelFrame" Margin="0,48,0,0" />
 
                         </Grid>
                     </SplitView.Content>

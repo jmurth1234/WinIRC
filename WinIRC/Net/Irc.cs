@@ -508,7 +508,7 @@ namespace WinIRC.Net
 
             if (channelList.Contains(channel) && Config.GetBoolean(Config.SwitchOnJoin))
             {
-                MainPage.instance.GetChannelList().SelectedItem = channel;
+                MainPage.instance.SwitchChannel(server.name, channel, true);
             }
 
             return channelList.Contains(channel);

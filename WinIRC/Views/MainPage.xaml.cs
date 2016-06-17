@@ -67,6 +67,7 @@ namespace WinIRC
         internal IrcUiHandler IrcHandler { get; private set; }
 
         public static MainPage instance;
+        private bool lastAuto;
 
         public MainPage()
         {
@@ -86,15 +87,54 @@ namespace WinIRC
             var inputPane = InputPane.GetForCurrentView();
             inputPane.Showing += this.InputPaneShowing;
             inputPane.Hiding += this.InputPaneHiding;
+            SizeChanged += MainPage_SizeChanged;
 
             Window.Current.SizeChanged += Current_SizeChanged;
-
+            UpdateSize();
             SidebarFrame.Navigated += SidebarFrame_Navigated;
 
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
             this.CommandHandler = IrcHandler.CommandHandler;
 
             instance = this;
+        }
+
+        private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var size = e.NewSize;
+            var old = e.PreviousSize;
+
+            if (size.Width == old.Width) return;
+
+            if (size.Width >= 720 && old.Width < 720)
+            {
+                MainGrid.Children.Remove(MenuBar);
+                RightGrid.Children.Add(MenuBar);
+
+                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
+            }
+            else if (size.Width < 720 && old.Width >= 720)
+            {
+                RightGrid.Children.Remove(MenuBar);
+                MainGrid.Children.Add(MenuBar);
+
+                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Hidden;
+            }
+        }
+
+        private void UpdateSize()
+        {
+            var size = Window.Current.Bounds;
+
+            if (size.Width >= 720)
+            {
+                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
+            }
+            else if (size.Width < 720)
+            {
+                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Hidden;
+                MenuBar.IsOpen = true;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -167,9 +207,15 @@ namespace WinIRC
             }
         }
 
+        public PivotItem GetCurrentItem()
+        {
+            return Tabs.SelectedItem as PivotItem;
+        }
+
         public ChannelView GetCurrentChannelView()
         {
-            return ChannelFrame.Content as ChannelView;
+            var item = GetCurrentItem().Content as Frame;
+            return item.Content as ChannelView;
         }
 
         public TextBox GetInputBox()
@@ -186,7 +232,7 @@ namespace WinIRC
         {
             try
             {
-                ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
+                //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
 
                 serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
                 serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
@@ -248,7 +294,7 @@ namespace WinIRC
                     return;
 
                 var channel = channelList.SelectedItem.ToString();
-                SwitchChannel(currentServer, channel);
+                SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
             }
             catch (Exception ex)
@@ -259,7 +305,7 @@ namespace WinIRC
             }
         }
 
-        public void SwitchChannel(string server, string channel)
+        public void SwitchChannel(string server, string channel, bool auto)
         {
             if (currentServer != server)
             {
@@ -269,12 +315,40 @@ namespace WinIRC
             IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
             currentChannel = channel;
 
-            ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
+            //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
+
+            if ((auto || lastAuto) && (GetCurrentItem() != null))
+            {
+                var item = GetCurrentItem();
+                var frame = item.Content as Frame;
+                lastAuto = auto;
+
+                item.Header = channel;
+                frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+            }
+            else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
+            {
+                Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item => item.Header as string == channel);
+            }
+            else
+            {
+                PivotItem p = new PivotItem();
+                p.Header = channel;
+                Frame frame = new Frame();
+
+                p.Margin = new Thickness(0, 0, 0, -2);
+
+                p.Content = frame;
+                Tabs.Items.Add(p);
+                Tabs.SelectedIndex = Tabs.Items.Count - 1;
+                frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+            }
+
 
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
 
-            channelList.SelectedValue = channel;
+            //channelList.SelectedValue = channel;
             if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
                 TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
         }
@@ -334,7 +408,7 @@ namespace WinIRC
             currentServer = serversCombo.SelectedItem.ToString();
             channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
             if (IrcHandler.connectedServers[currentServer].channelList.Contains("Server"))
-                SwitchChannel(currentServer, "Server");
+                SwitchChannel(currentServer, "Server", false);
 
             IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel, true);
         }
@@ -353,7 +427,7 @@ namespace WinIRC
                 IrcHandler.connectedServers.Remove(irc.server.name);
                 IrcHandler.connectedServersList.Remove(irc.server.name);
                 channelList.ItemsSource = null;
-                ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
+                //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
             });
         }
 
@@ -511,6 +585,15 @@ namespace WinIRC
             dialog.ShowAsync();
         }
 
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            MenuBar.IsOpen = true;
+        }
+
+        private void CloseTab_Click(object sender, RoutedEventArgs e)
+        {
+            Tabs.Items.Remove(GetCurrentItem());
+        }
     }
 
 }

@@ -222,7 +222,7 @@ namespace WinIRC
                         mainPage.MentionReply(server, channel, username + ": " + message);
 
                     if (!mainPage.currentChannel.Equals(channel))
-                        mainPage.SwitchChannel(server, channel);
+                        mainPage.SwitchChannel(server, channel, false);
                 }
                 else if (qryStr["action"] == "viewConversation")
                 { 
@@ -241,7 +241,7 @@ namespace WinIRC
 
                     // If we're already viewing that channel, do nothing
                     if (!mainPage.currentChannel.Equals(channel))
-                        mainPage.SwitchChannel(server, channel);
+                        mainPage.SwitchChannel(server, channel, false);
 
                 }
 
