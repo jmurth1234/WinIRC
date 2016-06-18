@@ -108,7 +108,17 @@ namespace WinIRC.Net
                 }
                 else
                 {
-                    await reader.LoadAsync(socketReceiveBufferSize);
+                    try
+                    {
+                        await reader.LoadAsync(socketReceiveBufferSize);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        Debug.WriteLine(ex.StackTrace);
+                        Disconnect();
+                        break;
+                    }
 
                     while (reader.UnconsumedBufferLength > 0)
                     {
@@ -130,10 +140,13 @@ namespace WinIRC.Net
 
                         // Read next line from data stream.
                         var line = dataStreamLineReader.SafeFlushLine();
-                        if (line == null)
+                        if (line == null) break;
+                        if (line.Length == 0) continue;
+                        if (line.StartsWith("ERROR"))
+                        {
+                            Disconnect();
                             break;
-                        if (line.Length == 0)
-                            continue;
+                        }
 
                         HandleLine(line);
                     }
