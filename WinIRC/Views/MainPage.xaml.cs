@@ -157,6 +157,11 @@ namespace WinIRC
                 this.RequestedTheme = ElementTheme.Dark;
             }
 
+            if (!Config.Contains(Config.UseTabs)) 
+            {
+                Config.SetBoolean(Config.UseTabs, true);
+            }
+
             IrcHandler.ManageTitleBar();
             SettingsLoaded = true;
 
@@ -322,7 +327,7 @@ namespace WinIRC
             //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
             UpdateInfo(server, channel);
 
-            if ((auto || lastAuto) && (GetCurrentItem() != null))
+            if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
             {
                 var item = GetCurrentItem();
                 var frame = item.Content as Frame;

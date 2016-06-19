@@ -59,6 +59,17 @@ namespace WinIRC
                 this.AutoChannelSwitch.IsOn = true;
             }
 
+            if (Config.Contains(Config.UseTabs))
+            {
+                this.TabsSwitch.IsOn = Config.GetBoolean(Config.UseTabs);
+            }
+            else
+            {
+                Config.SetBoolean(Config.UseTabs, true);
+                this.TabsSwitch.IsOn = true;
+            }
+
+
             this.SettingsLoaded = true;
         }
 
@@ -76,6 +87,15 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.SwitchOnJoin, AutoChannelSwitch.IsOn);
+
+        }
+
+        private void TabsSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.UseTabs, TabsSwitch.IsOn);
 
         }
     }

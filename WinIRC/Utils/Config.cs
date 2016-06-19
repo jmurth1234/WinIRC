@@ -9,6 +9,7 @@ namespace WinIRC
         // behaviour settings
         public const string UserListClick = "userlistclick";
         public const string SwitchOnJoin = "switchonjoin";
+        public const string UseTabs = "usetabs";
 
         // display settings
         public const string DarkTheme = "darktheme";
