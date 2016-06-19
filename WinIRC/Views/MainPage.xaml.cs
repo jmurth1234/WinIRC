@@ -319,15 +319,8 @@ namespace WinIRC
 
         public void SwitchChannel(string server, string channel, bool auto)
         {
-            if (currentServer != server)
-            {
-                serversCombo.SelectedItem = server;
-            }
-
-            IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
-            currentChannel = channel;
-
             //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
+            UpdateInfo(server, channel);
 
             if ((auto || lastAuto) && (GetCurrentItem() != null))
             {
@@ -355,7 +348,17 @@ namespace WinIRC
                 Tabs.SelectedIndex = Tabs.Items.Count - 1;
                 frame.Navigate(typeof(ChannelView), new string[] { server, channel });
             }
+        }
 
+        public void UpdateInfo(string server, string channel )
+        {
+            if (currentServer != server)
+            {
+                serversCombo.SelectedItem = server;
+            }
+
+            IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
+            currentChannel = channel;
 
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
@@ -363,6 +366,7 @@ namespace WinIRC
             //channelList.SelectedValue = channel;
             if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
                 TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
+
         }
 
         public Irc GetCurrentServer()
@@ -605,6 +609,12 @@ namespace WinIRC
         private void CloseTab_Click(object sender, RoutedEventArgs e)
         {
             Tabs.Items.Remove(GetCurrentItem());
+        }
+
+        private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (GetCurrentChannelView() != null)
+                UpdateInfo(GetCurrentChannelView().currentServer, GetCurrentChannelView().currentChannel);
         }
     }
 

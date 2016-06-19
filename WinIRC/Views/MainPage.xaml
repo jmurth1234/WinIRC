@@ -86,7 +86,7 @@
 
                             <Rectangle VerticalAlignment="Top" Height="48" Fill="{ThemeResource SystemChromeMediumColor}" />
 
-                            <Pivot x:Name="Tabs" >
+                            <Pivot x:Name="Tabs" SelectionChanged="Tabs_SelectionChanged" >
                                 <Pivot.Resources>
                                     <DataTemplate x:Key="TabTemplate">
                                         <StackPanel Orientation="Horizontal">

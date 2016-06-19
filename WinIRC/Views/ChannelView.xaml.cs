@@ -27,8 +27,8 @@ namespace WinIRC.Views
     {
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
 
-        private string currentChannel;
-        private string currentServer;
+        public string currentChannel { get; set; }
+        public string currentServer { get; set; }
 
         public ChannelView()
         {
