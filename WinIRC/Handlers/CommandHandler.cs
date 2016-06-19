@@ -297,9 +297,22 @@ namespace WinIRC.Commands
             }
             else if (args[0].StartsWith("/"))
             {
-                if (CommandTable.ContainsKey(args[0]))
+                if (CommandList.Any(cmd => cmd.StartsWith(args[0])))
                 {
-                    ((Command) CommandTable[args[0]])(irc, args);
+                    var cmd = CommandList.Where(command => command.StartsWith(args[0])).ToList();
+
+                    if (cmd.Count > 1)
+                    {
+                        irc.ClientMessage("Multiple matches found: " + args[0]);
+                        irc.ClientMessage(String.Join(", ", cmd));
+                        irc.ClientMessage("Type /help for a list of commands.");
+
+                        return;
+                    }
+                    else
+                    {
+                        ((Command)CommandTable[cmd[0]])(irc, args);
+                    }
                 }
                 else
                 {

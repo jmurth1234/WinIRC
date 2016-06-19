@@ -1,1 +1,1 @@
-C:\Users\Ryan\Documents\Visual Studio 2015\Projects\WinIRC\WinIRC\SideloadAppPackages\WinIRC_1.2.12.0\WinIRC_1.2.12.0_x86_x64_arm.appxbundle
+C:\Users\Ryan\Documents\Visual Studio 2015\Projects\WinIRC\WinIRC\SideloadAppPackages\WinIRC_1.2.13.0\WinIRC_1.2.13.0_x86_x64_arm.appxbundle
