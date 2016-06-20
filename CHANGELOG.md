@@ -1,3 +1,13 @@
+## V1.2.18
+
+I haven't made any progress on background connections yet, but until then have an update with a couple new features:
+
+ - Tabs - Using the pivot control, you can now quickly switch between channels you've opened with tabs on the toolbar, or via swiping on a touchscreen! This can be disabled in the settings.
+
+ - Shorter commands - you can now type shorter versions of commands, and WinIRC will match it to a command. If there's multiple possible matches, the command won't be executed
+
+ - Application should not crash when IRC disconnects whilst suspended
+
 ## v1.2.11
 
 Minor release time! Nothing too big, just a couple of added  features. The specific changes are as follows:
