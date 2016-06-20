@@ -219,6 +219,8 @@ namespace WinIRC
 
         public ChannelView GetCurrentChannelView()
         {
+            if (GetCurrentItem() == null) return null;
+
             var item = GetCurrentItem().Content as Frame;
             return item.Content as ChannelView;
         }

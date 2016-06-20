@@ -19,7 +19,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>WinIRC_StoreKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>9079429E8C617EC704B491F07CF71BC075A1ED48</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>
     <AppxBundle>Always</AppxBundle>
