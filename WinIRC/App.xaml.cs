@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -151,6 +152,7 @@ namespace WinIRC
         {
             Frame rootFrame = Window.Current.Content as Frame;
             var deferral = e.SuspendingOperation.GetDeferral();
+
             deferral.Complete();
         }
 

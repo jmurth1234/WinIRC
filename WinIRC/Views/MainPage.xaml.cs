@@ -26,6 +26,7 @@ using WinIRC.Views;
 using WinIRC.Handlers;
 using WinIRC.Utils;
 using Windows.Storage;
+using Windows.ApplicationModel.ExtendedExecution;
 
 namespace WinIRC
 {
@@ -68,6 +69,7 @@ namespace WinIRC
 
         public static MainPage instance;
         private bool lastAuto;
+        private ExtendedExecutionSession session;
 
         public MainPage()
         {
@@ -405,10 +407,25 @@ namespace WinIRC
             serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
         }
 
-        public void Connect(Irc irc)
+        public async void Connect(Irc irc)
         {
             if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
             if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
+
+            if (session == null)
+            {
+                session = new ExtendedExecutionSession();
+
+                session.Reason = ExtendedExecutionReason.Unspecified;
+                session.Description = "Keeping IRC Connected";
+                session.Revoked += session_Revoked;
+                var result = await session.RequestExtensionAsync();
+                if (result == ExtendedExecutionResult.Denied)
+                {
+                    var toast = Irc.CreateBasicToast("Warning", "Unable to keep irc connected in the background. Connection may be lost when minimized.");
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
+            }
 
             irc.HandleDisconnect += HandleDisconnect;
 
@@ -421,6 +438,13 @@ namespace WinIRC
             serversCombo.SelectedItem = irc.server.name;
             currentServer = irc.server.name;
             channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
+        }
+
+        private void session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
+        {
+            var toast = Irc.CreateBasicToast("Warning", "The extended execution session has been revoked. Connection may be lost when minimized. Reason: " + args.Reason);
+            Debug.WriteLine("The extended execution session has been revoked. Connection may be lost when minimized. Reason: " + args.Reason);
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
 
         private void serversList_SelectionChanged(object sender, SelectionChangedEventArgs e)
