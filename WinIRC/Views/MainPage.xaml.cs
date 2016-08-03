@@ -251,12 +251,25 @@ namespace WinIRC
                 Tabs.SelectedIndex = Tabs.Items.Count - 1;
                 frame.Navigate(typeof(PlaceholderView));
 
+                UpdateUi();
+
                 //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
 
                 serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
                 serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
 
                 var folder = serversOSH.GetFolder(StorageType.Roaming);
+
+                if ((await folder.GetItemsAsync()).Count == 0 && !(await serversOSH.FileExists(folder, "migrated")))
+                {
+                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+                    return;
+                }
+
+                if ((await folder.GetItemsAsync()).Count == 1)
+                {
+                    return;
+                }
 
                 if (await serversOSH.FileExists(folder, "migrated"))
                 {
@@ -281,7 +294,6 @@ namespace WinIRC
                 await dialog.ShowAsync();
             }
 
-            UpdateUi();
         }
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
@@ -344,17 +356,28 @@ namespace WinIRC
             }
             else
             {
-                PivotItem p = new PivotItem();
-                p.Header = channel;
-                Frame frame = new Frame();
-
-                p.Margin = new Thickness(0, 0, 0, -2);
-
-                p.Content = frame;
-                Tabs.Items.Add(p);
-                Tabs.SelectedIndex = Tabs.Items.Count - 1;
-                frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+                CreateNewTab(channel).Navigate(typeof(ChannelView), new string[] { server, channel });
             }
+        }
+
+        private Frame CreateNewTab(String header)
+        {
+            PivotItem p = new PivotItem();
+            p.Header = header;
+            Frame frame = new Frame();
+
+            p.Margin = new Thickness(0, 0, 0, -2);
+
+            p.Content = frame;
+            Tabs.Items.Add(p);
+
+            if ((Tabs.Items[0] as PivotItem).Header == "Welcome") Tabs.Items.RemoveAt(0);
+
+            Tabs.SelectedIndex = Tabs.Items.Count - 1;
+
+
+
+            return frame;
         }
 
         public void UpdateInfo(string server, string channel )
@@ -415,6 +438,8 @@ namespace WinIRC
             // connect
             irc.Connect();
 
+            CreateNewTab(irc.server.name);
+
             // link the server up to the lists
             IrcHandler.connectedServers.Add(irc.server.name, irc);
             IrcHandler.connectedServersList.Add(irc.server.name);
@@ -430,7 +455,8 @@ namespace WinIRC
 
             currentServer = serversCombo.SelectedItem.ToString();
             channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
-            if (IrcHandler.connectedServers[currentServer].channelList.Contains("Server"))
+
+            if (IrcHandler.connectedServers[currentServer].channelList.Contains("Server") && !Config.GetBoolean(Config.UseTabs))
                 SwitchChannel(currentServer, "Server", false);
 
             IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel, true);

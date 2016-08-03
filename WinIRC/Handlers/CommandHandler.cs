@@ -13,7 +13,7 @@ namespace WinIRC.Commands
     public class CommandHandler
     {
         public delegate void Command(Irc irc, string[] args);
-        private Hashtable CommandTable = new Hashtable();
+        private Dictionary<String, Command> CommandTable = new Dictionary<String, Command>();
         private List<string> CommandList = new List<string>();
 
         public CommandHandler()

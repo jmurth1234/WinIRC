@@ -1,4 +1,5 @@
 ﻿using Microsoft.QueryStringDotNET;
+using NotificationsExtensions;
 using NotificationsExtensions.Toasts;
 using System;
 using System.Collections.Generic;
@@ -637,15 +638,18 @@ namespace WinIRC.Net
                 // Construct the visuals of the toast
                 ToastVisual visual = new ToastVisual()
                 {
-                    TitleText = new ToastText()
+                    BindingGeneric = new ToastBindingGeneric()
                     {
-                        Text = "You were mentioned in " + channel + " by " + username
-                    },
-
-                    BodyTextLine1 = new ToastText()
-                    {
-                        Text = text
-                    },
+                        Children =
+                        {
+                            new AdaptiveText {Text = "Message from " + username },
+                            new AdaptiveText {Text = text }
+                        },
+                        Attribution = new ToastGenericAttributionText
+                        {
+                            Text = "Mention in " + channel
+                        },
+                    }
                 };
 
                 ToastActionsCustom actions = new ToastActionsCustom()
