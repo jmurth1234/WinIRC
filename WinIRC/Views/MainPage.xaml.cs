@@ -227,7 +227,7 @@ namespace WinIRC
 
         public TextBox GetInputBox()
         {
-            return GetCurrentChannelView().GetInputBox(); ;
+            return GetCurrentChannelView().GetInputBox(); 
         }
 
         public ListBox GetChannelList()
@@ -369,13 +369,10 @@ namespace WinIRC
             p.Margin = new Thickness(0, 0, 0, -2);
 
             p.Content = frame;
+
             Tabs.Items.Add(p);
 
-            if ((Tabs.Items[0] as PivotItem).Header == "Welcome") Tabs.Items.RemoveAt(0);
-
-            Tabs.SelectedIndex = Tabs.Items.Count - 1;
-
-
+            Tabs.SelectedItem = p;
 
             return frame;
         }
@@ -393,7 +390,7 @@ namespace WinIRC
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
 
-            //channelList.SelectedValue = channel;
+            channelList.SelectedValue = channel;
             if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
                 TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
 
@@ -436,9 +433,12 @@ namespace WinIRC
             irc.HandleDisconnect += HandleDisconnect;
 
             // connect
-            irc.Connect();
+            if (((Tabs.Items[0] as PivotItem).Content as Frame).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
 
-            CreateNewTab(irc.server.name);
+            if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name);
+            lastAuto = Config.GetBoolean(Config.UseTabs);
+
+            irc.Connect();
 
             // link the server up to the lists
             IrcHandler.connectedServers.Add(irc.server.name, irc);
