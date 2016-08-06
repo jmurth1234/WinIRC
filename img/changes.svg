@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="258.000000pt"
+   height="260.000000pt"
+   viewBox="0 0 258.000000 260.000000"
+   preserveAspectRatio="xMidYMid meet"
+   id="svg2"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="changes.svg">
+  <defs
+     id="defs14" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1310"
+     inkscape:window-height="927"
+     id="namedview12"
+     showgrid="false"
+     inkscape:zoom="1.4523077"
+     inkscape:cx="163.10268"
+     inkscape:cy="156.79705"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <metadata
+     id="metadata4">
+Created by potrace 1.11, written by Peter Selinger 2001-2013
+<rdf:RDF>
+  <cc:Work
+     rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title></dc:title>
+  </cc:Work>
+</rdf:RDF>
+</metadata>
+  <g
+     transform="translate(0.000000,260.000000) scale(0.100000,-0.100000)"
+     fill="#000000"
+     stroke="none"
+     id="g6"
+     style="fill:#ffffff">
+    <path
+       d="M1205 2404 c-299 -35 -507 -130 -704 -321 -46 -46 -87 -83 -90 -83 -3 0 -61 55 -128 122 l-123 123 0 -318 0 -317 317 0 318 0 -119 119 -119 119 74 74 c156 158 331 243 550 269 441 51 841 -219 976 -658 24 -80 27 -103 27 -248 0 -146 -3 -168 -28 -250 -121 -396 -468 -656 -876 -656 -331 0 -627 171 -791 459 -88 153 -125 314 -116 500 l5 113 -101 -3 -102 -3 -9 -75 c-12 -92 5 -273 35 -380 29 -106 118 -284 188 -377 201 -267 506 -426 843 -440 154 -7 256 7 397 53 283 93 514 291 647 556 110 220 145 433 109 671 -35 232 -132 430 -295 601 -198 208 -427 319 -715 346 -101 10 -115 10 -170 4z"
+       id="path8"
+       style="fill:#ffffff" />
+    <path
+       d="M1120 1050 l0 -560 160 0 160 0 0 400 0 400 240 0 240 0 0 160 0 160 -400 0 -400 0 0 -560z"
+       id="path10"
+       style="fill:#ffffff" />
+  </g>
+</svg>

@@ -28,6 +28,12 @@
 			</div>
 
 			<div class="nav-commands">
+				<a data-win-control="WinJS.UI.SplitViewCommand"
+				   data-win-options="{ label: 'Home', icon: 'home'}" onclick="loadContent('README.md');"></a>
+
+				<a data-win-control="WinJS.UI.SplitViewCommand" onclick="loadContent('CHANGELOG.md');"
+				   data-win-options="{ label: 'Changelog', icon: 'url(\'img/changes.svg\')'}"></a>
+
 				<a href="https://github.com/rymate1234/WinIRC" data-win-control="WinJS.UI.SplitViewCommand"
 				   data-win-options="{ label: 'GitHub', icon: 'url(\'img/github.svg\')'}"></a>
 
@@ -35,7 +41,7 @@
 				   data-win-control="WinJS.UI.SplitViewCommand"
 				   data-win-options="{ label: 'Store Link', icon: 'shop'}"></a>
 
-				<a href="WinIRC_1.2.12.0_x86_x64_arm.appxbundle"
+				<a href="WinIRC_1.3.0.0_x86_x64_arm.appxbundle"
 					data-win-control="WinJS.UI.SplitViewCommand"
 				   data-win-options="{ label: 'Direct Download', icon: 'download'}"></a>
 			</div>
@@ -55,22 +61,30 @@
 		new WinJS.UI._WinKeyboard(splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
 	});
 
-	var request = new XMLHttpRequest();
-	request.open('GET', 'https://raw.githubusercontent.com/rymate1234/WinIRC/master/README.md', true);
+	function loadContent(filename) {
+		var request = new XMLHttpRequest();
+		request.open('GET', 'https://raw.githubusercontent.com/rymate1234/WinIRC/master/' + filename, true);
 
-	request.onload = function () {
-		if (request.status >= 200 && request.status < 400) {
-			// Success!
-			var data = request.responseText;
-			var content = document.getElementById("content");
+		request.onload = function () {
+			if (request.status >= 200 && request.status < 400) {
+				// Success!
+				var data = request.responseText;
+				var content = document.getElementById("content");
 
-			var converter = new showdown.Converter();
-			content.innerHTML = converter.makeHtml(data);
-		} 
-	};
+				var converter = new showdown.Converter();
+				content.innerHTML = converter.makeHtml(data);
+			} 
+		};
 
-	request.send();
+		location.hash = filename;
 
+		request.send();
+	}
+
+	if (location.hash == "")
+		loadContent("README.md");
+	else 
+		loadContent(location.hash)
 </script>
 
 </body>
