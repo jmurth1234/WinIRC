@@ -182,6 +182,12 @@ namespace WinIRC.Net
                 // handle messages to this irc client
                 var destination = parsedLine.CommandMessage.Parameters[0];
                 var content = parsedLine.TrailMessage.TrailingContent;
+
+                if (destination == server.username)
+                {
+                    destination = parsedLine.PrefixMessage.Nickname;
+                }
+
                 if (!channelList.Contains(destination))
                 {
                     AddChannel(destination);
@@ -190,13 +196,6 @@ namespace WinIRC.Net
                 Message msg = new Message();
 
                 msg.messageColour = chatTextColor;
-
-                if (parsedLine.TrailMessage.TrailingContent.Contains(server.username))
-                {
-                    var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
-                    toast.ExpirationTime = DateTime.Now.AddDays(2);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
-                }
 
                 if (content.Contains("ACTION"))
                 {
@@ -208,6 +207,14 @@ namespace WinIRC.Net
                 {
                     msg.messageText = String.Format("<{0}> {1}", parsedLine.PrefixMessage.Nickname, content);
                 }
+
+                if (parsedLine.TrailMessage.TrailingContent.Contains(server.username) || parsedLine.CommandMessage.Parameters[0] == server.username)
+                {
+                    var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
+                    toast.ExpirationTime = DateTime.Now.AddDays(2);
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
+
                 AddMessage(destination, msg);
 
             }
@@ -384,6 +391,11 @@ namespace WinIRC.Net
             }
             else if (parsedLine.CommandMessage.Command == "376")
             {
+                if (server.nickservPassword != null)
+                {
+                    SendMessage("nickserv", "identify " + server.nickservPassword);
+                }
+
                 var channelsList = server.channels.Split(',');
                 foreach (string channel in channelsList)
                 {
@@ -423,7 +435,7 @@ namespace WinIRC.Net
             WriteLine(String.Format("PRIVMSG {0} :\u0001ACTION {1}\u0001", currentChannel, message));
         }
 
-        public void MentionReply(string channel, string message)
+        public void SendMessage(string channel, string message)
         {
             // todo
             Message msg = new Message();
@@ -431,7 +443,9 @@ namespace WinIRC.Net
             msg.messageText = String.Format("<{0}> {1}", server.username, message);
             msg.messageColour = lightTextColor;
 
-            channelBuffers[channel].Add(msg);
+            if (channelBuffers.Keys.Contains(channel))
+                channelBuffers[channel].Add(msg);
+
             WriteLine(String.Format("PRIVMSG {0} :{1}", channel, message));
         }
 

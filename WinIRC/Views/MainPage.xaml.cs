@@ -300,8 +300,29 @@ namespace WinIRC
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
         {
+            var bounds = Window.Current.Bounds;
+            double height = bounds.Height;
+            connectDialogRoot.MaxHeight = height;
+
             serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
             serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
+        }
+
+
+        private void ConnectDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!(ConnectFrame.Content is ConnectView))
+                ConnectFrame.Navigate(typeof(ConnectView));
+
+            serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
+            if ((Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) > 20)
+                serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
+            else
+                serverConnect.VerticalOffset = 0;
+            
+            var bounds = Window.Current.Bounds;
+            double height = bounds.Height;
+            connectDialogRoot.MaxHeight = height;
         }
 
         private void InputPaneHiding(InputPane sender, InputPaneVisibilityEventArgs args)
@@ -405,7 +426,7 @@ namespace WinIRC
 
         public void MentionReply(string ircserver, string channel, string message)
         {
-            IrcHandler.connectedServers[ircserver].MentionReply(channel, message);
+            IrcHandler.connectedServers[ircserver].SendMessage(channel, message);
         }
 
         private void ToggleSplitView(object sender, RoutedEventArgs e)
@@ -416,15 +437,6 @@ namespace WinIRC
         private void ShowConnectPopup(object sender, RoutedEventArgs e)
         {
             serverConnect.IsOpen = !serverConnect.IsOpen;
-        }
-
-        private void ConnectDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!(ConnectFrame.Content is ConnectView))
-                ConnectFrame.Navigate(typeof(ConnectView));
-
-            serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
-            serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
         }
 
         public async void Connect(Irc irc)

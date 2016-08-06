@@ -17,6 +17,7 @@ namespace WinIRC.Net
         public bool webSocket { get; set; }
         public string username { get; set; }
         public string password { get; set; }
+        public string nickservPassword { get; set; }
 
         // channels are a string seperated by commas
         public string channels { get; set; }

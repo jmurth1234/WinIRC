@@ -158,7 +158,7 @@
                     <EntranceThemeTransition IsStaggeringEnabled="True" />
                 </TransitionCollection>
             </Popup.ChildTransitions>
-            <Grid Height="Auto" Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
+            <Grid Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
                 <Frame x:Name="ConnectFrame" />
             </Grid>
         </Popup>

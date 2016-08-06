@@ -168,6 +168,7 @@ namespace WinIRC.Views
             ircServer.ssl = ssl.IsOn;
             ircServer.username = username.Text;
             ircServer.password = password.Password;
+            ircServer.nickservPassword = nickservPassword.Password;
             ircServer.name = server.Text;
             ircServer.webSocket = webSocket.IsOn;
             ircServer.channels = channels.Text;
@@ -244,8 +245,12 @@ namespace WinIRC.Views
             password.Password = ircServer.password;
             server.Text = ircServer.name;
             webSocket.IsOn = ircServer.webSocket;
+
             if (ircServer.channels != null)
                 channels.Text = ircServer.channels;
+
+            if (ircServer.nickservPassword != null)
+                nickservPassword.Password = ircServer.nickservPassword;
 
         }
 

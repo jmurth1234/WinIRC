@@ -8,7 +8,11 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid Margin="0" Background="{ThemeResource SystemChromeMediumColor}" Height="44" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Background="{ThemeResource SystemChromeMediumColor}" Height="48" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
@@ -27,31 +31,45 @@
 
         </Grid>
 
-        <StackPanel Orientation="Vertical"  x:Name="pop" BorderThickness="0" Margin="0,44,0,0" Padding="10,0" >
-            <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,10"/>
+        <ScrollViewer Grid.Row="2">
+            <StackPanel Orientation="Vertical" x:Name="pop" BorderThickness="0" Padding="6,0,14,0" >
+                <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,10"/>
 
-            <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
+                <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
 
-            <TextBox  x:Name="server"  Margin="5,10" PlaceholderText="Server Name"  />
+                <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">Connection Details</TextBlock>
 
-            <Grid Margin="0,10" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="90" />
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="hostname" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Url" PlaceholderText="Hostname or IP"/>
-                <TextBox Grid.Column="1" x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Number" PlaceholderText="Port"/>
-            </Grid>
+                <TextBox  x:Name="server"  Margin="5,10" PlaceholderText="Server Name"  />
 
-            <ToggleSwitch Margin="5,1" x:Name="ssl" OffContent="Insecure Connection" OnContent="Secure Connection"  />
+                <Grid Margin="0,10" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="90" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="hostname" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Url" PlaceholderText="Hostname or IP"/>
+                    <TextBox Grid.Column="1" x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Number" PlaceholderText="Port"/>
+                </Grid>
 
-            <TextBox  x:Name="username"  Margin="5,10" PlaceholderText="Username"  />
-            <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,10" PlaceholderText="Server Password" />
+                <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,10" PlaceholderText="Server Password" />
 
-            <TextBox x:Name="channels"  Margin="5,10" PlaceholderText="Channels to Join"  />
+                <Grid Margin="5,0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="124" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
 
-            <ToggleSwitch Margin="5,1" x:Name="webSocket" OffContent="Direct IRC Connection" OnContent="Connect via Websocket" Toggled="webSocket_Toggled" />
+                    <ToggleSwitch Grid.Column="0" x:Name="ssl" OffContent="No" OnContent="Yes" Header="Secure Connection"  />
+                    <ToggleSwitch Grid.Column="1" x:Name="webSocket" OffContent="Standard" OnContent="Websocket" Toggled="webSocket_Toggled" Header="Connection Type" HorizontalAlignment="Right" Width="126" MinWidth="0" />
+                </Grid>
 
-        </StackPanel>
+                <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">User Info</TextBlock>
+                <TextBox  x:Name="username"  Margin="5,10" PlaceholderText="Username"  />
+
+                <PasswordBox  x:Name="nickservPassword"  IsPasswordRevealButtonEnabled="True"  Margin="5,10" PlaceholderText="Nickserv Password" />
+
+                <TextBox x:Name="channels"  Margin="5,10" PlaceholderText="Channels to Join"  />
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
