@@ -48,7 +48,6 @@
 #app .contenttext {
 	padding-left: 20px;
 	padding-right: 20px;
-	max-height: 100vh;
 	margin: 0 auto;
 	max-width: 60vw;
 }
@@ -58,9 +57,9 @@
 }
 
 .content-wrapper {
+	max-height: calc(100vh);
 	overflow: auto;
 }
-
 
 .win-splitviewcommand-icon {
 	background-size: 16px;

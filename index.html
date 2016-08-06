@@ -84,7 +84,7 @@
 	if (location.hash == "")
 		loadContent("README.md");
 	else 
-		loadContent(location.hash)
+		loadContent(location.hash.replace("#", ""));
 </script>
 
 </body>
