@@ -1,3 +1,5 @@
+# Changelog
+
 ## v1.3
 
 This release adds an initial implementation of an ExtendedExecutionSession - this allows WinIRC to keep connected in the background. This has been tested to both work on a Lumia 435 running build 10586 and a desktop running build 14393. 
