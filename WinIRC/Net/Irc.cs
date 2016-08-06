@@ -598,18 +598,20 @@ namespace WinIRC.Net
         {
             try
             {
-                // Construct the visuals of the toast
                 ToastVisual visual = new ToastVisual()
                 {
-                    TitleText = new ToastText()
+                    BindingGeneric = new ToastBindingGeneric()
                     {
-                        Text = title
-                    },
-
-                    BodyTextLine1 = new ToastText()
-                    {
-                        Text = msg
-                    },
+                        Children =
+                        {
+                            new AdaptiveText { Text = title },
+                            new AdaptiveText { Text = msg }
+                        },
+                        Attribution = new ToastGenericAttributionText
+                        {
+                            Text = "Information"
+                        },
+                    }
                 };
 
                 // Now we can construct the final toast content
@@ -625,7 +627,6 @@ namespace WinIRC.Net
             {
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
-
             }
 
             return null;
@@ -673,7 +674,7 @@ namespace WinIRC.Net
                         }.ToString())
                         {
                             ActivationType = ToastActivationType.Foreground,
-                            ImageUri = "Assets/Reply.png",
+                            ImageUri = "Assets/Send.png",
                             TextBoxId = "tbReply"
                         },
                     },

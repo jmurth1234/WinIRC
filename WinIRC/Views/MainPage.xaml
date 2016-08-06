@@ -152,13 +152,13 @@
             </SplitView.Content>
         </SplitView>
 
-        <Popup x:Name="serverConnect" IsLightDismissEnabled="True" Loaded="ConnectDialog_Loaded" >
+        <Popup x:Name="serverConnect" IsLightDismissEnabled="True" Loaded="ConnectDialog_Loaded">
             <Popup.ChildTransitions>
                 <TransitionCollection>
                     <EntranceThemeTransition IsStaggeringEnabled="True" />
                 </TransitionCollection>
             </Popup.ChildTransitions>
-            <Grid Height="Auto" Width="Auto" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
+            <Grid Height="Auto" Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded">
                 <Frame x:Name="ConnectFrame" />
             </Grid>
         </Popup>

@@ -9,7 +9,11 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ScrollViewer Canvas.ZIndex="0" x:Name="messagesScroll" Margin="5,0,5,48" VerticalScrollMode="Enabled" >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
             <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -24,7 +28,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <Grid Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
+        <Grid Grid.Row="1" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />

@@ -35,6 +35,7 @@ namespace WinIRC.Net
             streamSocket = new StreamSocket();
             streamSocket.SetIrc(this);
             streamSocket.Control.KeepAlive = true;
+
             try
             {
                 var protectionLevel = server.ssl ? SocketProtectionLevel.Tls12 : SocketProtectionLevel.PlainSocket;
@@ -48,38 +49,23 @@ namespace WinIRC.Net
                 reader.InputStreamOptions = InputStreamOptions.Partial;
                 IsConnected = true;
 
-                using (var session = new ExtendedExecutionSession())
+                // TODO: Get this working  (probably after next update)
+                try
                 {
-                    session.Reason = ExtendedExecutionReason.Unspecified;
-                    session.Description = "Keeping IRC Connected";
-                    session.Revoked += session_Revoked;
-                    var result = await session.RequestExtensionAsync();
-                    if (result == ExtendedExecutionResult.Denied)
+                    var status = channel.WaitForPushEnabled();
+                    if (status != ControlChannelTriggerStatus.HardwareSlotAllocated
+                        && status != ControlChannelTriggerStatus.SoftwareSlotAllocated)
                     {
-                        var toast = CreateBasicToast("Warning", "Unable to keep irc connected in the background. Connection may be lost when minimized.");
-                        ToastNotificationManager.CreateToastNotifier().Show(toast);
+                        Debug.WriteLine(string.Format("Neither hardware nor software slot could be allocated. ChannelStatus is {0}", status.ToString()));
                     }
-
-                    // TODO: Get this working  (probably after next update)
-                    try
-                    {
-                        var status = channel.WaitForPushEnabled();
-                        if (status != ControlChannelTriggerStatus.HardwareSlotAllocated
-                            && status != ControlChannelTriggerStatus.SoftwareSlotAllocated)
-                        {
-                            Debug.WriteLine(string.Format("Neither hardware nor software slot could be allocated. ChannelStatus is {0}", status.ToString()));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        Debug.WriteLine(ex.StackTrace);
-                    }
-
-
-                    ConnectionHandler();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine(ex.StackTrace);
                 }
 
+                ConnectionHandler();
             }
             catch (Exception e)
             {
