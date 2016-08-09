@@ -1,4 +1,16 @@
 # Changelog
+-----
+
+## 1.3.1
+
+This release of WinIRC features a major recode of the view of messages within a channel. Rather than just being a list of `<TextBlock>` elements, it's now a list of a custom `<MessageLine>` element. Seperate parts of the message can now be coloured and styled differently. Currently this brings two new features:
+
+ - ping highlights in chat
+ - timestamps in chat
+
+This release also fixes a couple issues with the extended execution session on phones.
+
+-----
 
 ## v1.3
 
