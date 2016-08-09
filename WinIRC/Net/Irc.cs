@@ -56,9 +56,6 @@ namespace WinIRC.Net
             channelBuffers = new Dictionary<string, ObservableCollection<Message>>();
             channelStore = new Dictionary<string, ChannelStore>();
             IsAuthed = false;
-
-            lightTextColor = (bool) roamingSettings.Values["darktheme"] ? "#FFBBBBBB" : "#FF444444";
-            chatTextColor = (bool) roamingSettings.Values["darktheme"] ? "#FFFFFFFF" : "#FF000000";
         }
 
         public virtual async void Connect() { }
@@ -147,10 +144,10 @@ namespace WinIRC.Net
                         channel = parsedLine.CommandMessage.Parameters[0];
                     }
                     Message msg = new Message();
-                    msg.messageColour = lightTextColor;
-                    msg.messageFormat = FontStyle.Italic;
+                    msg.Type = MessageType.Info;
+                    msg.User = parsedLine.PrefixMessage.Nickname;
 
-                    msg.messageText = String.Format("* {0} ({1}) {2}", parsedLine.PrefixMessage.Nickname, parsedLine.PrefixMessage.Prefix, "joined the channel");
+                    msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "joined the channel");
                     AddMessage(channel, msg);
                     channelStore[channel].AddUser(parsedLine.PrefixMessage.Nickname, true);
                 }
@@ -169,10 +166,10 @@ namespace WinIRC.Net
                         channel = parsedLine.CommandMessage.Parameters[0];
                     }
                     Message msg = new Message();
-                    msg.messageColour = lightTextColor;
-                    msg.messageFormat = FontStyle.Italic;
+                    msg.Type = MessageType.Info;
+                    msg.User = parsedLine.PrefixMessage.Nickname;
 
-                    msg.messageText = String.Format("* {0} ({1}) {2}", parsedLine.PrefixMessage.Nickname, parsedLine.PrefixMessage.Prefix, "left the channel");
+                    msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "left the channel");
                     AddMessage(channel, msg);
                     channelStore[channel].RemoveUser(parsedLine.PrefixMessage.Nickname);
                 }
@@ -195,17 +192,22 @@ namespace WinIRC.Net
 
                 Message msg = new Message();
 
-                msg.messageColour = chatTextColor;
+                msg.Type = MessageType.Normal;
+                msg.User = parsedLine.PrefixMessage.Nickname;
+                if (parsedLine.ServerTime != null)
+                {
+                    var time = DateTime.Parse(parsedLine.ServerTime);
+                    msg.Timestamp = time.ToString("HH:mm");
+                }
 
                 if (content.Contains("ACTION"))
                 {
-                    content = content.Replace("ACTION ", "");
-                    msg.messageText = String.Format(" * {0} {1}", parsedLine.PrefixMessage.Nickname, content);
-                    msg.messageFormat = FontStyle.Italic;
+                    msg.Text = content.Replace("ACTION ", "");
+                    msg.Type = MessageType.Action;
                 }
                 else
                 {
-                    msg.messageText = String.Format("<{0}> {1}", parsedLine.PrefixMessage.Nickname, content);
+                    msg.Text = content;
                 }
 
                 if (parsedLine.TrailMessage.TrailingContent.Contains(server.username) || parsedLine.CommandMessage.Parameters[0] == server.username)
@@ -213,6 +215,7 @@ namespace WinIRC.Net
                     var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
                     toast.ExpirationTime = DateTime.Now.AddDays(2);
                     ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    msg.Mention = true;
                 }
 
                 AddMessage(destination, msg);
@@ -231,7 +234,7 @@ namespace WinIRC.Net
 
                 Message msg = new Message();
 
-                msg.messageColour = chatTextColor;
+                msg.Type = MessageType.Info;
 
                 if (reciever == server.username)
                 {
@@ -240,11 +243,13 @@ namespace WinIRC.Net
                     var toast = CreateBasicToast(kickTitle, content);
                     toast.ExpirationTime = DateTime.Now.AddDays(2);
                     ToastNotificationManager.CreateToastNotifier().Show(toast);
-                    msg.messageText = String.Format("{0} kicked you from the channel: {1}", parsedLine.PrefixMessage.Nickname, content);
+                    msg.User = parsedLine.PrefixMessage.Nickname;
+                    msg.Text = "kicked you from the channel: " + content;
                 }
                 else
                 {
-                    msg.messageText = String.Format("{0} kicked {1} from the channel: {1}", parsedLine.PrefixMessage.Nickname, reciever, content);
+                    msg.User = parsedLine.PrefixMessage.Nickname;
+                    msg.Text = String.Format("kicked {0} from the channel: {1}", reciever, content);
                 }
 
                 AddMessage(destination, msg);
@@ -263,10 +268,10 @@ namespace WinIRC.Net
                 var topic = parsedLine.TrailMessage.TrailingContent;
                 var channel = parsedLine.CommandMessage.Parameters[1];
                 Message msg = new Message();
-                msg.messageColour = lightTextColor;
-                msg.messageFormat = FontStyle.Italic;
+                msg.Type = MessageType.Info;
 
-                msg.messageText = String.Format("Topic for channel {0}: {1}", channel, topic);
+                msg.User = "";
+                msg.Text = String.Format("Topic for channel {0}: {1}", channel, topic);
                 AddMessage(channel, msg);
                 channelStore[channel].SetTopic(topic);
             }
@@ -279,9 +284,9 @@ namespace WinIRC.Net
                     if (users.HasUser(username))
                     {
                         Message msg = new Message();
-                        msg.messageColour = lightTextColor;
-                        msg.messageFormat = FontStyle.Italic;
-                        msg.messageText = String.Format("* {0} ({1}) {2}: {3}", parsedLine.PrefixMessage.Nickname, parsedLine.PrefixMessage.Prefix, "quit the server", parsedLine.TrailMessage.TrailingContent);
+                        msg.Type = MessageType.Info;
+                        msg.User = parsedLine.PrefixMessage.Nickname;
+                        msg.Text = String.Format("({0}) {1}: {2}", parsedLine.PrefixMessage.Prefix, "quit the server", parsedLine.TrailMessage.TrailingContent);
                         AddMessage(channel, msg);
                         users.RemoveUser(username);
                     }
@@ -383,15 +388,15 @@ namespace WinIRC.Net
             {
                 Debug.WriteLine(currentWhois);
                 Message msg = new Message();
-                msg.messageText = currentWhois;
-                msg.messageColour = lightTextColor;
+                msg.Text = currentWhois;
+                msg.Type = MessageType.Info;
                 AddMessage(currentChannel, msg);
 
                 currentWhois = "";
             }
             else if (parsedLine.CommandMessage.Command == "376")
             {
-                if (server.nickservPassword != null)
+                if (server.nickservPassword != null && server.nickservPassword != "")
                 {
                     SendMessage("nickserv", "identify " + server.nickservPassword);
                 }
@@ -412,8 +417,9 @@ namespace WinIRC.Net
                     }
 
                     Message msg = new Message();
-                    msg.messageText = parsedLine.OriginalMessage;
-                    msg.messageColour = lightTextColor;
+                    msg.Text = parsedLine.OriginalMessage;
+                    msg.Type = MessageType.Info;
+                    msg.User = "";
                     AddMessage("Server", msg);
                 }
                 Debug.WriteLine(parsedLine.CommandMessage.Command + " - " + receivedData);
@@ -427,9 +433,9 @@ namespace WinIRC.Net
         {
             Message msg = new Message();
 
-            msg.messageText = String.Format(" * {0} {1}", server.username, message);
-            msg.messageColour = lightTextColor;
-            msg.messageFormat = FontStyle.Italic;
+            msg.Text = message;
+            msg.Type = MessageType.Action;
+            msg.User = server.username;
             AddMessage(currentChannel, msg);
 
             WriteLine(String.Format("PRIVMSG {0} :\u0001ACTION {1}\u0001", currentChannel, message));
@@ -440,8 +446,9 @@ namespace WinIRC.Net
             // todo
             Message msg = new Message();
 
-            msg.messageText = String.Format("<{0}> {1}", server.username, message);
-            msg.messageColour = lightTextColor;
+            msg.Text = message;
+            msg.User = server.username;
+            msg.Type = MessageType.Normal;
 
             if (channelBuffers.Keys.Contains(channel))
                 channelBuffers[channel].Add(msg);
@@ -470,8 +477,10 @@ namespace WinIRC.Net
         {
             Message msg = new Message();
 
-            msg.messageText = String.Format("<{0}> {1}", server.username, message);
-            msg.messageColour = lightTextColor;                               
+            msg.Text = message;
+            msg.User = server.username;
+            msg.Type = MessageType.Normal;
+
             AddMessage(currentChannel, msg);
 
             WriteLine(String.Format("PRIVMSG {0} :{1}", currentChannel, message));
@@ -556,9 +565,9 @@ namespace WinIRC.Net
         public void ClientMessage(string channel, string text)
         {
             Message msg = new Message();
-            msg.messageColour = (bool)Config.GetBoolean(Config.DarkTheme) ? "#FFBBBBBB" : "#FF444444";
-            msg.messageFormat = FontStyle.Italic;
-            msg.messageText = text;
+            msg.User = "";
+            msg.Type = MessageType.Info;
+            msg.Text = text;
 
             this.AddMessage(channel, msg);
         }
@@ -566,9 +575,9 @@ namespace WinIRC.Net
         public void ClientMessage(string text)
         {
             Message msg = new Message();
-            msg.messageColour = (bool)Config.GetBoolean(Config.DarkTheme) ? "#FFBBBBBB" : "#FF444444";
-            msg.messageFormat = FontStyle.Italic;
-            msg.messageText = text;
+            msg.User = "";
+            msg.Type = MessageType.Info;
+            msg.Text = text;
 
             this.AddMessage(currentChannel, msg);
         }

@@ -4,21 +4,28 @@
     xmlns:local="using:WinIRC">
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
-            <Color x:Key="StatusTextColour">#FFBBBBBB</Color>
-            <Color x:Key="ChatTextColour">#FFFFFFFF</Color>
+            <SolidColorBrush x:Key="StatusTextColour" Color="#FFBBBBBB" />
+            <SolidColorBrush x:Key="ChatTextColour" Color="#FFFFFFFF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
-            <Color x:Key="StatusTextColour">#FF444444</Color>
-            <Color x:Key="ChatTextColour">#FF000000</Color>
+            <SolidColorBrush x:Key="StatusTextColour" Color="#FF444444" />
+            <SolidColorBrush x:Key="ChatTextColour" Color="#FF000000" />
         </ResourceDictionary>
-
-
     </ResourceDictionary.ThemeDictionaries>
 
     <Style x:Key="AppTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="Margin" Value="12,6,0,6" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+
+    <Style x:Key="InfoTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource StatusTextColour }" />
+    </Style>
+
+    <Style x:Key="InfoTextRichStyle" TargetType="RichTextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource StatusTextColour}" />
+    </Style>
+
 
     <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
         <Setter Property="Padding" Value="10" />

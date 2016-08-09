@@ -13,6 +13,7 @@ namespace WinIRC.Net
     public class ChannelStore
     {
         private CoreDispatcher dispatcher;
+        private bool currentlySorting;
 
         public ObservableCollection<User> Users { get; private set; }
         public ObservableCollection<string> RawUsers { get; private set; }
@@ -33,8 +34,10 @@ namespace WinIRC.Net
             SortedUsers.Clear();
         }
 
-        private void SortUsers()
+        public void SortUsers()
         {
+            if (currentlySorting) return;
+            currentlySorting = true;
             var watch = Stopwatch.StartNew();
 
             SortedUsers.Clear();
@@ -58,24 +61,32 @@ namespace WinIRC.Net
                 }
             }
 
-            ops = ops.OrderBy(s => s.ToLower()).ToList();
-            voiced = voiced.OrderBy(s => s.ToLower()).ToList();
-            users = users.OrderBy(s => s.ToLower()).ToList();
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Debug.WriteLine("Elapsed time to sort: " + elapsedMs + "ms");
+            watch.Start();
+
+            ops.Sort();
+            voiced.Sort();
+            users.Sort();
 
             ops.ForEach(SortedUsers.Add);
             voiced.ForEach(SortedUsers.Add);
             users.ForEach(SortedUsers.Add);
 
             watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
+            var elapsedMsOrder = watch.ElapsedMilliseconds;
 
-            Debug.WriteLine("Elapsed time to sort: " + elapsedMs + "ms");
+            Debug.WriteLine("Elapsed time to order: " + elapsedMsOrder + "ms");
+
+            Debug.WriteLine("Total time: " + (elapsedMsOrder + elapsedMs) + "ms");
+            currentlySorting = false;
+
         }
 
         public void AddUsers(List<string> users)
         {
             users.ForEach(AddUser);
-            SortUsers();
         }
 
         private void AddUser(string username)

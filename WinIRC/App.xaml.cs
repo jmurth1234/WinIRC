@@ -33,6 +33,8 @@ namespace WinIRC
     /// </summary>
     sealed partial class App : Application
     {
+        public bool AppLaunched { get; private set; }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -43,11 +45,13 @@ namespace WinIRC
                 Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
                 Microsoft.ApplicationInsights.WindowsCollectors.Session);
 
+            this.SetTheme();
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }
 
-        private void SetTheme()
+        public void SetTheme()
         {
             try
             {
@@ -66,6 +70,22 @@ namespace WinIRC
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
             }
+
+            if (AppLaunched)
+            {
+                Frame rootFrame = Window.Current.Content as Frame;
+                if (Config.Contains(Config.DarkTheme))
+                {
+                    rootFrame.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light;
+                }
+                else
+                {
+                    Config.SetBoolean(Config.DarkTheme, true);
+                    rootFrame.RequestedTheme = ElementTheme.Dark;
+                }
+                MainPage.instance.ManageTitleBar();
+            }
+
         }
 
         /// <summary>
@@ -75,7 +95,7 @@ namespace WinIRC
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-
+            AppLaunched = true;
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -95,8 +115,6 @@ namespace WinIRC
                     Width = 320,
                     Height = 240
                 });
-
-                this.SetTheme();
 
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();

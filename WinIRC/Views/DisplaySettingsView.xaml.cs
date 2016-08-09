@@ -99,11 +99,12 @@ namespace WinIRC
             if (!SettingsLoaded)
                 return;
             Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
-            //this.RequestedTheme = Settings.DarkTheme ? ElementTheme.Dark : ElementTheme.Light;
+            (Application.Current as App).SetTheme();
+            MainPage.instance.RequestedTheme = Theme.IsOn ? ElementTheme.Dark : ElementTheme.Light;
 
-            var dialog = new MessageDialog("To apply the theme, please restart WinIRC.");
-            await dialog.ShowAsync();
-
+            //var dialog = new MessageDialog("To apply the theme, please restart WinIRC.");
+            //await dialog.ShowAsync();
+            base.UpdateUi();
         }
 
         private void FontCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -111,8 +112,7 @@ namespace WinIRC
             if (!SettingsLoaded)
                 return;
             Config.SetString(Config.FontFamily, FontCombo.SelectedValue as string);
-            //this.RequestedTheme = Settings.DarkTheme ? ElementTheme.Dark : ElementTheme.Light;
-
+            
             base.UpdateUi();
         }
 
@@ -121,7 +121,6 @@ namespace WinIRC
             if (!SettingsLoaded)
                 return;
             Config.SetString(Config.FontSize, FontSize.Text);
-            //this.RequestedTheme = Settings.DarkTheme ? ElementTheme.Dark : ElementTheme.Light;
 
             base.UpdateUi();
         }

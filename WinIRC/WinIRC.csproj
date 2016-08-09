@@ -169,6 +169,7 @@
     <Compile Include="Ui\ChannelListItem.xaml.cs">
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Ui\HyperlinkedTextBlock.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
@@ -191,6 +192,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ui\MessageLine.xaml.cs">
+      <DependentUpon>MessageLine.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PlaceholderView.xaml.cs">
       <DependentUpon>PlaceholderView.xaml</DependentUpon>
     </Compile>
@@ -206,7 +210,6 @@
     <Compile Include="Views\DisplaySettingsView.xaml.cs">
       <DependentUpon>DisplaySettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ui\HyperlinkedTextBlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -252,6 +255,10 @@
     <Page Include="Views\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Ui\MessageLine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlaceholderView.xaml">
       <SubType>Designer</SubType>

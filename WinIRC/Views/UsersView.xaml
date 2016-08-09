@@ -5,8 +5,7 @@
     xmlns:local="using:WinIRC"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    DataContext="{Binding Self, RelativeSource={RelativeSource Self}}">
+    mc:Ignorable="d">
 
     <Page.Resources>
         <Style x:Key="MenuFlyoutItemIconTemplate" TargetType="MenuFlyoutItem">

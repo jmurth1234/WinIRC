@@ -35,26 +35,6 @@ namespace WinIRC.Handlers
             Instance = this;
         }
 
-        public void ManageTitleBar()
-        {
-            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-
-            var darkTheme = Config.GetBoolean(Config.DarkTheme);
-
-            var background = darkTheme ? ParseColor("#FF1F1F1F") : ParseColor("#FFE6E6E6");
-            var backgroundInactive = darkTheme ? ParseColor("#FF2B2B2B") : ParseColor("#FFF2F2F2");
-            var foreground = darkTheme ? ParseColor("#FFFFFFFF") : ParseColor("#FF000000");
-
-            titleBar.BackgroundColor = background;
-            titleBar.InactiveBackgroundColor = backgroundInactive;
-            titleBar.ButtonHoverBackgroundColor = backgroundInactive;
-            titleBar.ButtonBackgroundColor = background;
-            titleBar.ButtonInactiveBackgroundColor = backgroundInactive;
-            titleBar.ButtonForegroundColor = foreground;
-        }
-
         public void IrcTextBoxHandler(TextBox msgBox, KeyRoutedEventArgs e, string server, string channel)
         {
             if (server == null || channel == null || server == "" || channel == "")
@@ -93,7 +73,7 @@ namespace WinIRC.Handlers
 
             foreach (var user in users)
             {
-                if (user.StartsWith(word))
+                if (user.ToLower().StartsWith(word.ToLower()))
                 {
                     if (isFirst)
                     {
@@ -134,16 +114,6 @@ namespace WinIRC.Handlers
             if (usersView != null)
                 usersView.UpdateUsers(users);
 
-        }
-
-        private Color ParseColor(string hexCode)
-        {
-            var color = new Color();
-            color.A = byte.Parse(hexCode.Substring(1, 2), NumberStyles.AllowHexSpecifier);
-            color.R = byte.Parse(hexCode.Substring(3, 2), NumberStyles.AllowHexSpecifier);
-            color.G = byte.Parse(hexCode.Substring(5, 2), NumberStyles.AllowHexSpecifier);
-            color.B = byte.Parse(hexCode.Substring(7, 2), NumberStyles.AllowHexSpecifier);
-            return color;
         }
 
     }

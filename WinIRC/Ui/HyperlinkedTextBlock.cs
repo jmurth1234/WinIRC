@@ -35,9 +35,11 @@ namespace WinIRC.Ui
 
         private static void OnInlineListPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            var tb = obj as TextBlock;
+            var tb = obj as Paragraph;
+
             if (tb == null)
                 return;
+
             string text = e.NewValue as string;
             tb.Inlines.Clear();
 
@@ -47,7 +49,7 @@ namespace WinIRC.Ui
                 tb.Inlines.Add(GetRunControl(text));
         }
 
-        private static void AddInlineControls(TextBlock textBlock, string[] splittedString)
+        private static void AddInlineControls(Paragraph textBlock, string[] splittedString)
         {
             for (int i = 0; i < splittedString.Length; i++)
             {
