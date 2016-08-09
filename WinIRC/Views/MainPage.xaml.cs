@@ -499,20 +499,27 @@ namespace WinIRC
             channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
         }
 
-        private async void ExtendExecution()
+        public async void ExtendExecution()
         {
             if (session == null)
             {
-                session = new ExtendedExecutionSession();
-
-                session.Reason = ExtendedExecutionReason.Unspecified;
-                session.Description = "Keeping IRC Connected";
-                session.Revoked += session_Revoked;
-                var result = await session.RequestExtensionAsync();
-                if (result == ExtendedExecutionResult.Denied)
+                try
                 {
-                    var toast = Irc.CreateBasicToast("Warning", "Unable to keep irc connected in the background. Connection may be lost when minimized.");
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    session = new ExtendedExecutionSession();
+
+                    session.Reason = ExtendedExecutionReason.Unspecified;
+                    session.Description = "Keeping IRC Connected";
+                    session.Revoked += session_Revoked;
+                    var result = await session.RequestExtensionAsync();
+                    if (result == ExtendedExecutionResult.Denied)
+                    {
+                        var toast = Irc.CreateBasicToast("Warning", "Unable to keep irc connected in the background. Connection may be lost when minimized.");
+                        ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
                 }
             }
         }

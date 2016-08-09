@@ -49,6 +49,12 @@ namespace WinIRC
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.Resuming += App_Resuming;
+        }
+
+        private void App_Resuming(object sender, object e)
+        {
+            MainPage.instance.ExtendExecution();
         }
 
         public void SetTheme()
@@ -168,9 +174,12 @@ namespace WinIRC
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
+            MainPage.instance.ExtendExecution();
             var deferral = e.SuspendingOperation.GetDeferral();
             deferral.Complete();
         }
+
+
 
         protected override void OnActivated(IActivatedEventArgs e)
         {
