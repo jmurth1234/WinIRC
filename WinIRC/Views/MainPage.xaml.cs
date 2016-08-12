@@ -98,6 +98,9 @@ namespace WinIRC
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
             this.CommandHandler = IrcHandler.CommandHandler;
 
+#if DEBUG
+            DebugButton.Visibility = Visibility.Visible;
+#endif
             instance = this;
         }
 
@@ -510,12 +513,7 @@ namespace WinIRC
                     session.Reason = ExtendedExecutionReason.Unspecified;
                     session.Description = "Keeping IRC Connected";
                     session.Revoked += session_Revoked;
-                    var result = await session.RequestExtensionAsync();
-                    if (result == ExtendedExecutionResult.Denied)
-                    {
-                        var toast = Irc.CreateBasicToast("Warning", "Unable to keep irc connected in the background. Connection may be lost when minimized.");
-                        ToastNotificationManager.CreateToastNotifier().Show(toast);
-                    }
+                    await session.RequestExtensionAsync();
                 }
                 catch (Exception ex)
                 {
@@ -731,6 +729,17 @@ namespace WinIRC
         {
             if (GetCurrentChannelView() != null)
                 UpdateInfo(GetCurrentChannelView().currentServer, GetCurrentChannelView().currentChannel);
+        }
+
+        private void TransferServer_Click(object sender, RoutedEventArgs e)
+        {
+            if (GetCurrentServer() != null)
+            {
+                if (!GetCurrentServer().Transferred)
+                    GetCurrentServer().SocketTransfer();
+                else
+                    GetCurrentServer().SocketReturn();
+            }
         }
     }
 

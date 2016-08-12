@@ -6,12 +6,16 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Notifications;
 using Windows.UI.Popups;
@@ -48,14 +52,17 @@ namespace WinIRC
             this.SetTheme();
 
             this.InitializeComponent();
+
+            foreach (var current in BackgroundTaskRegistration.AllTasks)
+            {
+                current.Value.Unregister(true);
+            }
+
             this.Suspending += OnSuspending;
             this.Resuming += App_Resuming;
         }
 
-        private void App_Resuming(object sender, object e)
-        {
-            MainPage.instance.ExtendExecution();
-        }
+        private Boolean CanBackground = false;
 
         public void SetTheme()
         {
@@ -99,7 +106,7 @@ namespace WinIRC
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             AppLaunched = true;
 #if DEBUG
@@ -108,6 +115,18 @@ namespace WinIRC
                 this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
+            try
+            {
+                var check = await BackgroundExecutionManager.RequestAccessAsync();
+                CanBackground = check == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity ||
+                                check == BackgroundAccessStatus.AllowedSubjectToSystemPolicy ||
+                                check == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity ||
+                                check == BackgroundAccessStatus.AlwaysAllowed;
+            }
+            catch 
+            {
+                CanBackground = false;
+            }
 
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -174,11 +193,115 @@ namespace WinIRC
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
-            MainPage.instance.ExtendExecution();
+
             var deferral = e.SuspendingOperation.GetDeferral();
+
+            if (CanBackground)
+            {
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                foreach (Irc server in servers)
+                {
+                    if (server is IrcSocket)
+                    {
+                        server.SocketTransfer();
+                    }
+                }
+            }
+            else
+            {
+                MainPage.instance.ExtendExecution();
+            }
+
             deferral.Complete();
         }
 
+        private void App_Resuming(object sender, object e)
+        {
+            if (CanBackground)
+            {
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                foreach (Irc server in servers)
+                {
+                    if (server is IrcSocket)
+                    {
+                        server.SocketReturn();
+                    }
+                }
+            }
+            else
+            {
+                MainPage.instance.ExtendExecution();
+            }
+        }
+
+        protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            var taskInstance = args.TaskInstance;
+            var deferral = taskInstance.GetDeferral();
+            Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
+            try
+            {
+                var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
+                var socketInformation = details.SocketInformation;
+
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                IrcSocket irc = null;
+
+                foreach (Irc server in servers)
+                {
+                    Debug.WriteLine("Irc server name " + server.BackgroundTaskName +  " - Task name " + taskInstance.Task.Name);
+
+                    if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName )
+                    {
+                        irc = server as IrcSocket;
+                    }
+                }
+
+                if (irc == null)
+                {
+                    Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
+                    return;
+                }
+
+                Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
+
+                switch (details.Reason)
+                {
+                    case SocketActivityTriggerReason.SocketActivity:
+                    case SocketActivityTriggerReason.KeepAliveTimerExpired:
+                        var socket = socketInformation.StreamSocket;
+                        DataReader reader = new DataReader(socket.InputStream);
+                        DataWriter writer = new DataWriter(socket.OutputStream);
+                        reader.InputStreamOptions = InputStreamOptions.Partial;
+                        await irc.ReadFromServer(reader, writer);
+                        break;
+                    case SocketActivityTriggerReason.SocketClosed:
+                        // implement reconnecting
+                        break;
+                    default:
+                        break;
+                }
+                deferral.Complete();
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                Debug.WriteLine(exception.StackTrace);
+                deferral.Complete();
+            }
+        }
+
+        private void ShowToast(string title, string message)
+        {
+            var toast = Irc.CreateBasicToast(title, message);
+
+            var toastNotifier = ToastNotificationManager.CreateToastNotifier();
+
+            toastNotifier.Show(toast);
+        }
 
 
         protected override void OnActivated(IActivatedEventArgs e)

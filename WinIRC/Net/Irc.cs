@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -29,6 +30,13 @@ namespace WinIRC.Net
 
         public IrcServer server { get; set; }
 
+        public String BackgroundTaskName {
+            get
+            {
+                return "WinIRCBackgroundTask." + server.name;
+            }
+        }
+
         public bool IsAuthed { get; set; }
 
         public ObservableCollection<Message> ircMessages { get; set; }
@@ -44,6 +52,8 @@ namespace WinIRC.Net
 
         public string buffer;
         public string currentChannel;
+        public bool Transferred = false;
+
         private string lightTextColor;
         private string chatTextColor;
 
@@ -60,6 +70,8 @@ namespace WinIRC.Net
 
         public virtual async void Connect() { }
         public virtual async void Disconnect(string msg = "Powered by WinIRC") { }
+        public virtual async void SocketTransfer() { }
+        public virtual async void SocketReturn() { }
 
         internal void AttemptAuth()
         {
@@ -88,8 +100,8 @@ namespace WinIRC.Net
         private async void AttemptRegister()
         {
             try {
-                writer.WriteString(String.Format("NICK {0}", server.username) + "\r\n");
-                writer.WriteString(String.Format("USER {0} {1} * :{2}", server.username, "8", server.username) + "\r\n");
+                WriteLine(String.Format("NICK {0}", server.username) + "\r\n");
+                WriteLine(String.Format("USER {0} {1} * :{2}", server.username, "8", server.username) + "\r\n");
                 await writer.StoreAsync();
                 await writer.FlushAsync();
             }
@@ -100,14 +112,8 @@ namespace WinIRC.Net
             }
         }
 
-        internal void HandleLine(string receivedData)
+        internal async Task HandleLine(string receivedData)
         {
-            if (receivedData.StartsWith("PING"))
-            {
-                WriteLine(receivedData.Replace("PING", "PONG"));
-                return;
-            }
-
             var parsedLine = new IrcMessage(receivedData);
 
             if (parsedLine.CommandMessage.Command == "CAP")
@@ -413,7 +419,7 @@ namespace WinIRC.Net
                 {
                     if (!channelList.Contains("Server"))
                     {
-                        AddChannel("Server");
+                        await AddChannel("Server");
                     }
 
                     Message msg = new Message();
@@ -428,6 +434,7 @@ namespace WinIRC.Net
             //Debug.WriteLine(parsedLine.CommandMessage.Command + " - " + receivedData);
 
         }
+
 
         public void SendAction(string message)
         {
@@ -583,6 +590,11 @@ namespace WinIRC.Net
         }
 
         public async void WriteLine(string str)
+        {
+            await WriteLine(writer, str);
+        }
+
+        public async Task WriteLine(DataWriter writer, string str)
         {
             try
             {

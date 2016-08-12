@@ -127,6 +127,7 @@
                             </Pivot>
 
                             <CommandBar x:Name="MenuBar" Height="48" VerticalAlignment="Top" ClosedDisplayMode="Compact">
+                                <AppBarButton x:Name="DebugButton" Style="{StaticResource AppbarButtonStyle}" Icon="Stop" ToolTipService.ToolTip="Suspend" Click="TransferServer_Click" Visibility="Collapsed"/>
 
                                 <AppBarButton Style="{StaticResource AppbarButtonStyle}" Icon="Add" ToolTipService.ToolTip="Connect" Click="ShowConnectPopup"/>
                                 <AppBarSeparator Width="32" Margin="-10,0" />
