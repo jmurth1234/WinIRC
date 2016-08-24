@@ -75,35 +75,27 @@ namespace WinIRC.Net
 
         internal void AttemptAuth()
         {
-
             // Auth to the server
             Debug.WriteLine("Attempting to auth");
 
-            System.Threading.Timer timer = null;
+            WriteLine("CAP LS");
+
             AttemptRegister();
 
-            timer = new System.Threading.Timer((obj) =>
+            if (server.password != "")
             {
-                WriteLine("CAP LS");
-
-                if (server.password != "")
-                {
-                    WriteLine("PASS " + server.password);
-                }
-                //WriteLine(String.Format("JOIN {0}", "#rymate"));
-                timer.Dispose();
-            }, null, 300, System.Threading.Timeout.Infinite);
+                WriteLine("PASS " + server.password);
+            }
 
             IsAuthed = true;
         }
 
-        private async void AttemptRegister()
+        private void AttemptRegister()
         {
-            try {
-                WriteLine(String.Format("NICK {0}", server.username) + "\r\n");
-                WriteLine(String.Format("USER {0} {1} * :{2}", server.username, "8", server.username) + "\r\n");
-                await writer.StoreAsync();
-                await writer.FlushAsync();
+            try
+            {
+                WriteLine(String.Format("NICK {0}", server.username));
+                WriteLine(String.Format("USER {0} {1} * :{2}", server.username, "8", server.username));
             }
             catch (Exception e)
             {

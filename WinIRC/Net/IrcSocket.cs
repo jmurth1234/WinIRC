@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.ExtendedExecution;
@@ -20,6 +21,7 @@ namespace WinIRC.Net
         private IBackgroundTaskRegistration task = null;
         private DataReaderLoadOperation readOperation;
         private SafeLineReader dataStreamLineReader;
+        private CancellationTokenSource socketCancellation;
 
         public override async void Connect()
         {
@@ -96,15 +98,26 @@ namespace WinIRC.Net
 
         public override async void SocketTransfer()
         {
-            // set a variable to ensure the while loop doesn't continue trying to process connections
-            Transferred = true;
+            if (streamSocket == null) return;
+            try
+            {
+                // set a variable to ensure the while loop doesn't continue trying to process connections
+                Transferred = true;
 
-            // detatch all the buffers
-            await streamSocket.CancelIOAsync();
+                // detatch all the buffers
+                await streamSocket.CancelIOAsync();
 
-            // transfer the socket
-            streamSocket.TransferOwnership(server.name);
-            streamSocket = null;
+                // transfer the socket
+                streamSocket.TransferOwnership(server.name);
+                streamSocket = null;
+            }
+            catch (Exception e)
+            {
+                var toast = CreateBasicToast("Error when activating background socket", e.Message);
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+                ToastNotificationManager.CreateToastNotifier().Show(toast);
+            }
         }
 
         public override void SocketReturn()

@@ -208,11 +208,9 @@ namespace WinIRC
                     }
                 }
             }
-            else
-            {
-                MainPage.instance.ExtendExecution();
-            }
-
+            
+            MainPage.instance.ExtendExecution();
+            
             deferral.Complete();
         }
 
@@ -230,10 +228,8 @@ namespace WinIRC
                     }
                 }
             }
-            else
-            {
-                MainPage.instance.ExtendExecution();
-            }
+
+            MainPage.instance.ExtendExecution();
         }
 
         protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
