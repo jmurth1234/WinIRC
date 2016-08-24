@@ -463,7 +463,6 @@ namespace WinIRC.Net
         public void JoinChannel(string channel)
         {
             WriteLine(String.Format("JOIN {0}", channel));
-            AddChannel(channel);
         }
 
         public void PartChannel(string channel)
