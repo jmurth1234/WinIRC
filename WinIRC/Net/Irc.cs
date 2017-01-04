@@ -258,6 +258,11 @@ namespace WinIRC.Net
                 var list = parsedLine.TrailMessage.TrailingContent.Split(' ').ToList();
                 var channel = parsedLine.CommandMessage.Parameters[2];
 
+                if (!channelList.Contains(channel))
+                {
+                    await AddChannel(channel);
+                }
+
                 channelStore[channel].AddUsers(list);
             }
             else if (parsedLine.CommandMessage.Command == "332")
@@ -265,6 +270,12 @@ namespace WinIRC.Net
                 // handle /TOPIC
                 var topic = parsedLine.TrailMessage.TrailingContent;
                 var channel = parsedLine.CommandMessage.Parameters[1];
+
+                if (!channelList.Contains(channel))
+                {
+                    await AddChannel(channel);
+                }
+
                 Message msg = new Message();
                 msg.Type = MessageType.Info;
 

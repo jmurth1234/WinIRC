@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using Tweetinvi;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
@@ -29,6 +30,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
 using WinIRC.Net;
+using Tweetinvi.Models;
 
 namespace WinIRC
 {
@@ -38,6 +40,7 @@ namespace WinIRC
     sealed partial class App : Application
     {
         public bool AppLaunched { get; private set; }
+        public ITwitterCredentials TwitterCredentials { get; private set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -85,7 +88,7 @@ namespace WinIRC
             }
 
             if (AppLaunched)
-            {
+            { 
                 Frame rootFrame = Window.Current.Content as Frame;
                 if (Config.Contains(Config.DarkTheme))
                 {
@@ -140,6 +143,8 @@ namespace WinIRC
                     Width = 320,
                     Height = 240
                 });
+
+                this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
 
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
@@ -196,6 +201,8 @@ namespace WinIRC
 
             var deferral = e.SuspendingOperation.GetDeferral();
 
+            MainPage.instance.ExtendExecution();
+
             if (CanBackground)
             {
                 var servers = IrcUiHandler.Instance.connectedServers.Values;
@@ -204,13 +211,11 @@ namespace WinIRC
                 {
                     if (server is IrcSocket)
                     {
-                        server.SocketTransfer();
+                        //server.SocketTransfer();
                     }
                 }
             }
-            
-            MainPage.instance.ExtendExecution();
-            
+                        
             deferral.Complete();
         }
 
@@ -224,7 +229,7 @@ namespace WinIRC
                 {
                     if (server is IrcSocket)
                     {
-                        server.SocketReturn();
+                        //server.SocketReturn();
                     }
                 }
             }
@@ -232,63 +237,65 @@ namespace WinIRC
             MainPage.instance.ExtendExecution();
         }
 
-        protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
-        {
-            var taskInstance = args.TaskInstance;
-            var deferral = taskInstance.GetDeferral();
-            Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
-            try
-            {
-                var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
-                var socketInformation = details.SocketInformation;
 
-                var servers = IrcUiHandler.Instance.connectedServers.Values;
+        //protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        //{
+        //    var taskInstance = args.TaskInstance;
+        //    var deferral = taskInstance.GetDeferral();
+        //    Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
+        //    try
+        //    {
+        //        var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
+        //        var socketInformation = details.SocketInformation;
 
-                IrcSocket irc = null;
+        //        var servers = IrcUiHandler.Instance.connectedServers.Values;
 
-                foreach (Irc server in servers)
-                {
-                    Debug.WriteLine("Irc server name " + server.BackgroundTaskName +  " - Task name " + taskInstance.Task.Name);
+        //        IrcSocket irc = null;
 
-                    if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName )
-                    {
-                        irc = server as IrcSocket;
-                    }
-                }
+        //        foreach (Irc server in servers)
+        //        {
+        //            Debug.WriteLine("Irc server name " + server.BackgroundTaskName +  " - Task name " + taskInstance.Task.Name);
 
-                if (irc == null)
-                {
-                    Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
-                    return;
-                }
+        //            if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName )
+        //            {
+        //                irc = server as IrcSocket;
+        //            }
+        //        }
 
-                Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
+        //        if (irc == null)
+        //        {
+        //            Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
+        //            return;
+        //        }
 
-                switch (details.Reason)
-                {
-                    case SocketActivityTriggerReason.SocketActivity:
-                    case SocketActivityTriggerReason.KeepAliveTimerExpired:
-                        var socket = socketInformation.StreamSocket;
-                        DataReader reader = new DataReader(socket.InputStream);
-                        DataWriter writer = new DataWriter(socket.OutputStream);
-                        reader.InputStreamOptions = InputStreamOptions.Partial;
-                        await irc.ReadFromServer(reader, writer);
-                        break;
-                    case SocketActivityTriggerReason.SocketClosed:
-                        // implement reconnecting
-                        break;
-                    default:
-                        break;
-                }
-                deferral.Complete();
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
-                Debug.WriteLine(exception.StackTrace);
-                deferral.Complete();
-            }
-        }
+        //        Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
+
+        //        switch (details.Reason)
+        //        {
+        //            case SocketActivityTriggerReason.SocketActivity:
+        //            case SocketActivityTriggerReason.KeepAliveTimerExpired:
+        //                var socket = socketInformation.StreamSocket;
+        //                DataReader reader = new DataReader(socket.InputStream);
+        //                DataWriter writer = new DataWriter(socket.OutputStream);
+        //                reader.InputStreamOptions = InputStreamOptions.Partial;
+        //                await irc.ReadFromServer(reader, writer);
+        //                break;
+        //            case SocketActivityTriggerReason.SocketClosed:
+        //                // implement reconnecting
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //        deferral.Complete();
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        Debug.WriteLine(exception.Message);
+        //        Debug.WriteLine(exception.StackTrace);
+        //        deferral.Complete();
+        //    }
+        //}
+
 
         private void ShowToast(string title, string message)
         {

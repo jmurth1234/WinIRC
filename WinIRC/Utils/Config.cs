@@ -10,6 +10,7 @@ namespace WinIRC
         public const string UserListClick = "userlistclick";
         public const string SwitchOnJoin = "switchonjoin";
         public const string UseTabs = "usetabs";
+        public const string AutoReconnect = "autoreconnect";
 
         // display settings
         public const string DarkTheme = "darktheme";
@@ -21,7 +22,6 @@ namespace WinIRC
         // handles for server storage
         public static string ServersStore = "serversstore";
         public static string ServersListStore = "serversliststore";
-
 
         public static bool Contains(string key)
         {
@@ -78,6 +78,11 @@ namespace WinIRC
             {
                 return 0;
             }
+        }
+
+        internal static void SetBoolean(object autoReconnect, bool isOn)
+        {
+            throw new NotImplementedException();
         }
     }
 }

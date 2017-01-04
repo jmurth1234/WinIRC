@@ -135,7 +135,7 @@
                                     <AppBarButton.Flyout>
                                         <Flyout x:Name="ChannelInfoFlyout" Placement="Left">
                                             <StackPanel Orientation="Vertical" MaxWidth="300">
-                                                <TextBlock x:Name="TopicText" ui:HyperlinkedTextBlock.Text="{Binding ElementName=Root, Path=currentTopic}" TextWrapping="WrapWholeWords" LineHeight="8"/>
+                                                <TextBlock x:Name="TopicText" Text="{Binding ElementName=Root, Path=currentTopic}" TextWrapping="WrapWholeWords" LineHeight="8"/>
                                             </StackPanel>
                                         </Flyout>
                                     </AppBarButton.Flyout>

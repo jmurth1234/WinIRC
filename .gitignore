@@ -245,3 +245,6 @@ ModelManifest.xml
 .fake/
 /IRCForwarder/.idea
 /IRCForwarder/out/production/IRCForwarder
+/WinIRC/SideloadAppPackages
+/.idea/.idea.WinIRC
+/WinIRC/.vscode

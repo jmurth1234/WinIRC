@@ -17,7 +17,7 @@
             <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ui:MessageLine MessageItem="{Binding}"/>
+                        <ui:MessageLine CompactMode="False" MessageItem="{Binding}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>

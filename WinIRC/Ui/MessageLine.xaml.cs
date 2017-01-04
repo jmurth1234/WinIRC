@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Net;
+using WinIRC.Ui;
+using WinIRC.Views;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -28,14 +30,38 @@ namespace WinIRC.Ui
                 typeof(MessageLine),
                 new PropertyMetadata(null));
 
+        public static readonly DependencyProperty CompactModeProperty =
+            DependencyProperty.Register(
+                "CompactMode",
+                typeof(bool),
+                typeof(MessageLine),
+                new PropertyMetadata(null));
+
+        private HyperlinkManager hyperlinkManager;
+        private Uri lastUri;
+
         public Message MessageItem
         {
             get { return (Message)GetValue(MessageProperty); }
             set { SetValue(MessageProperty, value); }
         }
+
+        public bool CompactMode
+        {
+            get {
+                return (bool)GetValue(CompactModeProperty);
+            }
+            set {
+                SetValue(CompactModeProperty, value);
+            }
+        }
+
+        public bool HasLoaded { get; private set; }
+
         public MessageLine()
         {
             this.InitializeComponent();
+            this.hyperlinkManager = new HyperlinkManager();
 
             Loaded += MessageLine_Loaded;
         }
@@ -47,7 +73,7 @@ namespace WinIRC.Ui
 
             if (double.IsNaN(UsernameBox.ActualWidth) || double.IsNaN(TimestampBox.ActualWidth)) return;
 
-            MessageParagraph.TextIndent = UsernameBox.ActualWidth + TimestampBox.ActualWidth;  
+            MessageParagraph.TextIndent = UsernameBox.ActualWidth + TimestampBox.ActualWidth;
 
             if (MessageBox.ActualHeight > UsernameBox.ActualHeight)
             {
@@ -57,8 +83,8 @@ namespace WinIRC.Ui
 
             if (MessageItem.Type == MessageType.Info)
             {
-                UsernameBox.Style = (Style)Application.Current.Resources["InfoTextBlockStyle"];
-                MessageBox.Style = (Style)Application.Current.Resources["InfoTextRichStyle"];
+                UsernameBox.Style = (Style) Application.Current.Resources["InfoTextBlockStyle"];
+                MessageBox.Style  = (Style) Application.Current.Resources["InfoTextRichStyle"];
             }
             else if (MessageItem.Type == MessageType.Action)
             {
@@ -71,8 +97,31 @@ namespace WinIRC.Ui
                 UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
                 MessageBox.Foreground = new SolidColorBrush(Colors.Red);
             }
+            hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
+            hyperlinkManager.LinkClicked += MediaPreview_Clicked;
+            this.HasLoaded = true;
         }
 
+        private void MediaPreview_Clicked(Uri uri)
+        {
 
+            if (PreviewFrame.Visibility == Visibility.Collapsed || uri != lastUri)
+            {
+                PreviewFrame.Visibility = Visibility.Visible;
+
+                if (uri.Host.Contains("twitter.com"))
+                    PreviewFrame.Navigate(typeof(TwitterView), uri);
+                else if (uri.Host.Contains("youtube.com") || uri.Host.Contains("youtu.be")) 
+                    PreviewFrame.Navigate(typeof(YoutubeView), uri);
+                else if (HyperlinkManager.isImage(uri.ToString()))
+                    PreviewFrame.Navigate(typeof(ImageView), uri);
+
+                lastUri = uri;
+            }
+            else
+            {
+                PreviewFrame.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }

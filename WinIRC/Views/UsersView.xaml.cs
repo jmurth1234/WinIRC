@@ -149,6 +149,8 @@ namespace WinIRC
             {
                 var msgEntry = MainPage.instance.GetInputBox();
 
+                if (msgEntry == null) return;
+
                 if (msgEntry.Text == "")
                 {
                     msgEntry.Text = UserSelected + ": ";
@@ -171,6 +173,7 @@ namespace WinIRC
         private void UsernameItem_Click(object sender, RoutedEventArgs e)
         {
             var msgEntry = MainPage.instance.GetInputBox();
+            if (msgEntry == null) return;
 
             if (msgEntry.Text == "")
             {

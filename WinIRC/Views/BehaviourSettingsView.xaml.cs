@@ -49,6 +49,17 @@ namespace WinIRC
                 this.UserListClick.SelectedIndex = 0;
             }
 
+            if (Config.Contains(Config.AutoReconnect))
+            {
+                this.ReconnectSwitch.IsOn = Config.GetBoolean(Config.AutoReconnect);
+            }
+            else
+            {
+                Config.SetBoolean(Config.AutoReconnect, true);
+                this.ReconnectSwitch.IsOn = true;
+            }
+
+
             if (Config.Contains(Config.SwitchOnJoin))
             {
                 this.AutoChannelSwitch.IsOn = Config.GetBoolean(Config.SwitchOnJoin);
@@ -97,6 +108,14 @@ namespace WinIRC
 
             Config.SetBoolean(Config.UseTabs, TabsSwitch.IsOn);
 
+        }
+
+        private void ReconnectSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.AutoReconnect, ReconnectSwitch.IsOn);
         }
     }
 

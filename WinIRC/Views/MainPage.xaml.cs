@@ -263,7 +263,9 @@ namespace WinIRC
 
         public TextBox GetInputBox()
         {
-            return GetCurrentChannelView().GetInputBox(); 
+            if (GetCurrentChannelView() != null)
+                return GetCurrentChannelView().GetInputBox(); 
+            else return null;
         }
 
         public ListBox GetChannelList()
@@ -366,6 +368,8 @@ namespace WinIRC
 
         private void InputPaneShowing(InputPane sender, InputPaneVisibilityEventArgs args)
         {
+            if (GetInputBox() == null) return;
+
             if (GetInputBox().FocusState != FocusState.Unfocused)
             {
                 this.mainGrid.Margin = new Thickness(0, -48, 0, args.OccludedRect.Height);
@@ -384,6 +388,7 @@ namespace WinIRC
                 var channel = channelList.SelectedItem.ToString();
                 SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
+                GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
             }
             catch (Exception ex)
             {
@@ -459,7 +464,13 @@ namespace WinIRC
 
         public Irc GetCurrentServer()
         {
-            return IrcHandler.connectedServers[currentServer];
+            try
+            {
+                return IrcHandler.connectedServers[currentServer];
+            } catch
+            {
+                return null;
+            }
         }
 
         public void MentionReply(string ircserver, string channel, string message)
