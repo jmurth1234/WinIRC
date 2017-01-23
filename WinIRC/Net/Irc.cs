@@ -69,7 +69,7 @@ namespace WinIRC.Net
         }
 
         public virtual async void Connect() { }
-        public virtual async void Disconnect(string msg = "Powered by WinIRC") { }
+        public virtual async void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false) { }
         public virtual async void SocketTransfer() { }
         public virtual async void SocketReturn() { }
 

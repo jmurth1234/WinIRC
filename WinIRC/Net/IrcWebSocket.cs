@@ -60,7 +60,7 @@ namespace WinIRC.Net
             HandleDisconnect(this);
         }
 
-        public override void Disconnect(string msg = "Powered by WinIRC")
+        public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
             HandleDisconnect(this);

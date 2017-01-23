@@ -152,7 +152,7 @@ namespace WinIRC.Net
                 {
                     Debug.WriteLine(ex.Message);
                     Debug.WriteLine(ex.StackTrace);
-                    if (!Transferred) Disconnect();
+                    if (!Transferred) Disconnect("", true);
                     return;
                 }
 
@@ -180,7 +180,7 @@ namespace WinIRC.Net
                     if (line.Length == 0) continue;
                     if (line.StartsWith("ERROR"))
                     {
-                        Disconnect();
+                        Disconnect("", true);
                         return;
                     }
 
@@ -195,11 +195,18 @@ namespace WinIRC.Net
             }
         }
 
-        public override void Disconnect(string msg = "Powered by WinIRC")
+        public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
-            WriteLine("QUIT :" + msg);
-            IsConnected = false;
-            HandleDisconnect(this);
+            if (attemptReconnect)
+            {
+                Connect();
+            }
+            else
+            {
+                WriteLine("QUIT :" + msg);
+                IsConnected = false;
+                HandleDisconnect(this);
+            }
         }
     }
 

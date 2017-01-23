@@ -101,6 +101,7 @@ namespace WinIRC
 #if DEBUG
             DebugButton.Visibility = Visibility.Visible;
 #endif
+
             instance = this;
         }
 
@@ -493,7 +494,10 @@ namespace WinIRC
             if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
             if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
 
-            ExtendExecution();
+            if (session == null)
+            {
+                ExtendExecution();
+            }
 
             irc.HandleDisconnect += HandleDisconnect;
 
@@ -524,7 +528,20 @@ namespace WinIRC
                     session.Reason = ExtendedExecutionReason.Unspecified;
                     session.Description = "Keeping IRC Connected";
                     session.Revoked += session_Revoked;
-                    await session.RequestExtensionAsync();
+
+                    ExtendedExecutionResult result = await session.RequestExtensionAsync();
+
+                    switch (result)
+                    {
+                        case ExtendedExecutionResult.Allowed:
+                            Debug.WriteLine("Extended execution allowed.");
+                            break;
+                        default:
+                        case ExtendedExecutionResult.Denied:
+                            Debug.WriteLine("Extended execution denied.");
+                            session.Dispose();
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
