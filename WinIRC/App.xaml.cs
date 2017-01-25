@@ -131,12 +131,20 @@ namespace WinIRC
                 CanBackground = false;
             }
 
-            Frame rootFrame = Window.Current.Content as Frame;
+            InitApp(e);
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
 
+        private bool InitApp(IActivatedEventArgs e)
+        {
+            var loaded = true;
+            Frame rootFrame = Window.Current.Content as Frame;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (rootFrame == null)
             {
+                loaded = false;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
                 applicationView.SetPreferredMinSize(new Windows.Foundation.Size
                 {
@@ -156,7 +164,7 @@ namespace WinIRC
                     //TODO: Load state from previously suspended application
                 }
 
-                if (!e.PrelaunchActivated)
+                if (e is LaunchActivatedEventArgs && !(e as LaunchActivatedEventArgs).PrelaunchActivated)
                 {
                     //TODO: maybe add some stuff here if needed.
                 }
@@ -167,15 +175,17 @@ namespace WinIRC
 
             if (rootFrame.Content == null)
             {
+                loaded = false;
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                if (e is LaunchActivatedEventArgs)
+                    rootFrame.Navigate(typeof(MainPage), (e as LaunchActivatedEventArgs).Arguments);
+                else
+                    rootFrame.Navigate(typeof(MainPage));
             }
 
-
-            // Ensure the current window is active
-            Window.Current.Activate();
+            return loaded;
         }
 
         /// <summary>
@@ -197,105 +207,17 @@ namespace WinIRC
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
             var deferral = e.SuspendingOperation.GetDeferral();
 
             MainPage.instance.ExtendExecution();
-
-            if (CanBackground)
-            {
-                var servers = IrcUiHandler.Instance.connectedServers.Values;
-
-                foreach (Irc server in servers)
-                {
-                    if (server is IrcSocket)
-                    {
-                        //server.SocketTransfer();
-                    }
-                }
-            }
                         
             deferral.Complete();
         }
 
         private void App_Resuming(object sender, object e)
-        {
-            if (CanBackground)
-            {
-                var servers = IrcUiHandler.Instance.connectedServers.Values;
-
-                foreach (Irc server in servers)
-                {
-                    if (server is IrcSocket)
-                    {
-                        //server.SocketReturn();
-                    }
-                }
-            }
-
+        { 
             MainPage.instance.ExtendExecution();
         }
-
-
-        //protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
-        //{
-        //    var taskInstance = args.TaskInstance;
-        //    var deferral = taskInstance.GetDeferral();
-        //    Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
-        //    try
-        //    {
-        //        var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
-        //        var socketInformation = details.SocketInformation;
-
-        //        var servers = IrcUiHandler.Instance.connectedServers.Values;
-
-        //        IrcSocket irc = null;
-
-        //        foreach (Irc server in servers)
-        //        {
-        //            Debug.WriteLine("Irc server name " + server.BackgroundTaskName +  " - Task name " + taskInstance.Task.Name);
-
-        //            if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName )
-        //            {
-        //                irc = server as IrcSocket;
-        //            }
-        //        }
-
-        //        if (irc == null)
-        //        {
-        //            Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
-        //            return;
-        //        }
-
-        //        Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
-
-        //        switch (details.Reason)
-        //        {
-        //            case SocketActivityTriggerReason.SocketActivity:
-        //            case SocketActivityTriggerReason.KeepAliveTimerExpired:
-        //                var socket = socketInformation.StreamSocket;
-        //                DataReader reader = new DataReader(socket.InputStream);
-        //                DataWriter writer = new DataWriter(socket.OutputStream);
-        //                reader.InputStreamOptions = InputStreamOptions.Partial;
-        //                await irc.ReadFromServer(reader, writer);
-        //                break;
-        //            case SocketActivityTriggerReason.SocketClosed:
-        //                // implement reconnecting
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //        deferral.Complete();
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Debug.WriteLine(exception.Message);
-        //        Debug.WriteLine(exception.StackTrace);
-        //        deferral.Complete();
-        //    }
-        //}
-
 
         private void ShowToast(string title, string message)
         {
@@ -309,37 +231,12 @@ namespace WinIRC
 
         protected override void OnActivated(IActivatedEventArgs e)
         {
-            // Get the root frame
+            // Initialise the app if it's not already open
             Frame rootFrame = Window.Current.Content as Frame;
 
-            var loaded = true;
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
-            if (rootFrame == null)
-            {
-                this.SetTheme();
+            Debug.WriteLine("App activated!");
 
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-
-                rootFrame.NavigationFailed += OnNavigationFailed;
-
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
-                loaded = false;
-            }
-
-            if (rootFrame.Content == null)
-            {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                rootFrame.Navigate(typeof(MainPage));
-
-                // Ensure the current window is active
-                Window.Current.Activate();
-                loaded = false;
-            }
+            var loaded = InitApp(e);
 
             // Handle toast activation
             if (e.Kind == ActivationKind.ToastNotification && loaded)

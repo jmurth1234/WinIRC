@@ -494,10 +494,7 @@ namespace WinIRC
             if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
             if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
 
-            if (session == null)
-            {
-                ExtendExecution();
-            }
+            ExtendExecution();
 
             irc.HandleDisconnect += HandleDisconnect;
 

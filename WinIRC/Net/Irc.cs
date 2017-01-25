@@ -410,10 +410,13 @@ namespace WinIRC.Net
                     SendMessage("nickserv", "identify " + server.nickservPassword);
                 }
 
-                var channelsList = server.channels.Split(',');
-                foreach (string channel in channelsList)
+                if (server.channels != null && server.channels != "")
                 {
-                    JoinChannel(channel);
+                    var channelsList = server.channels.Split(',');
+                    foreach (string channel in channelsList)
+                    {
+                        JoinChannel(channel);
+                    }
                 }
             }
             else
@@ -673,6 +676,21 @@ namespace WinIRC.Net
         {
             try
             {
+                AdaptiveText message;
+                if (text.StartsWith("ACTION"))
+                {
+                    message = new AdaptiveText
+                    {
+                        Text = text.Replace("ACTION", " * " + username)
+                    };
+                }
+                else
+                {
+                    message = new AdaptiveText
+                    {
+                        Text = text
+                    };
+                }
                 // Construct the visuals of the toast
                 ToastVisual visual = new ToastVisual()
                 {
@@ -681,7 +699,7 @@ namespace WinIRC.Net
                         Children =
                         {
                             new AdaptiveText {Text = "Message from " + username },
-                            new AdaptiveText {Text = text }
+                            message
                         },
                         Attribution = new ToastGenericAttributionText
                         {
