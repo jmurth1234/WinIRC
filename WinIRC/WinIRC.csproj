@@ -170,6 +170,7 @@
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\IrcUiHandler.cs" />
     <Compile Include="Net\ChannelStore.cs" />
+    <Compile Include="Net\Connection.cs" />
     <Compile Include="Net\Irc.cs" />
     <Compile Include="Net\IrcMessage.cs" />
     <Compile Include="Net\IrcServer.cs" />

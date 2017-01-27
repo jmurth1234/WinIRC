@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using WinIRC.Net;
 using WinIRC.Ui;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -49,16 +50,19 @@ namespace WinIRC.Views
 
         private async void setupPageAsync()
         {
-            var uriArray = uri.ToString().Split('/');
-            var tweet = await Task.Run(() =>
+            if (new Connection().HasInternetAccess)
             {
-                return Tweet.GetTweet(long.Parse(uriArray[uriArray.Length - 1].Replace("?s=09", "")));
-            });
+                var uriArray = uri.ToString().Split('/');
+                var tweet = await Task.Run(() =>
+                {
+                    return Tweet.GetTweet(long.Parse(uriArray[uriArray.Length - 1].Replace("?s=09", "")));
+                });
 
-            Timestamp.Text = tweet.CreatedAt.ToLocalTime().ToString();
-            hyperlinkManager.SetText(TweetParagraph, tweet.Text);
-            UsernameBox.Text = tweet.CreatedBy.Name;
-            Picture.Source = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
+                Timestamp.Text = tweet.CreatedAt.ToLocalTime().ToString();
+                hyperlinkManager.SetText(TweetParagraph, tweet.Text);
+                UsernameBox.Text = tweet.CreatedBy.Name;
+                Picture.Source = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
+            }
         }
 
         private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)

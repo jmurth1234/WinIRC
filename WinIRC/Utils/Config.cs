@@ -80,9 +80,5 @@ namespace WinIRC
             }
         }
 
-        internal static void SetBoolean(object autoReconnect, bool isOn)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

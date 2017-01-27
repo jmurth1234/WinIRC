@@ -56,6 +56,8 @@ namespace WinIRC.Net
 
         private string lightTextColor;
         private string chatTextColor;
+        internal Connection ConnCheck;
+        public bool IsConnected = false;
 
         public Action<Irc> HandleDisconnect { get; set; }
 
@@ -66,6 +68,32 @@ namespace WinIRC.Net
             channelBuffers = new Dictionary<string, ObservableCollection<Message>>();
             channelStore = new Dictionary<string, ChannelStore>();
             IsAuthed = false;
+            ConnCheck = new Connection();
+
+            ConnCheck.ConnectionChanged += (connected) =>
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
+            );
+        }
+
+        private void ConnectionChanged(bool connected)
+        {
+            if (connected && Config.GetBoolean(Config.AutoReconnect))
+            {
+                IsAuthed = false;
+                Connect();
+
+                foreach (string channel in channelBuffers.Keys)
+                {
+                    ClientMessage(channel, "Reconnecting...");
+                }
+            }
+            else
+            {
+                foreach (string channel in channelBuffers.Keys)
+                {
+                    ClientMessage(channel, "Disconnected from IRC");
+                }
+            }
         }
 
         public virtual async void Connect() { }

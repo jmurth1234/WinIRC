@@ -237,8 +237,7 @@ namespace WinIRC
 
             if (Config.Contains(Config.HideStatusBar))
             {
-                var isStatusBarPresent = ApiInformation.IsTypePresent(typeof(StatusBar).ToString());
-                if (isStatusBarPresent)
+                if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1, 0))
                 {
                     StatusBar statusBar = StatusBar.GetForCurrentView();
                     if (Config.GetBoolean(Config.HideStatusBar))
@@ -451,7 +450,11 @@ namespace WinIRC
                 serversCombo.SelectedItem = server;
             }
 
-            IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
+            if (IrcHandler.connectedServers.ContainsKey(currentServer))
+            {
+                IrcHandler.connectedServers[currentServer].SwitchChannel(channel);
+            }
+
             currentChannel = channel;
 
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)

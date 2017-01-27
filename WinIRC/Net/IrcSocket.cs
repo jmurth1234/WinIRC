@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.ExtendedExecution;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -16,7 +17,6 @@ namespace WinIRC.Net
 {
     public class IrcSocket : Irc
     {
-        public bool IsConnected = false;
         private const int socketReceiveBufferSize = 1024;
         private IBackgroundTaskRegistration task = null;
         private DataReaderLoadOperation readOperation;
@@ -25,6 +25,25 @@ namespace WinIRC.Net
 
         public override async void Connect()
         {
+            if (!ConnCheck.HasInternetAccess)
+            {
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var msg = autoReconnect
+                    ? "We'll try to connect once a connection is available." 
+                    : "Please try again once your connection is restored";
+
+                var error = Irc.CreateBasicToast("No connection detected.", msg);
+                error.ExpirationTime = DateTime.Now.AddDays(2);
+                ToastNotificationManager.CreateToastNotifier().Show(error);
+
+                if (!autoReconnect)
+                {
+                    Disconnect("", autoReconnect);
+                }
+
+                return;
+            }
+
             try
             {
                 foreach (var current in BackgroundTaskRegistration.AllTasks)
@@ -152,7 +171,10 @@ namespace WinIRC.Net
                 {
                     Debug.WriteLine(ex.Message);
                     Debug.WriteLine(ex.StackTrace);
-                    if (!Transferred) Disconnect("", true);
+                    if (!Transferred)
+                        Disconnect("", true);
+
+                    IsConnected = false;
                     return;
                 }
 
@@ -197,9 +219,9 @@ namespace WinIRC.Net
 
         public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
-            if (attemptReconnect)
+            if (attemptReconnect && Config.GetBoolean(Config.AutoReconnect))
             {
-                Connect();
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
             }
             else
             {

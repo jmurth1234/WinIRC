@@ -152,7 +152,21 @@ namespace WinIRC
                     Height = 240
                 });
 
-                this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
+                Connection check = new Connection();
+                if (check.HasInternetAccess)
+                {
+                    setTwitterCredentials();
+                } 
+                else
+                {
+                    check.ConnectionChanged += (connected) =>
+                    {
+                        if (connected)
+                        {
+                            setTwitterCredentials();
+                        }
+                    };
+                }
 
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
@@ -186,6 +200,11 @@ namespace WinIRC
             }
 
             return loaded;
+        }
+
+        public void setTwitterCredentials()
+        {
+            this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
         }
 
         /// <summary>
