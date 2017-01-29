@@ -242,6 +242,8 @@ namespace WinIRC.Net
                     toast.ExpirationTime = DateTime.Now.AddDays(2);
                     ToastNotificationManager.CreateToastNotifier().Show(toast);
                     msg.Mention = true;
+
+                    (App.Current as App).NumberPings++;
                 }
 
                 AddMessage(destination, msg);

@@ -27,11 +27,7 @@ namespace WinIRC.Views
     /// </summary>
     public sealed partial class ConnectView : Page
     {
-        private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
-        private ObjectStorageHelper<List<IrcServer>> serversListOSH;
-
-        public ObservableCollection<String> servers { get; set; }
-        public List<IrcServer> serversList { get; set; }
+        private IrcServers ircServers = IrcServers.Instance;
 
         public IrcUiHandler IrcHandler = IrcUiHandler.Instance;
         private bool loadedSavedServer;
@@ -49,13 +45,8 @@ namespace WinIRC.Views
 
         private async void ConnectView_Loaded(object sender, RoutedEventArgs e)
         {
-            serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-            servers = await serversOSH.LoadAsync(Config.ServersStore);
-
-            serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-            serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
-
-            serversSavedCombo.ItemsSource = servers;
+            await ircServers.loadServers();
+            serversSavedCombo.ItemsSource = ircServers.servers;
         }
 
         private void ConnectButtonClick(object sender, RoutedEventArgs e)
@@ -74,13 +65,7 @@ namespace WinIRC.Views
                 return;
             }
 
-            Net.Irc irc;
-            if (webSocket.IsOn)
-                irc = new Net.IrcWebSocket();
-            else
-                irc = new Net.IrcSocket();
-
-            irc.server = ircServer;
+            var irc = ircServers.CreateConnection(ircServer);
 
             CloseView();
             MainPage.instance.Connect(irc);
@@ -97,34 +82,9 @@ namespace WinIRC.Views
                 return;
             }
 
-            if (servers == null)
-            {
-                servers = new ObservableCollection<string>();
-                serversList = new List<IrcServer>();
-                serversSavedCombo.ItemsSource = servers;
-            }
-
-            foreach (var serverCheck in serversList)
-            {
-                if (serverCheck.name == server.Text)
-                {
-                    var name = serverCheck.name;
-                    serversList.Remove(serverCheck);
-                    servers.Remove(name);
-
-                    serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    serversOSH.SaveAsync(servers, Config.ServersStore);
-                    break;
-                }
-            }
-
-            servers.Add(ircServer.name);
-            serversList.Add(ircServer);
+            ircServers.AddServer(ircServer);
 
             serversSavedCombo.SelectedItem = ircServer.name;
-
-            serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-            serversOSH.SaveAsync(servers, Config.ServersStore);
         }
 
         internal IrcServer CreateIrcServer()
@@ -200,19 +160,8 @@ namespace WinIRC.Views
         private void DeleteButtonClick(object sender, RoutedEventArgs e)
         {
             if (serversSavedCombo.SelectedItem == null) return;
-            foreach (var ircServer in serversList)
-            {
-                if (ircServer.name == serversSavedCombo.SelectedItem.ToString())
-                {
-                    var name = ircServer.name;
-                    serversList.Remove(ircServer);
-                    servers.Remove(name);
 
-                    serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    serversOSH.SaveAsync(servers, Config.ServersStore);
-                    break;
-                }
-            }
+            ircServers.DeleteServer(serversSavedCombo.SelectedItem.ToString());
         }
 
         private async void savedServersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -223,19 +172,18 @@ namespace WinIRC.Views
                 return;
             }
 
-            if (serversList == null)
+            if (ircServers.servers == null)
             {
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them");
                 await dialog.ShowAsync();
 
-                servers = new ObservableCollection<string>();
-                serversList = new List<IrcServer>();
-                serversSavedCombo.ItemsSource = servers;
+                ircServers.servers = new ObservableCollection<string>();
+                ircServers.serversList = new List<IrcServer>();
+                serversSavedCombo.ItemsSource = ircServers;
                 return;
             }
 
-            if (!serversList.Any(server => server.name == serversSavedCombo.SelectedItem.ToString())) return;
-            var ircServer = serversList.First(server => server.name == serversSavedCombo.SelectedItem.ToString());
+            var ircServer = ircServers.Get(serversSavedCombo.SelectedItem.ToString());
 
             hostname.Text = ircServer.hostname;
 

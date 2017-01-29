@@ -84,8 +84,6 @@ namespace WinIRC
             currentServer = "";
             currentTopic = "";
 
-            Loaded += MainPage_Loaded;
-
             var inputPane = InputPane.GetForCurrentView();
             inputPane.Showing += this.InputPaneShowing;
             inputPane.Hiding += this.InputPaneHiding;
@@ -103,6 +101,80 @@ namespace WinIRC
 #endif
 
             instance = this;
+        }
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            try
+            {
+                PivotItem p = new PivotItem();
+                lastAuto = true;
+                p.Header = "Welcome";
+                Frame frame = new Frame();
+
+                p.Margin = new Thickness(0, 0, 0, -2);
+
+                p.Content = frame;
+                Tabs.Items.Add(p);
+                Tabs.SelectedIndex = Tabs.Items.Count - 1;
+                frame.Navigate(typeof(PlaceholderView));
+
+                UpdateUi();
+
+                //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
+
+                serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
+                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
+
+                var folder = serversOSH.GetFolder(StorageType.Roaming);
+
+                if ((await folder.GetItemsAsync()).Count == 0 && !(await serversOSH.FileExists(folder, "migrated")))
+                {
+                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+                    return;
+                }
+
+                if ((await folder.GetItemsAsync()).Count == 1)
+                {
+                    return;
+                }
+
+                if (await serversOSH.FileExists(folder, "migrated"))
+                {
+                    servers = await serversOSH.LoadAsync(Config.ServersStore);
+                    serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+                }
+                else
+                {
+                    servers = await serversOSH.LoadAsync();
+                    await serversOSH.MigrateAsync(servers, Config.ServersStore);
+
+                    serversList = await serversListOSH.LoadAsync();
+                    await serversListOSH.MigrateAsync(serversList, Config.ServersListStore);
+
+                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var dialog = new MessageDialog("Error when loading saved servers: " + ex.Message);
+                await dialog.ShowAsync();
+            }
+
+            if (e.Parameter != null)
+            {
+                var launchEvent = e.Parameter.ToString();
+                this.OnLaunchedEvent(launchEvent);
+            }
+        }
+
+        public void OnLaunchedEvent(string args)
+        {
+            if (args == "") return; 
+
+            var server = IrcServers.Instance.Get(args);
+            Connect(IrcServers.Instance.CreateConnection(server));
         }
 
         private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -271,67 +343,6 @@ namespace WinIRC
         public ListBox GetChannelList()
         {
             return channelList;
-        }
-
-        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                PivotItem p = new PivotItem();
-                lastAuto = true;
-                p.Header = "Welcome";
-                Frame frame = new Frame();
-
-                p.Margin = new Thickness(0, 0, 0, -2);
-
-                p.Content = frame;
-                Tabs.Items.Add(p);
-                Tabs.SelectedIndex = Tabs.Items.Count - 1;
-                frame.Navigate(typeof(PlaceholderView));
-
-                UpdateUi();
-
-                //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
-
-                serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-
-                var folder = serversOSH.GetFolder(StorageType.Roaming);
-
-                if ((await folder.GetItemsAsync()).Count == 0 && !(await serversOSH.FileExists(folder, "migrated")))
-                {
-                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
-                    return;
-                }
-
-                if ((await folder.GetItemsAsync()).Count == 1)
-                {
-                    return;
-                }
-
-                if (await serversOSH.FileExists(folder, "migrated"))
-                {
-                    servers = await serversOSH.LoadAsync(Config.ServersStore);
-                    serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
-                }
-                else
-                {
-                    servers = await serversOSH.LoadAsync();
-                    await serversOSH.MigrateAsync(servers, Config.ServersStore);
-
-                    serversList = await serversListOSH.LoadAsync();
-                    await serversListOSH.MigrateAsync(serversList, Config.ServersListStore);
-
-                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                var dialog = new MessageDialog("Error when loading saved servers: " + ex.Message);
-                await dialog.ShowAsync();
-            }
-
         }
 
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)

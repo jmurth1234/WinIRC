@@ -22,7 +22,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>
-    <AppxBundle>Always</AppxBundle>
+    <AppxBundle>Auto</AppxBundle>
     <AppxPackageDir>C:\Users\super\Documents\Visual Studio 2015\Projects\WinIRC\WinIRC\SideloadAppPackages\</AppxPackageDir>
     <HockeyAppResourceId>ca57c9d3f4bf4bb082d064cd09de9ac6</HockeyAppResourceId>
   </PropertyGroup>
@@ -89,7 +89,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
     <EnableGatekeeperAnalysis>true</EnableGatekeeperAnalysis>
-    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -160,6 +160,7 @@
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
     <Content Include="Assets\winirc-badge.scale-100.png" />
     <Content Include="Assets\winirc-badge.scale-200.png" />
+    <Content Include="Assets\winirc-jumplist.png" />
     <Content Include="Assets\winirc.png" />
     <Content Include="Assets\winirc.svg" />
     <Content Include="Assets\winircsplash.png" />
@@ -182,6 +183,7 @@
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>

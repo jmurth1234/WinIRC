@@ -31,6 +31,10 @@ using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
 using WinIRC.Net;
 using Tweetinvi.Models;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Core;
+using WinIRC.Utils;
+using System.Threading.Tasks;
 
 namespace WinIRC
 {
@@ -41,6 +45,35 @@ namespace WinIRC
     {
         public bool AppLaunched { get; private set; }
         public ITwitterCredentials TwitterCredentials { get; private set; }
+
+        private int _NumberPings;
+
+        public int NumberPings {
+            get
+            {
+                return _NumberPings;
+            }
+            set
+            {
+                if (!IncrementPings)
+                {
+                    return;
+                }
+
+                _NumberPings = value;
+                
+                if (NumberPings > 0)
+                {
+                    setBadgeNumber(_NumberPings);
+                }
+                else
+                {
+                    clearBadge();
+                }
+            }
+        }
+
+        public bool IncrementPings = true;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -104,6 +137,34 @@ namespace WinIRC
 
         }
 
+        private void setBadgeNumber(int num)
+        {
+
+            // Get the blank badge XML payload for a badge number
+            XmlDocument badgeXml =
+                BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+
+            // Set the value of the badge in the XML to our number
+            XmlElement badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
+            badgeElement.SetAttribute("value", num.ToString());
+
+            // Create the badge notification
+            BadgeNotification badge = new BadgeNotification(badgeXml);
+
+            // Create the badge updater for the application
+            BadgeUpdater badgeUpdater =
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            // And update the badge
+            badgeUpdater.Update(badge);
+
+        }
+
+        private void clearBadge()
+        {
+            BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -131,19 +192,38 @@ namespace WinIRC
                 CanBackground = false;
             }
 
-            InitApp(e);
-            // Ensure the current window is active
+            await InitApp(e);
+
+            // Ensure the current window is active  
             Window.Current.Activate();
+            Window.Current.Activated += Current_Activated; 
         }
 
-        private bool InitApp(IActivatedEventArgs e)
+        private void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
+        {
+            if (e.WindowActivationState == CoreWindowActivationState.Deactivated)
+            {
+                System.Diagnostics.Debug.WriteLine("Deactivated " + DateTime.Now);
+                IncrementPings = true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Activated " + DateTime.Now);
+                NumberPings = 0;
+                IncrementPings = false;
+            }
+        }
+
+        private async Task<bool> InitApp(IActivatedEventArgs e)
         {
             var loaded = true;
             Frame rootFrame = Window.Current.Content as Frame;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
+
             if (rootFrame == null)
             {
+                NumberPings = 0;
                 loaded = false;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
                 applicationView.SetPreferredMinSize(new Windows.Foundation.Size
@@ -187,6 +267,9 @@ namespace WinIRC
                 Window.Current.Content = rootFrame;
             }
 
+            IrcServers servers = IrcServers.Instance;
+            await servers.UpdateJumpList();
+
             if (rootFrame.Content == null)
             {
                 loaded = false;
@@ -197,6 +280,13 @@ namespace WinIRC
                     rootFrame.Navigate(typeof(MainPage), (e as LaunchActivatedEventArgs).Arguments);
                 else
                     rootFrame.Navigate(typeof(MainPage));
+
+            }
+            else
+            {
+                var page = rootFrame.Content as MainPage;
+                if (e is LaunchActivatedEventArgs)
+                    page?.OnLaunchedEvent((e as LaunchActivatedEventArgs).Arguments);
             }
 
             return loaded;
@@ -248,14 +338,14 @@ namespace WinIRC
         }
 
 
-        protected override void OnActivated(IActivatedEventArgs e)
+        protected override async void OnActivated(IActivatedEventArgs e)
         {
             // Initialise the app if it's not already open
             Frame rootFrame = Window.Current.Content as Frame;
 
             Debug.WriteLine("App activated!");
 
-            var loaded = InitApp(e);
+            var loaded = await InitApp(e);
 
             // Handle toast activation
             if (e.Kind == ActivationKind.ToastNotification && loaded)
@@ -294,7 +384,7 @@ namespace WinIRC
                         mainPage.SwitchChannel(server, channel, false);
                 }
                 else if (qryStr["action"] == "viewConversation")
-                { 
+                {
                     // The conversation ID retrieved from the toast args
                     string channel = qryStr["channel"];
                     string server = qryStr["server"];
