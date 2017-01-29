@@ -13,10 +13,18 @@ namespace WinIRC.Utils
     {
         private static IrcServers instance;
 
-        private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
         private ObjectStorageHelper<List<IrcServer>> serversListOSH;
 
-        public ObservableCollection<String> servers { get; set; }
+        public ObservableCollection<String> servers {
+            get
+            {
+                var list = new ObservableCollection<string>();
+
+                serversList.ForEach(server => list.Add(server.name));
+
+                return list;
+            }
+        }
         public List<IrcServer> serversList { get; set; }
 
         public static IrcServers Instance
@@ -55,15 +63,11 @@ namespace WinIRC.Utils
 
         public async Task loadServers()
         {
-            serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-            servers = await serversOSH.LoadAsync(Config.ServersStore);
-
             serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
             serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
 
             if (servers == null)
             {
-                servers = new ObservableCollection<string>();
                 serversList = new List<IrcServer>();
             }
             servers.CollectionChanged += async (e, i) => await UpdateJumpList();
@@ -86,7 +90,6 @@ namespace WinIRC.Utils
         {
             if (servers == null)
             {
-                servers = new ObservableCollection<string>();
                 serversList = new List<IrcServer>();
             }
 
@@ -99,16 +102,13 @@ namespace WinIRC.Utils
                     servers.Remove(name);
 
                     await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    await serversOSH.SaveAsync(servers, Config.ServersStore);
                     break;
                 }
             }
 
-            servers.Add(server.name);
             serversList.Add(server);
 
             serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-            serversOSH.SaveAsync(servers, Config.ServersStore);
         }
 
         public async void DeleteServer(String name)
@@ -121,7 +121,6 @@ namespace WinIRC.Utils
                     servers.Remove(name);
 
                     await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    await serversOSH.SaveAsync(servers, Config.ServersStore);
                     break;
                 }
             }
