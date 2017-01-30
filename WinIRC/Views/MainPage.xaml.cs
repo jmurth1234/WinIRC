@@ -167,6 +167,7 @@ namespace WinIRC
                 var launchEvent = e.Parameter.ToString();
                 this.OnLaunchedEvent(launchEvent);
             }
+
         }
 
         public void OnLaunchedEvent(string args)

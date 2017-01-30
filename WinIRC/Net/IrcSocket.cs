@@ -44,40 +44,12 @@ namespace WinIRC.Net
                 return;
             }
 
-            try
-            {
-                foreach (var current in BackgroundTaskRegistration.AllTasks)
-                {
-                    if (current.Value.Name == BackgroundTaskName)
-                    {
-                        task = current.Value;
-                        break;
-                    }
-                }
-
-                if (task == null)
-                {
-                    var socketTaskBuilder = new BackgroundTaskBuilder();
-                    socketTaskBuilder.Name = "WinIRCBackgroundTask." + server.name;
-
-                    var trigger = new SocketActivityTrigger();
-                    socketTaskBuilder.SetTrigger(trigger);
-                    task = socketTaskBuilder.Register();
-                }
-            }
-            catch
-            {
-                // empty catch
-            }
-
             streamSocket = new StreamSocket();
             streamSocket.Control.KeepAlive = true;
             dataStreamLineReader = new SafeLineReader();
 
             try
             { 
-                if (task != null) streamSocket.EnableTransferOwnership(task.TaskId, SocketActivityConnectedStandbyAction.Wake);
-
                 var protectionLevel = server.ssl ? SocketProtectionLevel.Tls12 : SocketProtectionLevel.PlainSocket;
                 Debug.WriteLine("Attempting to connect...");
                 await streamSocket.ConnectAsync(new Windows.Networking.HostName(server.hostname), server.port.ToString(), protectionLevel);
