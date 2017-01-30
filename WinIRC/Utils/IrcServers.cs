@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using WinIRC.Net;
 
@@ -41,7 +42,6 @@ namespace WinIRC.Utils
 
         private IrcServers()
         {
-            loadServers();
         }
 
         public async Task UpdateJumpList()
@@ -63,13 +63,25 @@ namespace WinIRC.Utils
 
         public async Task loadServers()
         {
-            serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-            serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+            try
+            {
+                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
+                serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+            }
+            catch (Exception e)
+            {
+                var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them. \n\nError: " + e.Message);
+                await dialog.ShowAsync();
 
-            if (servers == null)
+                serversList = new List<IrcServer>();
+                await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+            }
+
+            if (serversList == null)
             {
                 serversList = new List<IrcServer>();
             }
+
             servers.CollectionChanged += async (e, i) => await UpdateJumpList();
         }
 

@@ -83,7 +83,7 @@ namespace WinIRC.Views
             }
 
             ircServers.AddServer(ircServer);
-
+            serversSavedCombo.ItemsSource = ircServers.servers;
             serversSavedCombo.SelectedItem = ircServer.name;
         }
 

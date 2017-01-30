@@ -70,8 +70,8 @@ namespace WinIRC.Net
             IsAuthed = false;
             ConnCheck = new Connection();
 
-            ConnCheck.ConnectionChanged += (connected) =>
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
+            ConnCheck.ConnectionChanged += async (connected) =>
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
             );
         }
 
@@ -80,12 +80,12 @@ namespace WinIRC.Net
             if (connected && Config.GetBoolean(Config.AutoReconnect))
             {
                 IsAuthed = false;
-                Connect();
 
                 foreach (string channel in channelBuffers.Keys)
                 {
                     ClientMessage(channel, "Reconnecting...");
                 }
+                Connect();
             }
             else
             {

@@ -268,6 +268,7 @@ namespace WinIRC
             }
 
             IrcServers servers = IrcServers.Instance;
+            await servers.loadServers();
             await servers.UpdateJumpList();
 
             if (rootFrame.Content == null)
