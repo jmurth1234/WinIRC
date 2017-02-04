@@ -64,6 +64,15 @@ namespace WinIRC.Net
             }
             catch (Exception e)
             {
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var msg = autoReconnect
+                    ? "Attempting to reconnect..."
+                    : "Please try again later.";
+
+                var error = Irc.CreateBasicToast("Error whilst connecting: " + e.Message, msg);
+
+                Disconnect("", autoReconnect);
+
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
                 return;
