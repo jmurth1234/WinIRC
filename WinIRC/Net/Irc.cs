@@ -297,9 +297,28 @@ namespace WinIRC.Net
             }
             else if (parsedLine.CommandMessage.Command == "332")
             {
-                // handle /TOPIC
+                // handle initial topic recieve
                 var topic = parsedLine.TrailMessage.TrailingContent;
                 var channel = parsedLine.CommandMessage.Parameters[1];
+
+                if (!channelList.Contains(channel))
+                {
+                    await AddChannel(channel);
+                }
+
+                Message msg = new Message();
+                msg.Type = MessageType.Info;
+
+                msg.User = "";
+                msg.Text = String.Format("Topic for channel {0}: {1}", channel, topic);
+                AddMessage(channel, msg);
+                channelStore[channel].SetTopic(topic);
+            }
+            else if (parsedLine.CommandMessage.Command == "TOPIC")
+            {
+                // handle topic recieved
+                var topic = parsedLine.TrailMessage.TrailingContent;
+                var channel = parsedLine.CommandMessage.Parameters[0];
 
                 if (!channelList.Contains(channel))
                 {
@@ -346,7 +365,7 @@ namespace WinIRC.Net
                         string mode = parsedLine.CommandMessage.Parameters[1];
                         if (mode == "+o")
                         {
-                            if (currentPrefix[0] == '+')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '+')
                             {
                                 prefix = "@+";
                             }
@@ -357,14 +376,14 @@ namespace WinIRC.Net
                         }
                         else if (mode == "-o")
                         {
-                            if (currentPrefix[1] == '+')
+                            if (currentPrefix.Length > 0 && currentPrefix[1] == '+')
                             {
                                 prefix = "+";
                             }
                         }
                         else if (mode == "+v")
                         {
-                            if (currentPrefix[0] == '@')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '@')
                             {
                                 prefix = "@+";
                             }
@@ -375,7 +394,7 @@ namespace WinIRC.Net
                         }
                         else if (mode == "-v")
                         {
-                            if (currentPrefix[0] == '@')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '@')
                             {
                                 prefix = "@";
                             }
