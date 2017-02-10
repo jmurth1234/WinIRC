@@ -662,6 +662,7 @@ namespace WinIRC
             SidebarHeader.ShowBackButton = false;
 
             IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
+            UpdateInfo(currentServer, currentChannel);
             SidebarHeader.Title = "Channel Users";
             ToggleSidebar();
         }
