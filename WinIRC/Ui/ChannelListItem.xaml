@@ -9,7 +9,17 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Width="220">
+    <UserControl.Resources>
+
+        <MenuFlyout x:Key="ServerContextMenu" >
+            <MenuFlyoutItem x:Name="ReconnectItem" Text="Reconnect to server" Click="ReconnectItem_Click"  />
+            <MenuFlyoutItem x:Name="CloseItem" Text="Close server" Click="CloseItem_Click"  />
+        </MenuFlyout>
+
+    </UserControl.Resources>
+
+
+    <Grid Width="220" RightTapped="Grid_RightTapped">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition />

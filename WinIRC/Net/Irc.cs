@@ -57,6 +57,9 @@ namespace WinIRC.Net
         private string lightTextColor;
         private string chatTextColor;
         internal Connection ConnCheck;
+
+        internal bool IsReconnecting;
+
         public bool IsConnected = false;
 
         public Action<Irc> HandleDisconnect { get; set; }
@@ -79,8 +82,6 @@ namespace WinIRC.Net
         {
             if (connected && Config.GetBoolean(Config.AutoReconnect))
             {
-                IsAuthed = false;
-
                 foreach (string channel in channelBuffers.Keys)
                 {
                     ClientMessage(channel, "Reconnecting...");
@@ -658,8 +659,17 @@ namespace WinIRC.Net
             }
             catch (Exception e)
             {
-                MessageDialog dialog = new MessageDialog("An error occured: " + e.Message + ". Disconnecting");
-                HandleDisconnect(this);
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var msg = autoReconnect
+                    ? "Attempting to reconnect..."
+                    : "Please try again later.";
+
+                MessageDialog dialog = new MessageDialog("An error occured: " + e.Message + ". " + msg);
+
+                Disconnect(attemptReconnect: autoReconnect);
+
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
         }
 

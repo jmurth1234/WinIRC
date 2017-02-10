@@ -597,7 +597,40 @@ namespace WinIRC
                 IrcHandler.connectedServers.Remove(irc.server.name);
                 IrcHandler.connectedServersList.Remove(irc.server.name);
                 channelList.ItemsSource = null;
-                //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
+
+                List<PivotItem> Temp = new List<PivotItem>();
+                var name = irc.server.name;
+                Debug.WriteLine("All tabs: " + Tabs.Items.Count);
+
+                var count = Tabs.Items.Count;
+
+                for (var i = 0; i < count; i++)
+                {
+                    Debug.WriteLine("Tabs seen: " + i);
+                    var item = Tabs.Items[0] as PivotItem;
+                    var content = (item.Content as Frame).Content;
+                    if (content is ChannelView && (content as ChannelView).currentServer == name)
+                    {
+                        Tabs.Items.Remove(item);
+                    }
+                }
+
+                Debug.WriteLine(Tabs.Items.Count);
+
+                if (Tabs.Items.Count == 0)
+                {
+                    PivotItem p = new PivotItem();
+                    lastAuto = true;
+                    p.Header = "Welcome";
+                    Frame frame = new Frame();
+
+                    p.Margin = new Thickness(0, 0, 0, -2);
+
+                    p.Content = frame;
+                    Tabs.Items.Add(p);
+                    Tabs.SelectedIndex = Tabs.Items.Count - 1;
+                    frame.Navigate(typeof(PlaceholderView));
+                }
             });
         }
 
@@ -780,6 +813,17 @@ namespace WinIRC
                 else
                     GetCurrentServer().SocketReturn();
             }
+        }
+
+        private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)
+        {
+            var args = e as ServerRightClickArgs;
+
+            if (args.type == ServerRightClickType.RECONNECT)
+                GetCurrentServer().Disconnect(attemptReconnect: true);
+            else if (args.type == ServerRightClickType.CLOSE)
+                GetCurrentServer().Disconnect(attemptReconnect: false);
+
         }
     }
 
