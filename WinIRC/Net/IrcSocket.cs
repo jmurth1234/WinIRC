@@ -61,9 +61,9 @@ namespace WinIRC.Net
                 writer = new DataWriter(streamSocket.OutputStream);
 
                 IsConnected = true;
+                IsReconnecting = false;
 
                 ConnectionHandler();
-                IsReconnecting = false;
             }
             catch (Exception e)
             {
@@ -183,6 +183,12 @@ namespace WinIRC.Net
                     var line = dataStreamLineReader.SafeFlushLine();
                     if (line == null) break;
                     if (line.Length == 0) continue;
+                    
+                    if (line.Contains("Nickname is already in use"))
+                    {
+                        this.server.username += "_";
+                        AttemptAuth();
+                    }
 
                     if (line.StartsWith("ERROR"))
                     {
@@ -220,7 +226,10 @@ namespace WinIRC.Net
             if (attemptReconnect)
             {
                 IsReconnecting = true;
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                if (ConnCheck.HasInternetAccess)
+                {
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                }
             }
             else
             {

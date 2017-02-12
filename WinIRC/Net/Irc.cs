@@ -94,6 +94,7 @@ namespace WinIRC.Net
                 {
                     ClientMessage(channel, "Disconnected from IRC");
                 }
+                Disconnect(attemptReconnect: true);
             }
         }
 
@@ -653,9 +654,12 @@ namespace WinIRC.Net
         {
             try
             {
-                writer.WriteString(str + "\r\n");
-                await writer.StoreAsync();
-                await writer.FlushAsync();
+                if (ConnCheck.HasInternetAccess && !IsReconnecting)
+                {
+                    writer.WriteString(str + "\r\n");
+                    await writer.StoreAsync();
+                    await writer.FlushAsync();
+                }
             }
             catch (Exception e)
             {
@@ -663,8 +667,6 @@ namespace WinIRC.Net
                 var msg = autoReconnect
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
-
-                MessageDialog dialog = new MessageDialog("An error occured: " + e.Message + ". " + msg);
 
                 Disconnect(attemptReconnect: autoReconnect);
 
