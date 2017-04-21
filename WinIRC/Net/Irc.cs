@@ -57,6 +57,9 @@ namespace WinIRC.Net
         private string lightTextColor;
         private string chatTextColor;
         internal Connection ConnCheck;
+
+        internal bool IsReconnecting;
+
         public bool IsConnected = false;
 
         public Action<Irc> HandleDisconnect { get; set; }
@@ -70,8 +73,8 @@ namespace WinIRC.Net
             IsAuthed = false;
             ConnCheck = new Connection();
 
-            ConnCheck.ConnectionChanged += (connected) =>
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
+            ConnCheck.ConnectionChanged += async (connected) =>
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
             );
         }
 
@@ -79,13 +82,11 @@ namespace WinIRC.Net
         {
             if (connected && Config.GetBoolean(Config.AutoReconnect))
             {
-                IsAuthed = false;
-                Connect();
-
                 foreach (string channel in channelBuffers.Keys)
                 {
                     ClientMessage(channel, "Reconnecting...");
                 }
+                Connect();
             }
             else
             {
@@ -93,6 +94,7 @@ namespace WinIRC.Net
                 {
                     ClientMessage(channel, "Disconnected from IRC");
                 }
+                Disconnect(attemptReconnect: true);
             }
         }
 
@@ -297,9 +299,28 @@ namespace WinIRC.Net
             }
             else if (parsedLine.CommandMessage.Command == "332")
             {
-                // handle /TOPIC
+                // handle initial topic recieve
                 var topic = parsedLine.TrailMessage.TrailingContent;
                 var channel = parsedLine.CommandMessage.Parameters[1];
+
+                if (!channelList.Contains(channel))
+                {
+                    await AddChannel(channel);
+                }
+
+                Message msg = new Message();
+                msg.Type = MessageType.Info;
+
+                msg.User = "";
+                msg.Text = String.Format("Topic for channel {0}: {1}", channel, topic);
+                AddMessage(channel, msg);
+                channelStore[channel].SetTopic(topic);
+            }
+            else if (parsedLine.CommandMessage.Command == "TOPIC")
+            {
+                // handle topic recieved
+                var topic = parsedLine.TrailMessage.TrailingContent;
+                var channel = parsedLine.CommandMessage.Parameters[0];
 
                 if (!channelList.Contains(channel))
                 {
@@ -346,7 +367,7 @@ namespace WinIRC.Net
                         string mode = parsedLine.CommandMessage.Parameters[1];
                         if (mode == "+o")
                         {
-                            if (currentPrefix[0] == '+')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '+')
                             {
                                 prefix = "@+";
                             }
@@ -357,14 +378,14 @@ namespace WinIRC.Net
                         }
                         else if (mode == "-o")
                         {
-                            if (currentPrefix[1] == '+')
+                            if (currentPrefix.Length > 0 && currentPrefix[1] == '+')
                             {
                                 prefix = "+";
                             }
                         }
                         else if (mode == "+v")
                         {
-                            if (currentPrefix[0] == '@')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '@')
                             {
                                 prefix = "@+";
                             }
@@ -375,7 +396,7 @@ namespace WinIRC.Net
                         }
                         else if (mode == "-v")
                         {
-                            if (currentPrefix[0] == '@')
+                            if (currentPrefix.Length > 0 && currentPrefix[0] == '@')
                             {
                                 prefix = "@";
                             }
@@ -633,14 +654,24 @@ namespace WinIRC.Net
         {
             try
             {
-                writer.WriteString(str + "\r\n");
-                await writer.StoreAsync();
-                await writer.FlushAsync();
+                if (ConnCheck.HasInternetAccess && !IsReconnecting)
+                {
+                    writer.WriteString(str + "\r\n");
+                    await writer.StoreAsync();
+                    await writer.FlushAsync();
+                }
             }
             catch (Exception e)
             {
-                MessageDialog dialog = new MessageDialog("An error occured: " + e.Message + ". Disconnecting");
-                HandleDisconnect(this);
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var msg = autoReconnect
+                    ? "Attempting to reconnect..."
+                    : "Please try again later.";
+
+                Disconnect(attemptReconnect: autoReconnect);
+
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
             }
         }
 

@@ -63,9 +63,16 @@ namespace WinIRC.Net
         public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
-            HandleDisconnect(this);
-
-            messageWebSocket.Dispose();
+            if (attemptReconnect)
+            {
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+            }
+            else
+            {
+                IsConnected = false;
+                HandleDisconnect(this);
+                messageWebSocket.Dispose();
+            }
         }
 
         private async void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)

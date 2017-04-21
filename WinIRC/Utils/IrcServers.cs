@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using WinIRC.Net;
 
@@ -13,10 +14,18 @@ namespace WinIRC.Utils
     {
         private static IrcServers instance;
 
-        private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
         private ObjectStorageHelper<List<IrcServer>> serversListOSH;
 
-        public ObservableCollection<String> servers { get; set; }
+        public ObservableCollection<String> servers {
+            get
+            {
+                var list = new ObservableCollection<string>();
+
+                serversList.ForEach(server => list.Add(server.name));
+
+                return list;
+            }
+        }
         public List<IrcServer> serversList { get; set; }
 
         public static IrcServers Instance
@@ -33,7 +42,6 @@ namespace WinIRC.Utils
 
         private IrcServers()
         {
-            loadServers();
         }
 
         public async Task UpdateJumpList()
@@ -55,17 +63,25 @@ namespace WinIRC.Utils
 
         public async Task loadServers()
         {
-            serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-            servers = await serversOSH.LoadAsync(Config.ServersStore);
-
-            serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-            serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
-
-            if (servers == null)
+            try
             {
-                servers = new ObservableCollection<string>();
+                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
+                serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+            }
+            catch (Exception e)
+            {
+                var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them. \n\nError: " + e.Message);
+                await dialog.ShowAsync();
+
+                serversList = new List<IrcServer>();
+                await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+            }
+
+            if (serversList == null)
+            {
                 serversList = new List<IrcServer>();
             }
+
             servers.CollectionChanged += async (e, i) => await UpdateJumpList();
         }
 
@@ -86,7 +102,6 @@ namespace WinIRC.Utils
         {
             if (servers == null)
             {
-                servers = new ObservableCollection<string>();
                 serversList = new List<IrcServer>();
             }
 
@@ -99,16 +114,13 @@ namespace WinIRC.Utils
                     servers.Remove(name);
 
                     await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    await serversOSH.SaveAsync(servers, Config.ServersStore);
                     break;
                 }
             }
 
-            servers.Add(server.name);
             serversList.Add(server);
 
             serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-            serversOSH.SaveAsync(servers, Config.ServersStore);
         }
 
         public async void DeleteServer(String name)
@@ -121,7 +133,6 @@ namespace WinIRC.Utils
                     servers.Remove(name);
 
                     await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
-                    await serversOSH.SaveAsync(servers, Config.ServersStore);
                     break;
                 }
             }

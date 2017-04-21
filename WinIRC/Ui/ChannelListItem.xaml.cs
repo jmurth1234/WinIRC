@@ -26,6 +26,8 @@ namespace WinIRC.Ui
 
         public event EventHandler ChannelJoinClicked;
 
+        public event EventHandler ServerRightClickEvent;
+
         public string Title
         {
             get { return (string)GetValue(TitleProperty); }
@@ -59,6 +61,49 @@ namespace WinIRC.Ui
         {
             if (Title == "Server")
                 ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text));
+        }
+
+        private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            if (Title == "Server")
+            {
+                var RightClick = this.Resources["ServerContextMenu"] as MenuFlyout;
+
+                System.Diagnostics.Debug.WriteLine("MenuFlyout shown '{0}', '{1}'", null, e.GetPosition(null));
+
+                RightClick.ShowAt(null, e.GetPosition(null));
+
+                Style s = new Windows.UI.Xaml.Style { TargetType = typeof(MenuFlyoutPresenter) };
+                s.Setters.Add(new Setter(RequestedThemeProperty, Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light));
+                RightClick.MenuFlyoutPresenterStyle = s;
+            }
+
+
+        }
+
+        private void CloseItem_Click(object sender, RoutedEventArgs e)
+        {
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(ServerRightClickType.CLOSE));
+        }
+
+        private void ReconnectItem_Click(object sender, RoutedEventArgs e)
+        {
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(ServerRightClickType.RECONNECT));
+        }
+    }
+
+    public enum ServerRightClickType
+    {
+        CLOSE, RECONNECT
+    }
+
+    public class ServerRightClickArgs : EventArgs
+    {
+        public ServerRightClickType type { get; private set; }
+
+        public ServerRightClickArgs(ServerRightClickType type)
+        {
+            this.type = type;
         }
     }
 

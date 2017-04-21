@@ -10,6 +10,12 @@ namespace WinIRC.Net
 {
     public class Message
     {
+        public Message()
+        {
+            DateTime date = DateTime.Now;
+            Timestamp = date.ToString("HH:mm");
+        }
+
         public string Timestamp {
             get
             {
@@ -27,6 +33,7 @@ namespace WinIRC.Net
         }
 
         private string _date;
+
         public string User {
             get
             {

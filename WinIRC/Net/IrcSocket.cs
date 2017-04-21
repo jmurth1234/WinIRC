@@ -25,6 +25,8 @@ namespace WinIRC.Net
 
         public override async void Connect()
         {
+            IsAuthed = false;
+
             if (!ConnCheck.HasInternetAccess)
             {
                 var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
@@ -38,36 +40,10 @@ namespace WinIRC.Net
 
                 if (!autoReconnect)
                 {
-                    Disconnect("", autoReconnect);
+                    Disconnect(attemptReconnect: autoReconnect);
                 }
 
                 return;
-            }
-
-            try
-            {
-                foreach (var current in BackgroundTaskRegistration.AllTasks)
-                {
-                    if (current.Value.Name == BackgroundTaskName)
-                    {
-                        task = current.Value;
-                        break;
-                    }
-                }
-
-                if (task == null)
-                {
-                    var socketTaskBuilder = new BackgroundTaskBuilder();
-                    socketTaskBuilder.Name = "WinIRCBackgroundTask." + server.name;
-
-                    var trigger = new SocketActivityTrigger();
-                    socketTaskBuilder.SetTrigger(trigger);
-                    task = socketTaskBuilder.Register();
-                }
-            }
-            catch
-            {
-                // empty catch
             }
 
             streamSocket = new StreamSocket();
@@ -76,8 +52,6 @@ namespace WinIRC.Net
 
             try
             { 
-                if (task != null) streamSocket.EnableTransferOwnership(task.TaskId, SocketActivityConnectedStandbyAction.Wake);
-
                 var protectionLevel = server.ssl ? SocketProtectionLevel.Tls12 : SocketProtectionLevel.PlainSocket;
                 Debug.WriteLine("Attempting to connect...");
                 await streamSocket.ConnectAsync(new Windows.Networking.HostName(server.hostname), server.port.ToString(), protectionLevel);
@@ -87,16 +61,25 @@ namespace WinIRC.Net
                 writer = new DataWriter(streamSocket.OutputStream);
 
                 IsConnected = true;
+                IsReconnecting = false;
 
                 ConnectionHandler();
             }
             catch (Exception e)
             {
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var msg = autoReconnect
+                    ? "Attempting to reconnect..."
+                    : "Please try again later.";
+
+                var error = Irc.CreateBasicToast("Error whilst connecting: " + e.Message, msg);
+                ToastNotificationManager.CreateToastNotifier().Show(error);
+
+                Disconnect(attemptReconnect: autoReconnect);
+
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
-                return;
             }
-
         }
 
         private void session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
@@ -171,10 +154,10 @@ namespace WinIRC.Net
                 {
                     Debug.WriteLine(ex.Message);
                     Debug.WriteLine(ex.StackTrace);
-                    if (!Transferred)
-                        Disconnect("", true);
-
                     IsConnected = false;
+
+                    Disconnect(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
+
                     return;
                 }
 
@@ -200,9 +183,28 @@ namespace WinIRC.Net
                     var line = dataStreamLineReader.SafeFlushLine();
                     if (line == null) break;
                     if (line.Length == 0) continue;
+                    
+                    if (line.Contains("Nickname is already in use"))
+                    {
+                        this.server.username += "_";
+                        AttemptAuth();
+                    }
+
                     if (line.StartsWith("ERROR"))
                     {
-                        Disconnect("", true);
+                        if (!IsReconnecting)
+                        {
+                            var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                            var msg = autoReconnect
+                                ? "Attempting to reconnect..."
+                                : "Please try again later.";
+
+                            var error = Irc.CreateBasicToast("Error with connection", msg);
+
+                            ToastNotificationManager.CreateToastNotifier().Show(error);
+
+                            Disconnect(attemptReconnect: autoReconnect);
+                        }
                         return;
                     }
 
@@ -219,13 +221,18 @@ namespace WinIRC.Net
 
         public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
-            if (attemptReconnect && Config.GetBoolean(Config.AutoReconnect))
+            WriteLine("QUIT :" + msg);
+
+            if (attemptReconnect)
             {
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                IsReconnecting = true;
+                if (ConnCheck.HasInternetAccess)
+                {
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                }
             }
             else
             {
-                WriteLine("QUIT :" + msg);
                 IsConnected = false;
                 HandleDisconnect(this);
             }

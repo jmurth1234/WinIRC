@@ -192,7 +192,7 @@ namespace WinIRC.Net
         /// <param name="message">The message.</param>
         public MessageTrail(string message)
         {
-            string r = "[\x00-\x08\x0B\x0C\x0E-\x1F\x26]";
+            string r = "[\x00-\x08\x0B\x0C\x0E-\x1F]";
             message = Regex.Replace(message, r, "", RegexOptions.Compiled);
 
             // Find the index of the closing colon used to mark the end of the 

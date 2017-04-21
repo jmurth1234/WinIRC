@@ -125,7 +125,7 @@ namespace WinIRC.Net
         public Boolean HasUser(string nick)
         {
             nick = nick.Replace("@", "").Replace("+", "");
-            if (nick == "") return true;
+            if (nick == "") return false;
 
             return Users.Any(user => user.Nick == nick);
         }
@@ -152,7 +152,8 @@ namespace WinIRC.Net
 
         internal string GetPrefix(string user)
         {
-            if (HasUser(user)) return Users.First(u => u.Nick == user).Prefix;
+            if (HasUser(user))
+                return Users.First(u => u.Nick == user).Prefix;
             else return "";
         }
 

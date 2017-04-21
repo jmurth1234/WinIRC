@@ -83,7 +83,7 @@ namespace WinIRC.Views
             }
 
             ircServers.AddServer(ircServer);
-
+            serversSavedCombo.ItemsSource = ircServers.servers;
             serversSavedCombo.SelectedItem = ircServer.name;
         }
 
@@ -177,7 +177,6 @@ namespace WinIRC.Views
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them");
                 await dialog.ShowAsync();
 
-                ircServers.servers = new ObservableCollection<string>();
                 ircServers.serversList = new List<IrcServer>();
                 serversSavedCombo.ItemsSource = ircServers;
                 return;
