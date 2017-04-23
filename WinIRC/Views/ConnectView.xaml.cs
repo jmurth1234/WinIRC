@@ -38,14 +38,14 @@ namespace WinIRC.Views
         {
             this.InitializeComponent();
 
-            Loaded += ConnectView_Loaded; 
+            Loaded += ConnectView_LoadedAsync; 
 
             CloseView = MainPage.instance.CloseConnectView;
         }
 
-        private async void ConnectView_Loaded(object sender, RoutedEventArgs e)
+        private async void ConnectView_LoadedAsync(object sender, RoutedEventArgs e)
         {
-            await ircServers.loadServers();
+            await ircServers.loadServersAsync();
             serversSavedCombo.ItemsSource = ircServers.servers;
         }
 

@@ -26,13 +26,13 @@
         <Setter Property="Foreground" Value="{ThemeResource StatusTextColour}" />
     </Style>
 
-
-    <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
-        <Setter Property="Padding" Value="10" />
+    <Style x:Key="ListBoxItemStyle" TargetType="ListViewItem">
+        <Setter Property="Padding" Value="10,0" />
         <Setter Property="FontSize" Value="10" />
         <Setter Property="Margin" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
     </Style>
     
 

@@ -268,7 +268,7 @@ namespace WinIRC
             }
 
             IrcServers servers = IrcServers.Instance;
-            await servers.loadServers();
+            await servers.loadServersAsync();
             await servers.UpdateJumpList();
 
             if (rootFrame.Content == null)
@@ -295,7 +295,15 @@ namespace WinIRC
 
         public void setTwitterCredentials()
         {
-            this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
+            try
+            {
+                this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
         }
 
         /// <summary>
@@ -337,7 +345,6 @@ namespace WinIRC
 
             toastNotifier.Show(toast);
         }
-
 
         protected override async void OnActivated(IActivatedEventArgs e)
         {

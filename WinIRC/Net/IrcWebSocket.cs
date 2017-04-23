@@ -6,6 +6,8 @@ using Windows.Web;
 using Windows.UI.Core;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Popups;
+using Windows.UI.Notifications;
+using System.Threading.Tasks;
 
 namespace WinIRC.Net
 {
@@ -57,15 +59,33 @@ namespace WinIRC.Net
 
         private void Closed(IWebSocket sender, WebSocketClosedEventArgs args)
         {
-            HandleDisconnect(this);
+            var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+
+            var msg = autoReconnect
+                ? "Attempting to reconnect..."
+                : "Please try again later.";
+
+            var error = Irc.CreateBasicToast("Websocket closed", msg);
+
+            ToastNotificationManager.CreateToastNotifier().Show(error);
+
+            DisconnectAsync(attemptReconnect: autoReconnect);
         }
 
-        public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
+        public override async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
             if (attemptReconnect)
             {
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                IsReconnecting = true;
+                if (ConnCheck.HasInternetAccess)
+                {
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
+                    {
+                        await Task.Delay(100);
+                        Connect();
+                    });
+                }
             }
             else
             {

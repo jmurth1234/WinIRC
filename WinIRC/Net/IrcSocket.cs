@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace WinIRC.Net
         public override async void Connect()
         {
             IsAuthed = false;
+            ReadOrWriteFailed = false;
 
             if (!ConnCheck.HasInternetAccess)
             {
@@ -40,7 +42,7 @@ namespace WinIRC.Net
 
                 if (!autoReconnect)
                 {
-                    Disconnect(attemptReconnect: autoReconnect);
+                    DisconnectAsync(attemptReconnect: autoReconnect);
                 }
 
                 return;
@@ -75,7 +77,7 @@ namespace WinIRC.Net
                 var error = Irc.CreateBasicToast("Error whilst connecting: " + e.Message, msg);
                 ToastNotificationManager.CreateToastNotifier().Show(error);
 
-                Disconnect(attemptReconnect: autoReconnect);
+                DisconnectAsync(attemptReconnect: autoReconnect);
 
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
@@ -154,9 +156,10 @@ namespace WinIRC.Net
                 {
                     Debug.WriteLine(ex.Message);
                     Debug.WriteLine(ex.StackTrace);
+                    ReadOrWriteFailed = true;
                     IsConnected = false;
 
-                    Disconnect(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
+                    DisconnectAsync(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
 
                     return;
                 }
@@ -181,45 +184,16 @@ namespace WinIRC.Net
 
                     // Read next line from data stream.
                     var line = dataStreamLineReader.SafeFlushLine();
+
                     if (line == null) break;
                     if (line.Length == 0) continue;
-                    
-                    if (line.Contains("Nickname is already in use"))
-                    {
-                        this.server.username += "_";
-                        AttemptAuth();
-                    }
-
-                    if (line.StartsWith("ERROR"))
-                    {
-                        if (!IsReconnecting)
-                        {
-                            var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
-                            var msg = autoReconnect
-                                ? "Attempting to reconnect..."
-                                : "Please try again later.";
-
-                            var error = Irc.CreateBasicToast("Error with connection", msg);
-
-                            ToastNotificationManager.CreateToastNotifier().Show(error);
-
-                            Disconnect(attemptReconnect: autoReconnect);
-                        }
-                        return;
-                    }
-
-                    if (line.StartsWith("PING"))
-                    {
-                        await WriteLine(writer, line.Replace("PING", "PONG"));
-                        return;
-                    }
 
                     await HandleLine(line);
                 }
             }
         }
 
-        public override void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false)
+        public override async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
 
@@ -228,7 +202,11 @@ namespace WinIRC.Net
                 IsReconnecting = true;
                 if (ConnCheck.HasInternetAccess)
                 {
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => Connect());
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
+                    {
+                        await Task.Delay(100);
+                        Connect();
+                    });
                 }
             }
             else

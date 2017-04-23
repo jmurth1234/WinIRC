@@ -281,28 +281,25 @@ namespace WinIRC
         {
             if (Config.Contains(Config.ReducedPadding))
             {
-                Thickness padding = new Thickness();
-                padding.Left = 10;
-                padding.Right = 10;
+                int height;
+
                 if (Config.GetBoolean(Config.ReducedPadding))
                 {
-                    padding.Top = 4;
-                    padding.Bottom = 4;
+                    height = 28;
                 }
                 else
                 {
-                    padding.Top = 10;
-                    padding.Bottom = 10;
+                    height = 42;
                 }
 
                 var res = new ResourceDictionary { Source = new Uri("ms-appx:///Styles/Styles.xaml", UriKind.Absolute) };
 
                 var style = res["ListBoxItemStyle"] as Style;
 
-                foreach (var item in style.Setters.Cast<Setter>().Where(item => item.Property == PaddingProperty))
+                foreach (var item in style.Setters.Cast<Setter>().Where(item => item.Property == HeightProperty))
                     style.Setters.Remove(item);
 
-                style.Setters.Add(new Setter(PaddingProperty, padding));
+                style.Setters.Add(new Setter(HeightProperty, height));
 
                 this.ListBoxItemStyle = style;
                 this.channelList.ItemContainerStyle = style;
@@ -341,7 +338,7 @@ namespace WinIRC
             else return null;
         }
 
-        public ListBox GetChannelList()
+        public ListView GetChannelList()
         {
             return channelList;
         }
@@ -821,9 +818,9 @@ namespace WinIRC
             var args = e as ServerRightClickArgs;
 
             if (args.type == ServerRightClickType.RECONNECT)
-                GetCurrentServer().Disconnect(attemptReconnect: true);
+                GetCurrentServer().DisconnectAsync(attemptReconnect: true);
             else if (args.type == ServerRightClickType.CLOSE)
-                GetCurrentServer().Disconnect(attemptReconnect: false);
+                GetCurrentServer().DisconnectAsync(attemptReconnect: false);
 
         }
     }

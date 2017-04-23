@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignHeight="48"
+    d:DesignWidth="220">
 
     <UserControl.Resources>
 
@@ -19,7 +19,7 @@
     </UserControl.Resources>
 
 
-    <Grid Width="220" RightTapped="Grid_RightTapped">
+    <Grid Width="220"  RightTapped="Grid_RightTapped" Background="#00000000">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -31,7 +31,7 @@
             <TextBlock Text="{Binding Title, FallbackValue=Channel Name}" VerticalAlignment="Center" />
         </Grid>
 
-        <Button Grid.Column="1" Visibility="Collapsed" x:Name="AddButton" Content="&#xE109;" Style="{StaticResource IconButtonStyle}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Right" FontSize="14" >
+        <Button Grid.Column="1" Visibility="Collapsed" x:Name="AddButton" Content="&#xE109;" Style="{StaticResource IconButtonStyle}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Right" FontSize="16" >
             <Button.Flyout>
                 <Flyout Placement="Bottom">
                     <StackPanel>
@@ -42,7 +42,11 @@
             </Button.Flyout>
         </Button>
 
-        <Button Grid.Column="1" x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Right" FontSize="14" >
+        <Button Grid.Column="2" Visibility="Collapsed" x:Name="MenuButton" Content="&#xE10C;" Style="{StaticResource IconButtonStyle}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Right" FontSize="16" Click="MenuButton_Click" >
+            
+        </Button>
+
+        <Button Grid.Column="1" x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Right" FontSize="16" >
             <Button.Flyout>
                 <Flyout Placement="Bottom">
                     <StackPanel>

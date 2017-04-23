@@ -278,11 +278,11 @@ namespace WinIRC.Commands
 
             if (message != "")
             {
-                irc.Disconnect(message);
+                irc.DisconnectAsync(message);
             }
             else
             {
-                irc.Disconnect();
+                irc.DisconnectAsync();
             }
         }
 

@@ -19,6 +19,11 @@ namespace WinIRC.Utils
         public ObservableCollection<String> servers {
             get
             {
+                if (serversList == null)
+                {
+                    loadServersAsync();
+                }
+
                 var list = new ObservableCollection<string>();
 
                 serversList.ForEach(server => list.Add(server.name));
@@ -26,6 +31,7 @@ namespace WinIRC.Utils
                 return list;
             }
         }
+
         public List<IrcServer> serversList { get; set; }
 
         public static IrcServers Instance
@@ -46,6 +52,11 @@ namespace WinIRC.Utils
 
         public async Task UpdateJumpList()
         {
+            if (serversList == null)
+            {
+                await loadServersAsync();
+            }
+
             JumpList jumpList = await JumpList.LoadCurrentAsync();
             jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
             jumpList.Items.Clear();
@@ -61,7 +72,7 @@ namespace WinIRC.Utils
             await jumpList.SaveAsync();
         }
 
-        public async Task loadServers()
+        public async Task loadServersAsync()
         {
             try
             {

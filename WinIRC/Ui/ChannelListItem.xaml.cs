@@ -44,6 +44,7 @@ namespace WinIRC.Ui
                 {
                     CloseButton.Visibility = Visibility.Collapsed;
                     AddButton.Visibility = Visibility.Visible;
+                    MenuButton.Visibility = Visibility.Visible;
                 }
 
             };
@@ -65,20 +66,24 @@ namespace WinIRC.Ui
 
         private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
+            ShowServerMenu(sender, e);
+        }
+
+        private void ShowServerMenu(object sender, RoutedEventArgs e)
+        {
             if (Title == "Server")
             {
                 var RightClick = this.Resources["ServerContextMenu"] as MenuFlyout;
 
-                System.Diagnostics.Debug.WriteLine("MenuFlyout shown '{0}', '{1}'", null, e.GetPosition(null));
-
-                RightClick.ShowAt(null, e.GetPosition(null));
+                if (e is RightTappedRoutedEventArgs)
+                    RightClick.ShowAt(null, (e as RightTappedRoutedEventArgs).GetPosition(null));
+                else
+                    RightClick.ShowAt(sender as FrameworkElement);
 
                 Style s = new Windows.UI.Xaml.Style { TargetType = typeof(MenuFlyoutPresenter) };
                 s.Setters.Add(new Setter(RequestedThemeProperty, Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light));
                 RightClick.MenuFlyoutPresenterStyle = s;
             }
-
-
         }
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
@@ -89,6 +94,11 @@ namespace WinIRC.Ui
         private void ReconnectItem_Click(object sender, RoutedEventArgs e)
         {
             ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(ServerRightClickType.RECONNECT));
+        }
+
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowServerMenu(sender, e);
         }
     }
 

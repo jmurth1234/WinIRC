@@ -61,6 +61,7 @@ namespace WinIRC.Net
         internal bool IsReconnecting;
 
         public bool IsConnected = false;
+        internal bool ReadOrWriteFailed;
 
         public Action<Irc> HandleDisconnect { get; set; }
 
@@ -94,12 +95,12 @@ namespace WinIRC.Net
                 {
                     ClientMessage(channel, "Disconnected from IRC");
                 }
-                Disconnect(attemptReconnect: true);
+                DisconnectAsync(attemptReconnect: true);
             }
         }
 
         public virtual async void Connect() { }
-        public virtual async void Disconnect(string msg = "Powered by WinIRC", bool attemptReconnect = false) { }
+        public virtual async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false) { }
         public virtual async void SocketTransfer() { }
         public virtual async void SocketReturn() { }
 
@@ -136,6 +137,40 @@ namespace WinIRC.Net
 
         internal async Task HandleLine(string receivedData)
         {
+            if (receivedData.Contains("Nickname is already in use"))
+            {
+                this.server.username += "_";
+                AttemptAuth();
+                return;
+            }
+
+            if (receivedData.StartsWith("ERROR"))
+            {
+                if (!IsReconnecting)
+                {
+                    ReadOrWriteFailed = true;
+
+                    var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+
+                    var msg = autoReconnect
+                        ? "Attempting to reconnect..."
+                        : "Please try again later.";
+
+                    var error = Irc.CreateBasicToast("Error with connection", msg);
+
+                    ToastNotificationManager.CreateToastNotifier().Show(error);
+
+                    DisconnectAsync(attemptReconnect: autoReconnect);
+                }
+                return;
+            }
+
+            if (receivedData.StartsWith("PING"))
+            {
+                await WriteLine(writer, receivedData.Replace("PING", "PONG"));
+                return;
+            }
+
             var parsedLine = new IrcMessage(receivedData);
 
             if (parsedLine.CommandMessage.Command == "CAP")
@@ -652,6 +687,9 @@ namespace WinIRC.Net
 
         public async Task WriteLine(DataWriter writer, string str)
         {
+            if (ReadOrWriteFailed)
+                return;
+
             try
             {
                 if (ConnCheck.HasInternetAccess && !IsReconnecting)
@@ -663,12 +701,13 @@ namespace WinIRC.Net
             }
             catch (Exception e)
             {
+                ReadOrWriteFailed = true;
                 var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
                 var msg = autoReconnect
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
 
-                Disconnect(attemptReconnect: autoReconnect);
+                DisconnectAsync(attemptReconnect: autoReconnect);
 
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
