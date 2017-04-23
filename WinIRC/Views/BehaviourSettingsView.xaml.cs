@@ -49,6 +49,16 @@ namespace WinIRC
                 this.UserListClick.SelectedIndex = 0;
             }
 
+            if (Config.Contains(Config.IgnoreSSL))
+            {
+                this.IgnoreSSLErrors.IsOn = Config.GetBoolean(Config.IgnoreSSL);
+            }
+            else
+            {
+                Config.SetBoolean(Config.IgnoreSSL, false);
+                this.IgnoreSSLErrors.IsOn = false;
+            }
+
             if (Config.Contains(Config.AutoReconnect))
             {
                 this.ReconnectSwitch.IsOn = Config.GetBoolean(Config.AutoReconnect);
@@ -116,6 +126,14 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.AutoReconnect, ReconnectSwitch.IsOn);
+        }
+
+        private void IgnoreSSLErrors_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.IgnoreSSL, IgnoreSSLErrors.IsOn);
         }
     }
 

@@ -13,6 +13,9 @@
             <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
                 <TextBlock Text="Switch to channels on join" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ToggleSwitch Margin="5,1" x:Name="AutoChannelSwitch" OffContent="No" OnContent="Yes" Toggled="AutoChannelSwitch_Toggled"/>
+                
+                <TextBlock Text="Ignore SSL Errors" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="IgnoreSSLErrors" OffContent="No" OnContent="Yes" Toggled="IgnoreSSLErrors_Toggled"/>
 
                 <TextBlock Text="Reconnect when disconnected" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ToggleSwitch Margin="5,1" x:Name="ReconnectSwitch" OffContent="No" OnContent="Yes" Toggled="ReconnectSwitch_Toggled"/>

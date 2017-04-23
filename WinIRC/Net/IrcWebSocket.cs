@@ -31,6 +31,9 @@ namespace WinIRC.Net
 
                     webSocket = new MessageWebSocket();
 
+                    if (Config.GetBoolean(Config.IgnoreSSL))
+                        webSocket.ServerCustomValidationRequested += WebSocket_ServerCustomValidationRequested;
+
                     // MessageWebSocket supports both utf8 and binary messages.
                     // When utf8 is specified as the messageType, then the developer
                     // promises to only send utf8-encoded data.
@@ -55,6 +58,11 @@ namespace WinIRC.Net
                 HandleDisconnect(this);
             }
 
+        }
+
+        private void WebSocket_ServerCustomValidationRequested(MessageWebSocket sender, WebSocketServerCustomValidationRequestedEventArgs args)
+        {
+            // allowed
         }
 
         private void Closed(IWebSocket sender, WebSocketClosedEventArgs args)

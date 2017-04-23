@@ -11,6 +11,7 @@ using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.ExtendedExecution;
 using Windows.Networking.Sockets;
+using Windows.Security.Cryptography.Certificates;
 using Windows.Storage.Streams;
 using Windows.UI.Notifications;
 
@@ -50,6 +51,13 @@ namespace WinIRC.Net
 
             streamSocket = new StreamSocket();
             streamSocket.Control.KeepAlive = true;
+
+            if (Config.GetBoolean(Config.IgnoreSSL))
+            {
+                streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
+                streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+            }
+
             dataStreamLineReader = new SafeLineReader();
 
             try

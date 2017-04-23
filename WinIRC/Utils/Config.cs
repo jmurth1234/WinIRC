@@ -11,6 +11,7 @@ namespace WinIRC
         public const string SwitchOnJoin = "switchonjoin";
         public const string UseTabs = "usetabs";
         public const string AutoReconnect = "autoreconnect";
+        public static string IgnoreSSL = "ignoressl";
 
         // display settings
         public const string DarkTheme = "darktheme";
