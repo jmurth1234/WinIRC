@@ -1,6 +1,33 @@
 # Changelog
 -----
 
+## 1.4.0
+
+This release adds a major new feature - inline link viewing!
+
+Certain links can now be viewed inline without leaving the IRC client, making viewing them much faster!
+
+This is currently supported by:
+ - Images (.png, .gif and .jpg)
+ - Youtube videos
+ - Twitter links
+
+I've also added a JumpList, allowing you to connect to your saved servers by right clicking the taskbar icon or the entry in the start menu.
+
+This release also further enhances the extended execution session for sessions that are even more extended than the last release!
+
+Other changes in this release are:
+
+ - Added auto reconnecting for when the app loses connection for whatever reason
+ - Added the ability to ignore SSL cert errors
+ - Added the ability to right click the "Server" entry in the list of channels to close and reconnect from the server
+ - Fixed an issue with the list of users when joining a channel
+ - Added handling for topic changes
+ - Adds an _ to nicknames if there's a conflict
+ - Fixed an issue with timestamps	
+	
+-----
+	
 ## 1.3.1
 
 This release of WinIRC features a major recode of the view of messages within a channel. Rather than just being a list of `<TextBlock>` elements, it's now a list of a custom `<MessageLine>` element. Seperate parts of the message can now be coloured and styled differently. Currently this brings two new features:
