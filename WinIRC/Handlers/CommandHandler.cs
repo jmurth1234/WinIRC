@@ -14,7 +14,6 @@ namespace WinIRC.Commands
     {
         public delegate void Command(Irc irc, string[] args);
         private Dictionary<String, Command> CommandTable = new Dictionary<String, Command>();
-        private List<string> CommandList = new List<string>();
 
         public CommandHandler()
         {
@@ -46,13 +45,12 @@ namespace WinIRC.Commands
         internal void RegisterCommand(string cmd, Command handler)
         {
             CommandTable.Add(cmd, handler);
-            CommandList.Add(cmd);
         }
 
         private void HelpCommandHandler(Irc irc, string[] args)
         {
             irc.ClientMessage("The following commands are available: ");
-            irc.ClientMessage(String.Join(", ", CommandList));
+            irc.ClientMessage(String.Join(", ", CommandTable.Keys));
         }
 
 
@@ -297,7 +295,7 @@ namespace WinIRC.Commands
             }
             else if (args[0].StartsWith("/"))
             {
-                var cmd = CommandList.Where(command => command.StartsWith(args[0])).ToList();
+                var cmd = CommandTable.Keys.Where(command => command.StartsWith(args[0])).ToList();
 
                 if (cmd.Count > 1)
                 {

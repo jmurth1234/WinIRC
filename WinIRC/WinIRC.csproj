@@ -165,12 +165,14 @@
     <Content Include="Assets\winirc.png" />
     <Content Include="Assets\winirc.svg" />
     <Content Include="Assets\winircsplash.png" />
+    <Content Include="Libs\MoonSharp.Interpreter.dll" />
     <Content Include="Square44x44Logo.scale-100.png" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\IrcUiHandler.cs" />
+    <Compile Include="Handlers\LuaHandler.cs" />
     <Compile Include="Net\ChannelStore.cs" />
     <Compile Include="Net\Connection.cs" />
     <Compile Include="Net\Irc.cs" />
@@ -179,6 +181,7 @@
     <Compile Include="Net\IrcSocket.cs" />
     <Compile Include="Net\IrcWebSocket.cs" />
     <Compile Include="Net\Message.cs" />
+    <Compile Include="Net\MessageEventArgs.cs" />
     <Compile Include="Net\ReplyConstants.cs" />
     <Compile Include="Ui\ChannelListItem.xaml.cs">
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
@@ -186,7 +189,10 @@
     <Compile Include="Ui\HyperlinkManager.cs" />
     <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
-    <Compile Include="Views\AboutView.xaml.cs">
+    <Compile Include="Views\ScriptsView.xaml.cs">
+      <DependentUpon>ScriptsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Settings\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
@@ -194,7 +200,7 @@
     </Compile>
     <Compile Include="Utils\Config.cs" />
     <Compile Include="Ui\BaseSettingsPage.cs" />
-    <Compile Include="Views\BehaviourSettingsView.xaml.cs">
+    <Compile Include="Views\Settings\BehaviourSettingsView.xaml.cs">
       <DependentUpon>BehaviourSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ChannelView.xaml.cs">
@@ -203,7 +209,7 @@
     <Compile Include="Views\ConnectView.xaml.cs">
       <DependentUpon>ConnectView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ImageView.xaml.cs">
+    <Compile Include="Views\InlineMedia\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
@@ -216,22 +222,22 @@
     <Compile Include="Views\PlaceholderView.xaml.cs">
       <DependentUpon>PlaceholderView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsView.xaml.cs">
+    <Compile Include="Views\Settings\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\HeaderBlock.xaml.cs">
       <DependentUpon>HeaderBlock.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TwitterView.xaml.cs">
+    <Compile Include="Views\InlineMedia\TwitterView.xaml.cs">
       <DependentUpon>TwitterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UsersView.xaml.cs">
       <DependentUpon>UsersView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DisplaySettingsView.xaml.cs">
+    <Compile Include="Views\Settings\DisplaySettingsView.xaml.cs">
       <DependentUpon>DisplaySettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\YoutubeView.xaml.cs">
+    <Compile Include="Views\InlineMedia\YoutubeView.xaml.cs">
       <DependentUpon>YoutubeView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -260,11 +266,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AboutView.xaml">
+    <Page Include="Views\ScriptsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\BehaviourSettingsView.xaml">
+    <Page Include="Views\Settings\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Settings\BehaviourSettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -276,7 +286,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ImageView.xaml">
+    <Page Include="Views\InlineMedia\ImageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -292,7 +302,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsView.xaml">
+    <Page Include="Views\Settings\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -300,7 +310,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TwitterView.xaml">
+    <Page Include="Views\InlineMedia\TwitterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -308,11 +318,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\DisplaySettingsView.xaml">
+    <Page Include="Views\Settings\DisplaySettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\YoutubeView.xaml">
+    <Page Include="Views\InlineMedia\YoutubeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,6 +337,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MoonSharp.Interpreter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

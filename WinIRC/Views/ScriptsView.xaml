@@ -1,0 +1,60 @@
+﻿<Page
+    x:Class="WinIRC.Views.ScriptsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" DisplayMode="Inline" IsPaneOpen="True">
+            <SplitView.Pane>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" x:Name="ScriptAdd"  HorizontalAlignment="Stretch" Content="Add Script" VerticalAlignment="Stretch"/>
+                    <ListView Grid.Row="1" x:Name="ScriptsList" ItemsSource="{Binding}" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}" HorizontalContentAlignment="Left" SelectionChanged="ScriptsList_SelectionChanged"/>
+                </Grid>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <CommandBar Grid.Row="0" ClosedDisplayMode="Compact">
+                        <AppBarButton Style="{StaticResource AppbarButtonStyle}" Label="Save" Icon="Save" HorizontalAlignment="Left" Click="AppBarButton_Click" />
+                    </CommandBar>
+
+                    <ScrollViewer Grid.Row="1" >
+                        <!-- Script -->
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="2">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" x:Name="LineNumbers"
+                                 Width="8"
+                                 FontSize="16" FontFamily="Consolas" 
+                                 IsReadOnly="True" Text="" Background="{x:Null}" 
+                                 BorderBrush="{x:Null}" SelectionHighlightColor="{x:Null}" AcceptsReturn="True" IsEnabled="False" Padding="10,3,6,5"/>
+
+                            <TextBox Grid.Column="1" x:Name="Code"
+                                 FontSize="16"
+                                 AcceptsReturn="True" FontFamily="Consolas" HorizontalContentAlignment="Stretch" TextChanged="Code_TextChanged" />
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </SplitView.Content>
+        </SplitView>
+
+
+    </Grid>
+</Page>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.QueryStringDotNET;
+using MoonSharp.Interpreter;
 using NotificationsExtensions;
 using NotificationsExtensions.Toasts;
 using System;
@@ -19,6 +20,7 @@ using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
+using WinIRC.Handlers;
 
 namespace WinIRC.Net
 {
@@ -64,6 +66,10 @@ namespace WinIRC.Net
         internal bool ReadOrWriteFailed;
 
         public Action<Irc> HandleDisconnect { get; set; }
+
+        public event EventHandler MessageReceived;
+        public event EventHandler PostMessageReceived;
+
 
         public Irc()
         {
@@ -172,6 +178,15 @@ namespace WinIRC.Net
             }
 
             var parsedLine = new IrcMessage(receivedData);
+
+            MessageEventArgs args = new MessageEventArgs(parsedLine);
+
+            MessageReceived?.Invoke(this, args);
+
+            if (args.Cancel)
+            {
+                return;
+            }
 
             if (parsedLine.CommandMessage.Command == "CAP")
             {
@@ -524,7 +539,6 @@ namespace WinIRC.Net
             }
 
             //Debug.WriteLine(parsedLine.CommandMessage.Command + " - " + receivedData);
-
         }
 
 
