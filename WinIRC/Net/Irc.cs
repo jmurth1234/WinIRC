@@ -69,8 +69,8 @@ namespace WinIRC.Net
         {
             ircMessages = new ObservableCollection<Message>();
             channelList = new ObservableCollection<string>();
-            channelBuffers = new Dictionary<string, ObservableCollection<Message>>();
-            channelStore = new Dictionary<string, ChannelStore>();
+            channelBuffers = new Dictionary<string, ObservableCollection<Message>>(StringComparer.OrdinalIgnoreCase);
+            channelStore = new Dictionary<string, ChannelStore>(StringComparer.OrdinalIgnoreCase);
             IsAuthed = false;
             ConnCheck = new Connection();
 
@@ -273,7 +273,8 @@ namespace WinIRC.Net
                     msg.Text = content;
                 }
 
-                if (parsedLine.TrailMessage.TrailingContent.Contains(server.username) || parsedLine.CommandMessage.Parameters[0] == server.username)
+                if ((parsedLine.TrailMessage.TrailingContent.Contains(server.username) || 
+                    parsedLine.CommandMessage.Parameters[0] == server.username))
                 {
                     var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
                     toast.ExpirationTime = DateTime.Now.AddDays(2);
