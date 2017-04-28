@@ -88,9 +88,15 @@ namespace WinIRC.Net
                 IsReconnecting = true;
                 if (ConnCheck.HasInternetAccess)
                 {
+                    ReconnectionAttempts++;
+
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
                     {
-                        await Task.Delay(100);
+                        if (ReconnectionAttempts < 3)
+                            await Task.Delay(1000);
+                        else
+                            await Task.Delay(60000);
+
                         Connect();
                     });
                 }

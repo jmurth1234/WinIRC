@@ -162,7 +162,7 @@ namespace WinIRC.Net
                 }
                 catch (Exception e)
                 {
-                    AddError("Error with connection: " + e.Message + "\n" + msg);
+                    AddError("Error with connection: " + e.Message);
                     AddError(e.StackTrace);
                     ReadOrWriteFailed = true;
                     IsConnected = false;
@@ -208,11 +208,16 @@ namespace WinIRC.Net
             if (attemptReconnect)
             {
                 IsReconnecting = true;
+                ReconnectionAttempts++;
                 if (ConnCheck.HasInternetAccess)
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
                     {
-                        await Task.Delay(100);
+                        if (ReconnectionAttempts < 3)
+                            await Task.Delay(1000);
+                        else
+                            await Task.Delay(60000);
+
                         Connect();
                     });
                 }

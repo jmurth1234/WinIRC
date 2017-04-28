@@ -61,6 +61,7 @@ namespace WinIRC.Net
         internal bool IsReconnecting;
 
         public bool IsConnected = false;
+        internal int ReconnectionAttempts;
         internal bool ReadOrWriteFailed;
 
         public Action<Irc> HandleDisconnect { get; set; }
@@ -170,6 +171,8 @@ namespace WinIRC.Net
             }
 
             var parsedLine = new IrcMessage(receivedData);
+
+            ReconnectionAttempts = 0;
 
             if (parsedLine.CommandMessage.Command == "CAP")
             {
