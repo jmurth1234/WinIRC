@@ -82,8 +82,8 @@ namespace WinIRC.Net
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
 
-                var error = Irc.CreateBasicToast("Error whilst connecting: " + e.Message, msg);
-                ToastNotificationManager.CreateToastNotifier().Show(error);
+                AddError("Error whilst connecting: " + e.Message + "\n" + msg);
+                AddError(e.StackTrace);
 
                 DisconnectAsync(attemptReconnect: autoReconnect);
 
@@ -128,7 +128,7 @@ namespace WinIRC.Net
                 var toast = CreateBasicToast("Error when activating background socket", e.Message);
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
-                ToastNotificationManager.CreateToastNotifier().Show(toast);
+                //ToastNotificationManager.CreateToastNotifier().Show(toast);
             }
         }
 
@@ -160,10 +160,10 @@ namespace WinIRC.Net
                 {
                     await reader.LoadAsync(socketReceiveBufferSize);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Debug.WriteLine(ex.Message);
-                    Debug.WriteLine(ex.StackTrace);
+                    AddError("Error with connection: " + e.Message + "\n" + msg);
+                    AddError(e.StackTrace);
                     ReadOrWriteFailed = true;
                     IsConnected = false;
 

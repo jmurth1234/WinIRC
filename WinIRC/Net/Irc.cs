@@ -156,9 +156,7 @@ namespace WinIRC.Net
                         ? "Attempting to reconnect..."
                         : "Please try again later.";
 
-                    var error = Irc.CreateBasicToast("Error with connection", msg);
-
-                    ToastNotificationManager.CreateToastNotifier().Show(error);
+                    AddError("Error with connection: \n" + msg);
 
                     DisconnectAsync(attemptReconnect: autoReconnect);
                 }
@@ -273,15 +271,17 @@ namespace WinIRC.Net
                     msg.Text = content;
                 }
 
-                if ((parsedLine.TrailMessage.TrailingContent.Contains(server.username) || 
-                    parsedLine.CommandMessage.Parameters[0] == server.username))
+                if ((parsedLine.TrailMessage.TrailingContent.Contains(server.username) || parsedLine.CommandMessage.Parameters[0] == server.username))
                 {
-                    var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
-                    toast.ExpirationTime = DateTime.Now.AddDays(2);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
-                    msg.Mention = true;
+                    if (currentChannel != destination)
+                    {
+                        var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
+                        toast.ExpirationTime = DateTime.Now.AddDays(2);
+                        ToastNotificationManager.CreateToastNotifier().Show(toast);
+                        (App.Current as App).NumberPings++;
+                    }
 
-                    (App.Current as App).NumberPings++;
+                    msg.Mention = true;
                 }
 
                 AddMessage(destination, msg);
@@ -585,6 +585,18 @@ namespace WinIRC.Net
             WriteLine(String.Format("PRIVMSG {0} :{1}", currentChannel, message));
         }
 
+        public async void AddError(String message)
+        {
+            Message msg = new Message();
+
+            msg.Text = message;
+            msg.User = "Error";
+            msg.Type = MessageType.Info;
+            msg.Mention = true;
+
+            AddMessage("Server", msg);
+        }
+
         public async void AddMessage(string channel, Message msg)
         {
             if (!channelBuffers.ContainsKey(channel))
@@ -704,9 +716,13 @@ namespace WinIRC.Net
             {
                 ReadOrWriteFailed = true;
                 var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+
                 var msg = autoReconnect
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
+
+                AddError("Error whilst connecting: " + e.Message + "\n" + msg);
+                AddError(e.StackTrace);
 
                 DisconnectAsync(attemptReconnect: autoReconnect);
 
