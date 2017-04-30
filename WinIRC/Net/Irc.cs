@@ -75,6 +75,11 @@ namespace WinIRC.Net
             {
                 server.username = value;
                 WriteLine("NICK " + value);
+
+                foreach (string channel in channelBuffers.Keys)
+                {
+                    ClientMessage(channel, "Changed username to " + value);
+                }
             }
         }
 
