@@ -81,24 +81,29 @@ namespace WinIRC.Ui
                 MessageBox.Margin = margin;
             }
 
-            if (MessageItem.Type == MessageType.Info)
+            if (MessageItem != null)
             {
-                UsernameBox.Style = (Style) Application.Current.Resources["InfoTextBlockStyle"];
-                MessageBox.Style  = (Style) Application.Current.Resources["InfoTextRichStyle"];
+                if (MessageItem.Type == MessageType.Info)
+                {
+                    UsernameBox.Style = (Style)Application.Current.Resources["InfoTextBlockStyle"];
+                    MessageBox.Style = (Style)Application.Current.Resources["InfoTextRichStyle"];
+                }
+                else if (MessageItem.Type == MessageType.Action)
+                {
+                    UsernameBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                    MessageBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                }
+
+                if (MessageItem.Mention)
+                {
+                    UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
+                    MessageBox.Foreground = new SolidColorBrush(Colors.Red);
+                }
+
+                hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
+                hyperlinkManager.LinkClicked += MediaPreview_Clicked;
             }
-            else if (MessageItem.Type == MessageType.Action)
-            {
-                UsernameBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
-                MessageBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
-            }
-            
-            if (MessageItem.Mention)
-            {
-                UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
-                MessageBox.Foreground = new SolidColorBrush(Colors.Red);
-            }
-            hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
-            hyperlinkManager.LinkClicked += MediaPreview_Clicked;
+
             this.HasLoaded = true;
         }
 

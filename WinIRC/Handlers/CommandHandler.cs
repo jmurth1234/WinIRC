@@ -25,6 +25,7 @@ namespace WinIRC.Commands
             RegisterCommand("/part", PartCommandHandler);
             RegisterCommand("/quit", QuitCommandHandler);
             RegisterCommand("/query", QueryCommandHandler);
+            RegisterCommand("/nick", NickCommandHandler);
             RegisterCommand("/msg", MsgCommandHandler);
             RegisterCommand("/whois", WhoisCommandHandler);
 
@@ -112,6 +113,16 @@ namespace WinIRC.Commands
             }
 
             irc.AddChannel(args[1]);
+        }
+
+        internal void NickCommandHandler(Irc irc, string[] args)
+        {
+            if (args.Length != 2)
+            {
+                return;
+            }
+
+            irc.Nickname = args[1];
         }
 
         internal void KickCommandHandler(Irc irc, string[] args)

@@ -511,7 +511,10 @@ namespace WinIRC
             irc.HandleDisconnect += HandleDisconnect;
 
             // connect
-            if (((Tabs.Items[0] as PivotItem).Content as Frame).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
+            if (Tabs.Items.Count != 0)
+            {
+                if (((Tabs.Items[0] as PivotItem).Content as Frame).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
+            }
 
             if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name);
             lastAuto = Config.GetBoolean(Config.UseTabs);

@@ -66,6 +66,18 @@ namespace WinIRC.Net
 
         public Action<Irc> HandleDisconnect { get; set; }
 
+        public string Nickname {
+            get
+            {
+                return server.username;
+            }
+            set
+            {
+                server.username = value;
+                WriteLine("NICK " + value);
+            }
+        }
+
         public Irc()
         {
             ircMessages = new ObservableCollection<Message>();
