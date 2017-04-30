@@ -1,6 +1,16 @@
 # Changelog
 -----
 
+## 1.4.1
+This is a bug fix update for the previous update that fixes the following issues:
+
+ - Make channels case insensitive
+ - Better error handling on connection issues 
+ - Add a rate limiter on auto reconnects
+ - Fix error when joining a server with the welcome page closed
+
+This minor release also adds a /nick command to change usernames.
+
 ## 1.4.0
 
 This release adds a major new feature - inline link viewing!
