@@ -96,6 +96,11 @@ namespace WinIRC.Net
 
         public void AddUser(string username, bool sort)
         {
+            if (username.Length == 0)
+            {
+                return;
+            }
+
             if (!HasUser(username))
             {
                 string prefix = null;
@@ -104,7 +109,7 @@ namespace WinIRC.Net
                 {
                     prefix = username[0] + "" + username[1];
                 }
-                else
+                else if (username.Length > 1)
                 {
                     prefix = username[0] + "";
                 }
