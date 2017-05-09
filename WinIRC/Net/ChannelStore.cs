@@ -41,36 +41,63 @@ namespace WinIRC.Net
             var watch = Stopwatch.StartNew();
 
             SortedUsers.Clear();
+            var owners = new List<string>();
+            var protect = new List<string>();
             var ops = new List<string>();
+            var hops = new List<string>();
             var voiced = new List<string>();
             var users = new List<string>();
 
             foreach (var user in Users)
             {
-                if (user.Prefix.StartsWith("@"))
+                try
                 {
-                    ops.Add("@" + user.Nick);
+                    if (user.Prefix.StartsWith("~"))
+                    {
+                        owners.Add($"~{user.Nick}");
+                    }
+                    else if (user.Prefix.StartsWith("&"))
+                    {
+                        protect.Add($"&{user.Nick}");
+                    }
+                    else if (user.Prefix.StartsWith("@"))
+                    {
+                        ops.Add($"@{user.Nick}");
+                    }
+                    else if (user.Prefix.StartsWith("%"))
+                    {
+                        hops.Add($"@{user.Nick}");
+                    }
+                    else if (user.Prefix.StartsWith("+"))
+                    {
+                        voiced.Add($"+{user.Nick}");
+                    }
+                    else
+                    {
+                        users.Add(user.Nick);
+                    }
                 }
-                else if (user.Prefix.StartsWith("+"))
+                catch (NullReferenceException ex)
                 {
-                    voiced.Add("+" + user.Nick);
-                }
-                else
-                {
-                    users.Add(user.Nick);
+                    Debug.WriteLine($"User's nickname {user.Nick} with prefix type {user.Prefix.Substring(0,1)} is unhandled");
                 }
             }
-
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             Debug.WriteLine("Elapsed time to sort: " + elapsedMs + "ms");
             watch.Start();
 
+            owners.Sort();
+            protect.Sort();
             ops.Sort();
+            hops.Sort();
             voiced.Sort();
             users.Sort();
 
+            owners.ForEach(SortedUsers.Add);
+            protect.ForEach(SortedUsers.Add);
             ops.ForEach(SortedUsers.Add);
+            hops.ForEach(SortedUsers.Add);
             voiced.ForEach(SortedUsers.Add);
             users.ForEach(SortedUsers.Add);
 
@@ -115,7 +142,7 @@ namespace WinIRC.Net
                 }
                 User user = new User
                 {
-                    Nick = username.Replace("@", "").Replace("+", ""),
+                    Nick = username.Replace("~", "").Replace("&", "").Replace("@", "").Replace("%", "").Replace("+", ""),
                     Prefix = prefix
                 };
 
@@ -129,7 +156,7 @@ namespace WinIRC.Net
 
         public Boolean HasUser(string nick)
         {
-            nick = nick.Replace("@", "").Replace("+", "");
+            nick = nick.Replace("~","").Replace("&","").Replace("@", "").Replace("%","").Replace("+", "");
             if (nick == "") return false;
 
             return Users.Any(user => user.Nick == nick);
