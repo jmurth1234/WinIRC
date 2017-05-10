@@ -51,8 +51,18 @@ namespace WinIRC.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            currentServer = ((string[])e.Parameter)[0];
-            currentChannel = ((string[])e.Parameter)[1];
+            var args = ((string[])e.Parameter);
+
+            SetChannel(args[0], args[1]);
+        }
+
+
+        internal void SetChannel(string server, string channel)
+        {
+            currentServer = server;
+            currentChannel = channel;
+
+            messagesView.ItemsSource = null;
 
             messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
 
@@ -117,6 +127,5 @@ namespace WinIRC.Views
                 this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
             }
         }
-
     }
 }

@@ -76,7 +76,7 @@ namespace WinIRC.Utils
         {
             try
             {
-                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
+                serversListOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
                 serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
             }
             catch (Exception e)

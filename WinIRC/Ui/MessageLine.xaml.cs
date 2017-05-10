@@ -14,7 +14,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Net;
-using WinIRC.Ui;
 using WinIRC.Views;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -48,10 +47,12 @@ namespace WinIRC.Ui
 
         public bool CompactMode
         {
-            get {
-                return (bool)GetValue(CompactModeProperty);
+            get
+            {
+                return (bool) GetValue(CompactModeProperty);
             }
-            set {
+            set
+            {
                 SetValue(CompactModeProperty, value);
             }
         }

@@ -42,7 +42,7 @@ namespace WinIRC
         public string currentServer { get; set; }
 
         public ObservableCollection<String> servers { get; set; }
-        public List<Net.IrcServer> serversList { get; set; }
+        public List<IrcServer> serversList { get; set; }
         public bool SettingsLoaded = false;
         private bool loadedSavedServer;
 
@@ -74,6 +74,7 @@ namespace WinIRC
         public MainPage()
         {
             this.InitializeComponent();
+
             this.IrcHandler = new IrcUiHandler();
 
             this.LoadSettings();
@@ -124,7 +125,7 @@ namespace WinIRC
                 //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
 
                 serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
+                serversListOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
 
                 var folder = serversOSH.GetFolder(StorageType.Roaming);
 
@@ -421,7 +422,15 @@ namespace WinIRC
                 lastAuto = auto;
 
                 item.Header = channel;
-                frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+
+                if (frame.Content is ChannelView)
+                {
+                    (frame.Content as ChannelView).SetChannel(server, channel);
+                }
+                else
+                {
+                    frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+                }
             }
             else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
             {
@@ -440,6 +449,7 @@ namespace WinIRC
             PivotItem p = new PivotItem();
             p.Header = header;
             Frame frame = new Frame();
+            frame.CacheSize = 0;
 
             p.Margin = new Thickness(0, 0, 0, -2);
 
@@ -470,9 +480,11 @@ namespace WinIRC
                 SplitView.IsPaneOpen = false;
 
             channelList.SelectedValue = channel;
-            if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
-                TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
 
+            if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
+            {
+                TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
+            }
         }
 
         public Irc GetCurrentServer()
@@ -807,13 +819,7 @@ namespace WinIRC
 
         private void TransferServer_Click(object sender, RoutedEventArgs e)
         {
-            if (GetCurrentServer() != null)
-            {
-                if (!GetCurrentServer().Transferred)
-                    GetCurrentServer().SocketTransfer();
-                else
-                    GetCurrentServer().SocketReturn();
-            }
+            GC.Collect();
         }
 
         private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)

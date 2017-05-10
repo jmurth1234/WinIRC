@@ -89,7 +89,7 @@ namespace WinIRC.Views
 
         internal IrcServer CreateIrcServer()
         {
-            Net.IrcServer ircServer = new Net.IrcServer();
+            IrcServer ircServer = new IrcServer();
 
             if (hostname.Text == "")
             {

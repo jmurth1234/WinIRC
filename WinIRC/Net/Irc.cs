@@ -89,6 +89,7 @@ namespace WinIRC.Net
             channelList = new ObservableCollection<string>();
             channelBuffers = new Dictionary<string, ObservableCollection<Message>>(StringComparer.OrdinalIgnoreCase);
             channelStore = new Dictionary<string, ChannelStore>(StringComparer.OrdinalIgnoreCase);
+
             IsAuthed = false;
             ConnCheck = new Connection();
 
@@ -261,7 +262,7 @@ namespace WinIRC.Net
                 var destination = parsedLine.CommandMessage.Parameters[0];
                 var content = parsedLine.TrailMessage.TrailingContent;
 
-                if (destination == server.username)
+                if (destination == server.username) 
                 {
                     destination = parsedLine.PrefixMessage.Nickname;
                 }
@@ -578,7 +579,10 @@ namespace WinIRC.Net
 
         public string GetChannelTopic(string channel)
         {
-            return channelStore[channel].Topic;
+            if (channelStore.ContainsKey(channel))
+                return channelStore[channel].Topic;
+
+            return null;
         }
 
         public void JoinChannel(string channel)

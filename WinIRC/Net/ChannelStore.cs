@@ -103,7 +103,7 @@ namespace WinIRC.Net
 
             if (!HasUser(username))
             {
-                string prefix = null;
+                string prefix = "";
 
                 if (username.Length > 2)
                 {
