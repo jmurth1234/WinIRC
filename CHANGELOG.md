@@ -1,6 +1,10 @@
 # Changelog
 -----
 
+## 1.4.2
+
+Fixes to a couple bugs found since the last update. Also attempts to fix a memory leak.
+
 ## 1.4.1
 This is a bug fix update for the previous update that fixes the following issues:
 
