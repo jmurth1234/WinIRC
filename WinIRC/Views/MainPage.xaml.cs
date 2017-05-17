@@ -27,6 +27,8 @@ using WinIRC.Handlers;
 using WinIRC.Utils;
 using Windows.Storage;
 using Windows.ApplicationModel.ExtendedExecution;
+using Rymate.Controls.UWPMenuBar;
+using Template10.Services.SerializationService;
 
 namespace WinIRC
 {
@@ -50,6 +52,54 @@ namespace WinIRC
 
         public string currentTopic { get; set; }
 
+        public bool ShowTopic { get; set; } = true;
+
+        public Visibility _TabsVisible = Visibility.Visible;
+        public Visibility TabsVisible
+        {
+            get => _TabsVisible;
+            set
+            {
+                _TabsVisible = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool _ShowingUsers;
+
+        public bool ShowingUsers
+        {
+            get => _ShowingUsers;
+            set
+            {
+                if (currentChannel == "" || currentServer == "" || !IrcHandler.connectedServers.ContainsKey(currentServer))
+                {
+                    this.NotifyPropertyChanged();
+                    return;
+                }
+
+                SidebarFrame.BackStack.Clear();
+                SidebarHeader.ShowBackButton = false;
+
+                ShouldPin();
+
+                if (value)
+                {
+                    IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
+                    UpdateInfo(currentServer, currentChannel);
+                    SidebarHeader.Title = "Channel Users";
+                    SidebarSplitView.IsPaneOpen = true;
+                }
+                else
+                {
+                    SidebarSplitView.IsPaneOpen = false;
+                }
+
+                _ShowingUsers = SidebarFrame.Content is UsersView && SidebarSplitView.IsPaneOpen;
+                this.NotifyPropertyChanged();
+            }
+        }
+
         private Style _ListBoxItemStyle;
         public Style ListBoxItemStyle
         {
@@ -71,8 +121,42 @@ namespace WinIRC
         private bool lastAuto;
         private ExtendedExecutionSession session;
 
+        private SolidColorBrush _AccentColor;
+
+        public SolidColorBrush AccentColor
+        {
+            get
+            {
+                return _AccentColor;
+            }
+            set
+            {
+                this._AccentColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private SolidColorBrush _AccentColorAlt;
+
+        public SolidColorBrush AccentColorAlt
+        {
+            get
+            {
+                return _AccentColorAlt;
+            }
+            set
+            {
+                this._AccentColorAlt = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public MainPage()
         {
+            var uiSettings = new Windows.UI.ViewManagement.UISettings();
+            AccentColor = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Accent));
+            AccentColorAlt = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.AccentDark1));
+
             this.InitializeComponent();
 
             this.IrcHandler = new IrcUiHandler();
@@ -88,23 +172,17 @@ namespace WinIRC
             var inputPane = InputPane.GetForCurrentView();
             inputPane.Showing += this.InputPaneShowing;
             inputPane.Hiding += this.InputPaneHiding;
-            SizeChanged += MainPage_SizeChanged;
 
             Window.Current.SizeChanged += Current_SizeChanged;
-            UpdateSize();
             SidebarFrame.Navigated += SidebarFrame_Navigated;
 
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
             this.CommandHandler = IrcHandler.CommandHandler;
 
-#if DEBUG
-            DebugButton.Visibility = Visibility.Visible;
-#endif
-
             instance = this;
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             try
             {
@@ -123,39 +201,6 @@ namespace WinIRC
                 UpdateUi();
 
                 //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
-
-                serversOSH = new ObjectStorageHelper<ObservableCollection<String>>(StorageType.Roaming);
-                serversListOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
-
-                var folder = serversOSH.GetFolder(StorageType.Roaming);
-
-                if ((await folder.GetItemsAsync()).Count == 0 && !(await serversOSH.FileExists(folder, "migrated")))
-                {
-                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
-                    return;
-                }
-
-                if ((await folder.GetItemsAsync()).Count == 1)
-                {
-                    return;
-                }
-
-                if (await serversOSH.FileExists(folder, "migrated"))
-                {
-                    servers = await serversOSH.LoadAsync(Config.ServersStore);
-                    serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
-                }
-                else
-                {
-                    servers = await serversOSH.LoadAsync();
-                    await serversOSH.MigrateAsync(servers, Config.ServersStore);
-
-                    serversList = await serversListOSH.LoadAsync();
-                    await serversListOSH.MigrateAsync(serversList, Config.ServersListStore);
-
-                    await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
-                }
-
             }
             catch (Exception ex)
             {
@@ -163,15 +208,19 @@ namespace WinIRC
                 await dialog.ShowAsync();
             }
 
+            Servers.ItemsSource = IrcServers.Instance.Servers;
+
             if (e.Parameter != null)
             {
-                var launchEvent = e.Parameter.ToString();
-                this.OnLaunchedEvent(launchEvent);
+                var serv = SerializationService.Json;
+
+                var launchEvent = serv.Deserialize<String>(e.Parameter as String);
+                this.ConnectViaName(launchEvent);
             }
 
         }
 
-        public void OnLaunchedEvent(string args)
+        public void ConnectViaName(string args)
         {
             if (args == "") return; 
 
@@ -179,42 +228,12 @@ namespace WinIRC
             Connect(IrcServers.Instance.CreateConnection(server));
         }
 
-        private void MainPage_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void MenuBarItem_Click(object sender, RoutedEventArgs e)
         {
-            var size = e.NewSize;
-            var old = e.PreviousSize;
+            var button = sender as MenuBarItem;
 
-            if (size.Width == old.Width) return;
-
-            if (size.Width >= 720 && old.Width < 720)
-            {
-                MainGrid.Children.Remove(MenuBar);
-                RightGrid.Children.Add(MenuBar);
-
-                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
-            }
-            else if (size.Width < 720 && old.Width >= 720)
-            {
-                RightGrid.Children.Remove(MenuBar);
-                MainGrid.Children.Add(MenuBar);
-
-                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Hidden;
-            }
-        }
-
-        private void UpdateSize()
-        {
-            var size = Window.Current.Bounds;
-
-            if (size.Width >= 720)
-            {
-                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
-            }
-            else if (size.Width < 720)
-            {
-                MenuBar.ClosedDisplayMode = AppBarClosedDisplayMode.Hidden;
-                MenuBar.IsOpen = true;
-            }
+            var server = button.DataContext as IrcServer;
+            Connect(IrcServers.Instance.CreateConnection(server));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -244,12 +263,22 @@ namespace WinIRC
 
             ManageTitleBar();
             SettingsLoaded = true;
-
         }
 
         public void ManageTitleBar()
         {
+            var uiSettings = new Windows.UI.ViewManagement.UISettings();
+            AccentColor = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Accent));
+
+            if (this.RequestedTheme == ElementTheme.Dark)
+                AccentColorAlt = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.AccentDark1));
+
+            Menu.RequestedTheme = ElementTheme.Dark;
+
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            Window.Current.SetTitleBar(Menu.DragArea);
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
@@ -259,12 +288,15 @@ namespace WinIRC
             var backgroundInactive = darkTheme ? ParseColor("#FF2B2B2B") : ParseColor("#FFF2F2F2");
             var foreground = darkTheme ? ParseColor("#FFFFFFFF") : ParseColor("#FF000000");
 
-            titleBar.BackgroundColor = background;
+            titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
             titleBar.ButtonHoverBackgroundColor = backgroundInactive;
-            titleBar.ButtonBackgroundColor = background;
-            titleBar.ButtonInactiveBackgroundColor = backgroundInactive;
+            titleBar.ButtonBackgroundColor = _AccentColor.Color;
+            titleBar.ButtonInactiveBackgroundColor = _AccentColorAlt.Color;
             titleBar.ButtonForegroundColor = foreground;
+
+            Menu.Background = AccentColor;
+            Menu.Foreground = new SolidColorBrush(ParseColor("#FFFFFFFF"));
         }
 
 
@@ -317,6 +349,23 @@ namespace WinIRC
                         statusBar.ShowAsync();
                 }
             }
+
+            if (Config.Contains(Config.UseTabs))
+            {
+                TabsVisible = Config.GetBoolean(Config.UseTabs) ? Visibility.Visible : Visibility.Collapsed;
+                HeaderColor.Visibility = (Config.GetBoolean(Config.UseTabs) || ShowTopic) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            foreach (PivotItem item in Tabs.Items.Cast<PivotItem>())
+            {
+                if (item.Content is Frame && (item.Content as Frame).Content is ChannelView)
+                {
+                    var frame = item.Content as Frame;
+                    var view = frame.Content as ChannelView;
+
+                    view.UpdateUi();
+                }
+            }
         }
 
         public PivotItem GetCurrentItem()
@@ -349,22 +398,12 @@ namespace WinIRC
             var bounds = Window.Current.Bounds;
             double height = bounds.Height;
             connectDialogRoot.MaxHeight = height;
-
-            serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
-            serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
         }
-
 
         private void ConnectDialog_Loaded(object sender, RoutedEventArgs e)
         {
             if (!(ConnectFrame.Content is ConnectView))
                 ConnectFrame.Navigate(typeof(ConnectView));
-
-            serverConnect.HorizontalOffset = (Window.Current.Bounds.Width - connectDialogRoot.ActualWidth) / 2;
-            if ((Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) > 20)
-                serverConnect.VerticalOffset = (Window.Current.Bounds.Height - connectDialogRoot.ActualHeight) / 2;
-            else
-                serverConnect.VerticalOffset = 0;
             
             var bounds = Window.Current.Bounds;
             double height = bounds.Height;
@@ -480,11 +519,6 @@ namespace WinIRC
                 SplitView.IsPaneOpen = false;
 
             channelList.SelectedValue = channel;
-
-            if (IrcHandler.connectedServers[currentServer].GetChannelTopic(channel) != null)
-            {
-                TopicText.Text = IrcHandler.connectedServers[currentServer].GetChannelTopic(channel);
-            }
         }
 
         public Irc GetCurrentServer()
@@ -510,7 +544,7 @@ namespace WinIRC
 
         private void ShowConnectPopup(object sender, RoutedEventArgs e)
         {
-            serverConnect.IsOpen = !serverConnect.IsOpen;
+            serverConnect.IsModal = !serverConnect.IsModal;
         }
 
         public async void Connect(Irc irc)
@@ -646,37 +680,33 @@ namespace WinIRC
             });
         }
 
+        private void AppearanceSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ShowSettings(typeof(DisplaySettingsView));
+        }
 
-        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        private void ShowSettings(Type type)
         {
             SidebarFrame.BackStack.Clear();
             SidebarHeader.ShowBackButton = false;
 
-            if (!(SidebarFrame.Content is SettingsView))
+            if (SidebarFrame.Content == null || !(SidebarFrame.Content.GetType() == type))
             {
-                SidebarFrame.Navigate(typeof(SettingsView));
-                var settingsView = (SettingsView)SidebarFrame.Content;
+                SidebarFrame.Navigate(type);
+                var settingsView = (BaseSettingsPage) SidebarFrame.Content;
 
                 if (settingsView != null)
-                    settingsView.Header = SidebarHeader;
+                    SidebarHeader.Title = settingsView.Title;
             }
-            SidebarHeader.Title = "Settings";
+
+
+            NotifyPropertyChanged(nameof(ShowingUsers));
             ToggleSidebar();
         }
 
-        private void PeopleButton_Click(object sender, RoutedEventArgs e)
+        private void BehaviourSettings_Click(object sender, RoutedEventArgs e)
         {
-            if (currentChannel == "" || currentServer == "" || !IrcHandler.connectedServers.ContainsKey(currentServer))
-            {
-                return;
-            }
-            SidebarFrame.BackStack.Clear();
-            SidebarHeader.ShowBackButton = false;
-
-            IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
-            UpdateInfo(currentServer, currentChannel);
-            SidebarHeader.Title = "Channel Users";
-            ToggleSidebar();
+            ShowSettings(typeof(BehaviourSettingsView));
         }
 
         private void PinSidebar(object sender, RoutedEventArgs e)
@@ -699,11 +729,26 @@ namespace WinIRC
 
         private void ToggleSidebar()
         {
+            ShouldPin();
+
             if (!SidebarPinned() || (SidebarPinned() && !SidebarSplitView.IsPaneOpen))
             {
                 SidebarSplitView.IsPaneOpen = !SidebarSplitView.IsPaneOpen;
             }
         }
+
+        private void ShouldPin()
+        {
+            if (WindowStates.CurrentState == WideState)
+            {
+                SidebarSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+            }
+            else
+            {
+                SidebarSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
+            }
+        }
+
 
         private void HeaderBlock_BackButtonClicked(object sender, EventArgs e)
         {
@@ -751,7 +796,7 @@ namespace WinIRC
 
         internal void CloseConnectView()
         {
-            serverConnect.IsOpen = !serverConnect.IsOpen;
+            serverConnect.IsModal = !serverConnect.IsModal;
         }
 
         public async void IrcPrompt(IrcServer server)
@@ -801,11 +846,6 @@ namespace WinIRC
             dialog.ShowAsync();
         }
 
-        private void MenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            MenuBar.IsOpen = true;
-        }
-
         private void CloseTab_Click(object sender, RoutedEventArgs e)
         {
             Tabs.Items.Remove(GetCurrentItem());
@@ -817,11 +857,6 @@ namespace WinIRC
                 UpdateInfo(GetCurrentChannelView().currentServer, GetCurrentChannelView().currentChannel);
         }
 
-        private void TransferServer_Click(object sender, RoutedEventArgs e)
-        {
-            GC.Collect();
-        }
-
         private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)
         {
             var args = e as ServerRightClickArgs;
@@ -830,8 +865,12 @@ namespace WinIRC
                 GetCurrentServer().DisconnectAsync(attemptReconnect: true);
             else if (args.type == ServerRightClickType.CLOSE)
                 GetCurrentServer().DisconnectAsync(attemptReconnect: false);
-
         }
-    }
 
+        private void MenuBarToggleItem_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateUi();
+        }
+
+    }
 }

@@ -21,5 +21,10 @@ namespace WinIRC.Net
 
         // channels are a string seperated by commas
         public string channels { get; set; }
+
+        public override String ToString()
+        {
+            return name;
+        }
     }
 }

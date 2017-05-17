@@ -184,6 +184,9 @@
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Ui\PivotPage.xaml.cs">
+      <DependentUpon>PivotPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
@@ -257,6 +260,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Ui\ChannelListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\PivotPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

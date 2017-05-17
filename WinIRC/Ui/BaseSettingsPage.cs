@@ -10,6 +10,6 @@ namespace WinIRC.Ui
     public class BaseSettingsPage : Page
     {
         public Action UpdateUi { get; set; }
-
+        public string Title { get; internal set; }
     }
 }

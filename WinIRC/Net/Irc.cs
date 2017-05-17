@@ -582,7 +582,7 @@ namespace WinIRC.Net
             if (channelStore.ContainsKey(channel))
                 return channelStore[channel].Topic;
 
-            return null;
+            return "";
         }
 
         public void JoinChannel(string channel)
@@ -655,7 +655,7 @@ namespace WinIRC.Net
 
                 channelList.Insert(i, channel);
 
-                channelStore.Add(channel, new ChannelStore());
+                channelStore.Add(channel, new ChannelStore(channel));
             }
 
             await Task.Delay(1);

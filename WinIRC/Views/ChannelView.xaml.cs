@@ -15,14 +15,10 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+using WinIRC.Net;
 
 namespace WinIRC.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ChannelView : Page
     {
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
@@ -66,6 +62,10 @@ namespace WinIRC.Views
 
             messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
 
+            var store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
+            store.TopicSetEvent += ChannelView_TopicSetEvent;
+            topicText.Text = store.Topic;
+
             IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged += (s, args) => {
                 ScrollToBottom(currentServer, currentChannel);
             };
@@ -73,6 +73,12 @@ namespace WinIRC.Views
             ScrollToBottom(currentServer, currentChannel);
         }
 
+        private void ChannelView_TopicSetEvent(object sender, EventArgs e)
+        {
+            var channel = sender as ChannelStore;
+
+            topicText.Text = channel.Topic;
+        }
 
         public TextBox GetInputBox()
         {
@@ -125,6 +131,15 @@ namespace WinIRC.Views
             if (Config.Contains(Config.FontSize))
             {
                 this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
+            }
+
+            if (currentChannel != "Server")
+            {
+                topicScroll.Visibility = MainPage.instance.ShowTopic ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                topicScroll.Visibility = Visibility.Collapsed;
             }
         }
     }

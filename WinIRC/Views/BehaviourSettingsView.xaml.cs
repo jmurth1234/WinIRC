@@ -32,6 +32,7 @@ namespace WinIRC
         public BehaviourSettingsView()
         {
             this.InitializeComponent();
+            Title = "Behaviour";
             LoadSettings();
         }
 
@@ -117,7 +118,7 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.UseTabs, TabsSwitch.IsOn);
-
+            base.UpdateUi();
         }
 
         private void ReconnectSwitch_Toggled(object sender, RoutedEventArgs e)
