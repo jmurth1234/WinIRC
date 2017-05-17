@@ -331,7 +331,7 @@
                 <bar:MenuBarItem Text="Appearance" Click="AppearanceSettings_Click"/>
                 <bar:MenuBarItem Text="Behaviour" Click="BehaviourSettings_Click"/>
                 <MenuFlyoutSeparator />
-                <bar:MenuBarItem Text="About"/>
+                <bar:MenuBarItem Text="About" Click="AboutPage_Click"/>
             </bar:MenuBarButton>
         </bar:MenuBar>
 

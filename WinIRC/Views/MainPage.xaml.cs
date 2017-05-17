@@ -685,6 +685,11 @@ namespace WinIRC
             ShowSettings(typeof(DisplaySettingsView));
         }
 
+        private void AboutPage_Click(object sender, RoutedEventArgs e)
+        {
+            ShowSettings(typeof(AboutView));
+        }
+
         private void ShowSettings(Type type)
         {
             SidebarFrame.BackStack.Clear();
@@ -693,10 +698,17 @@ namespace WinIRC
             if (SidebarFrame.Content == null || !(SidebarFrame.Content.GetType() == type))
             {
                 SidebarFrame.Navigate(type);
-                var settingsView = (BaseSettingsPage) SidebarFrame.Content;
+                if (SidebarFrame.Content is BaseSettingsPage)
+                {
+                    var settingsView = (BaseSettingsPage)SidebarFrame.Content;
 
-                if (settingsView != null)
-                    SidebarHeader.Title = settingsView.Title;
+                    if (settingsView != null)
+                        SidebarHeader.Title = settingsView.Title;
+                }
+                else if (type.Name == nameof(AboutView))
+                {
+                    SidebarHeader.Title = "About";
+                }
             }
 
 
