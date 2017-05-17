@@ -79,7 +79,10 @@ namespace WinIRC.Net
                 }
                 catch (NullReferenceException ex)
                 {
-                    Debug.WriteLine($"User's nickname {user.Nick} with prefix type {user.Prefix.Substring(0,1)} is unhandled");
+                    if (user.Nick.Length != 1)
+                    {
+                        Debug.WriteLine($"User's nickname {user.Nick} with prefix type {user.Prefix.Substring(0, 1)} is unhandled");
+                    }
                 }
             }
             watch.Stop();
