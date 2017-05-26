@@ -270,10 +270,7 @@ namespace WinIRC
             var uiSettings = new Windows.UI.ViewManagement.UISettings();
             AccentColor = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Accent));
 
-            if (this.RequestedTheme == ElementTheme.Dark)
-                AccentColorAlt = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.AccentDark1));
-
-            Menu.RequestedTheme = ElementTheme.Dark;
+            AccentColorAlt = new SolidColorBrush(uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.AccentDark1));
 
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
@@ -284,15 +281,15 @@ namespace WinIRC
 
             var darkTheme = Config.GetBoolean(Config.DarkTheme);
 
-            var background = darkTheme ? ParseColor("#FF1F1F1F") : ParseColor("#FFE6E6E6");
-            var backgroundInactive = darkTheme ? ParseColor("#FF2B2B2B") : ParseColor("#FFF2F2F2");
-            var foreground = darkTheme ? ParseColor("#FFFFFFFF") : ParseColor("#FF000000");
+            var background = ParseColor("#FF1F1F1F");
+            var backgroundInactive = ParseColor("#FF2B2B2B");
+            var foreground = ParseColor("#FFFFFFFF");
 
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
-            titleBar.ButtonHoverBackgroundColor = backgroundInactive;
+            titleBar.ButtonHoverBackgroundColor = AccentColorAlt.Color;
             titleBar.ButtonBackgroundColor = _AccentColor.Color;
-            titleBar.ButtonInactiveBackgroundColor = _AccentColorAlt.Color;
+            titleBar.ButtonInactiveBackgroundColor = AccentColorAlt.Color;
             titleBar.ButtonForegroundColor = foreground;
 
             Menu.Background = AccentColor;
@@ -451,6 +448,7 @@ namespace WinIRC
         {
             //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
             UpdateInfo(server, channel);
+            SidebarHeader.Title = "Channel Users";
 
             if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
             {
@@ -695,6 +693,8 @@ namespace WinIRC
             SidebarFrame.BackStack.Clear();
             SidebarHeader.ShowBackButton = false;
 
+            ShowingUsers = false;
+
             if (SidebarFrame.Content == null || !(SidebarFrame.Content.GetType() == type))
             {
                 SidebarFrame.Navigate(type);
@@ -710,7 +710,6 @@ namespace WinIRC
                     SidebarHeader.Title = "About";
                 }
             }
-
 
             NotifyPropertyChanged(nameof(ShowingUsers));
             ToggleSidebar();
@@ -732,6 +731,8 @@ namespace WinIRC
                 SidebarSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
                 SidebarSplitView.IsPaneOpen = false;
             }
+
+            ShowingUsers = false;
         }
 
         private Boolean SidebarPinned()

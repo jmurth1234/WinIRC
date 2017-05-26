@@ -767,7 +767,12 @@ namespace WinIRC.Net
 
         public ObservableCollection<string> GetChannelUsers(string channel)
         {
-            return channelStore[channel].SortedUsers;
+            var store = channelStore[channel];
+
+            if (store.SortedUsers.Count == 0)
+                store.SortUsers();
+
+            return store.SortedUsers;
         }
 
         public ObservableCollection<string> GetRawUsers(string channel)
