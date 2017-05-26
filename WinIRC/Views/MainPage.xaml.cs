@@ -418,7 +418,7 @@ namespace WinIRC
 
             if (GetInputBox().FocusState != FocusState.Unfocused)
             {
-                this.mainGrid.Margin = new Thickness(0, -48, 0, args.OccludedRect.Height);
+                this.mainGrid.Margin = new Thickness(0, -70, 0, args.OccludedRect.Height);
                 args.EnsuredFocusedElementInView = true;
             }
             GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
@@ -885,5 +885,9 @@ namespace WinIRC
             UpdateUi();
         }
 
+        private void SidebarSplitView_PaneClosed(SplitView sender, object args)
+        {
+            ShowingUsers = false;
+        }
     }
 }

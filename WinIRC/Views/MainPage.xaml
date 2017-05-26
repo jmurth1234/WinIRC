@@ -357,7 +357,7 @@
                 </Grid>
             </SplitView.Pane>
             <SplitView.Content>
-                <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right">
+                <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed">
                     <SplitView.Pane>
                         <Grid>
                             <Grid.RowDefinitions>

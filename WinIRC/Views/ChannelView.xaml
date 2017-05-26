@@ -16,8 +16,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden" >
-            <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="#19000000"  />
+        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden"  Background="#19000000"    >
+            <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="{x:Null}" IsReadOnly="True"  />
         </ScrollViewer>
 
         <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
