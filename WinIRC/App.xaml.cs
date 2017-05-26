@@ -35,13 +35,15 @@ using Windows.Data.Xml.Dom;
 using Windows.UI.Core;
 using WinIRC.Utils;
 using System.Threading.Tasks;
+using Template10.Common;
 
 namespace WinIRC
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application
+    [Bindable]
+    sealed partial class App : BootStrapper
     {
         public bool AppLaunched
         {
@@ -83,6 +85,7 @@ namespace WinIRC
         }
 
         public bool IncrementPings = true;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -90,7 +93,9 @@ namespace WinIRC
         public App()
         {
             Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(Microsoft.ApplicationInsights.WindowsCollectors.Metadata | Microsoft.ApplicationInsights.WindowsCollectors.Session);
-            this.SetTheme();
+
+            SetTheme();
+
             this.InitializeComponent();
             foreach (var current in BackgroundTaskRegistration.AllTasks)
             {
@@ -102,6 +107,7 @@ namespace WinIRC
         }
 
         private Boolean CanBackground = false;
+
         public void SetTheme()
         {
             try
@@ -127,7 +133,7 @@ namespace WinIRC
                 Frame rootFrame = Window.Current.Content as Frame;
                 if (Config.Contains(Config.DarkTheme))
                 {
-                    rootFrame.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light;
+                    MainPage.instance.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light;
                 }
                 else
                 {
@@ -138,6 +144,7 @@ namespace WinIRC
                 MainPage.instance.ManageTitleBar();
             }
         }
+
 
         private void setBadgeNumber(int num)
         {
@@ -164,15 +171,13 @@ namespace WinIRC
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name = "e">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs e)
+        public override async Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
         {
-            AppLaunched = true;
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                this.DebugSettings.EnableFrameRateCounter = true;
+                //this.DebugSettings.EnableFrameRateCounter = true;
             }
-
 #endif
             try
             {
@@ -184,22 +189,28 @@ namespace WinIRC
                 CanBackground = false;
             }
 
-            await InitApp(e);
+            if (startKind.Equals(StartKind.Activate))
+                await Activated(args);
+            else
+                await InitApp(args);
+
             // Ensure the current window is active  
             Window.Current.Activate();
             Window.Current.Activated += Current_Activated;
+
+            AppLaunched = true;
         }
 
         private void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e)
         {
             if (e.WindowActivationState == CoreWindowActivationState.Deactivated)
             {
-                System.Diagnostics.Debug.WriteLine("Deactivated " + DateTime.Now);
+                Debug.WriteLine("Deactivated " + DateTime.Now);
                 IncrementPings = true;
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Activated " + DateTime.Now);
+                Debug.WriteLine("Activated " + DateTime.Now);
                 NumberPings = 0;
                 IncrementPings = false;
             }
@@ -208,15 +219,14 @@ namespace WinIRC
         private async Task<bool> InitApp(IActivatedEventArgs e)
         {
             var loaded = true;
-            Frame rootFrame = Window.Current.Content as Frame;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
-            if (rootFrame == null)
+            if (!AppLaunched)
             {
-                NumberPings = 0;
                 loaded = false;
+                NumberPings = 0;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
-                applicationView.SetPreferredMinSize(new Windows.Foundation.Size{Width = 320, Height = 240});
+                applicationView.SetPreferredMinSize(new Windows.Foundation.Size{Width = 360, Height = 240});
                 Connection check = new Connection();
                 if (check.HasInternetAccess)
                 {
@@ -230,47 +240,34 @@ namespace WinIRC
                         {
                             setTwitterCredentials();
                         }
-                    }
-
-                    ;
+                    };
                 }
-
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-                rootFrame.NavigationFailed += OnNavigationFailed;
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                //TODO: Load state from previously suspended application
-                }
-
-                if (e is LaunchActivatedEventArgs && !(e as LaunchActivatedEventArgs).PrelaunchActivated)
-                {
-                //TODO: maybe add some stuff here if needed.
-                }
-
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
             }
 
             IrcServers servers = IrcServers.Instance;
             await servers.loadServersAsync();
             await servers.UpdateJumpList();
-            if (rootFrame.Content == null)
+
+            if (!(NavigationService.Content is MainPage))
             {
                 loaded = false;
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
                 if (e is LaunchActivatedEventArgs)
-                    rootFrame.Navigate(typeof (MainPage), (e as LaunchActivatedEventArgs).Arguments);
-                else
-                    rootFrame.Navigate(typeof (MainPage));
+                {
+                    var args = (e as LaunchActivatedEventArgs).Arguments;
+                    await NavigationService.NavigateAsync(typeof(MainPage), args);
+                } else
+                {
+                    await NavigationService.NavigateAsync(typeof(MainPage));
+                }
             }
             else
             {
-                var page = rootFrame.Content as MainPage;
+                var page = NavigationService.Content as MainPage;
                 if (e is LaunchActivatedEventArgs)
-                    page?.OnLaunchedEvent((e as LaunchActivatedEventArgs).Arguments);
+                    page?.ConnectViaName((e as LaunchActivatedEventArgs).Arguments);
             }
 
             return loaded;
@@ -325,7 +322,7 @@ namespace WinIRC
             toastNotifier.Show(toast);
         }
 
-        protected override async void OnActivated(IActivatedEventArgs e)
+        protected async Task Activated(IActivatedEventArgs e)
         {
             // Initialise the app if it's not already open
             Frame rootFrame = Window.Current.Content as Frame;

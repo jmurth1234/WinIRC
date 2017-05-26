@@ -582,7 +582,7 @@ namespace WinIRC.Net
             if (channelStore.ContainsKey(channel))
                 return channelStore[channel].Topic;
 
-            return null;
+            return "";
         }
 
         public void JoinChannel(string channel)
@@ -655,7 +655,7 @@ namespace WinIRC.Net
 
                 channelList.Insert(i, channel);
 
-                channelStore.Add(channel, new ChannelStore());
+                channelStore.Add(channel, new ChannelStore(channel));
             }
 
             await Task.Delay(1);
@@ -767,7 +767,12 @@ namespace WinIRC.Net
 
         public ObservableCollection<string> GetChannelUsers(string channel)
         {
-            return channelStore[channel].SortedUsers;
+            var store = channelStore[channel];
+
+            if (store.SortedUsers.Count == 0)
+                store.SortUsers();
+
+            return store.SortedUsers;
         }
 
         public ObservableCollection<string> GetRawUsers(string channel)

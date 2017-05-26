@@ -81,5 +81,9 @@ namespace WinIRC
             }
         }
 
+        internal static void RemoveKey(string key)
+        {
+            roamingSettings.Values.Remove(key);
+        }
     }
 }

@@ -29,6 +29,8 @@ namespace WinIRC
         public DisplaySettingsView()
         {
             this.InitializeComponent();
+            Title = "Display";
+
             Theme.Toggled += theme_Toggled;
             LoadSettings();
         }
@@ -100,7 +102,6 @@ namespace WinIRC
                 return;
             Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
             (Application.Current as App).SetTheme();
-            MainPage.instance.RequestedTheme = Theme.IsOn ? ElementTheme.Dark : ElementTheme.Light;
 
             //var dialog = new MessageDialog("To apply the theme, please restart WinIRC.");
             //await dialog.ShowAsync();

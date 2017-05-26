@@ -46,7 +46,7 @@ namespace WinIRC.Views
         private async void ConnectView_LoadedAsync(object sender, RoutedEventArgs e)
         {
             await ircServers.loadServersAsync();
-            serversSavedCombo.ItemsSource = ircServers.servers;
+            serversSavedCombo.ItemsSource = ircServers.Servers;
         }
 
         private void ConnectButtonClick(object sender, RoutedEventArgs e)
@@ -83,7 +83,7 @@ namespace WinIRC.Views
             }
 
             ircServers.AddServer(ircServer);
-            serversSavedCombo.ItemsSource = ircServers.servers;
+            serversSavedCombo.ItemsSource = ircServers.Servers;
             serversSavedCombo.SelectedItem = ircServer.name;
         }
 
@@ -172,12 +172,12 @@ namespace WinIRC.Views
                 return;
             }
 
-            if (ircServers.servers == null)
+            if (ircServers.Servers == null)
             {
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them");
                 await dialog.ShowAsync();
 
-                ircServers.serversList = new List<IrcServer>();
+                ircServers.Servers = new ObservableCollection<IrcServer>();
                 serversSavedCombo.ItemsSource = ircServers;
                 return;
             }

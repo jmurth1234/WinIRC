@@ -12,17 +12,29 @@ namespace WinIRC.Net
 {
     public class ChannelStore
     {
-        private CoreDispatcher dispatcher;
         private bool currentlySorting;
+        private string _Topic = "";
 
         public ObservableCollection<User> Users { get; private set; }
         public ObservableCollection<string> RawUsers { get; private set; }
         public ObservableCollection<string> SortedUsers { get; private set; }
 
-        public string Topic { get; private set; }
-
-        public ChannelStore()
+        public string Topic
         {
+            get => _Topic;
+            set
+            {
+                _Topic = value;
+                TopicSetEvent?.Invoke(this, new EventArgs());
+            }
+        }
+        public string Name { get; private set; }
+
+        public event EventHandler TopicSetEvent;
+
+        public ChannelStore(String name)
+        {
+            this.Name = name;
             this.Users = new ObservableCollection<User>();
             this.RawUsers = new ObservableCollection<string>();
             this.SortedUsers = new ObservableCollection<string>();

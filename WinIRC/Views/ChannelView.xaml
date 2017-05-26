@@ -9,12 +9,18 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
+
+        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden" >
+            <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="#19000000"  />
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
             <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="net:Message">
@@ -30,7 +36,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <Grid Grid.Row="1" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
+        <Grid Grid.Row="2" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />
