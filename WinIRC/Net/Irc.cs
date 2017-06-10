@@ -225,12 +225,17 @@ namespace WinIRC.Net
                     {
                         channel = parsedLine.CommandMessage.Parameters[0];
                     }
-                    Message msg = new Message();
-                    msg.Type = MessageType.Info;
-                    msg.User = parsedLine.PrefixMessage.Nickname;
 
-                    msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "joined the channel");
-                    AddMessage(channel, msg);
+                    if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
+                    {
+                        Message msg = new Message();
+                        msg.Type = MessageType.Info;
+                        msg.User = parsedLine.PrefixMessage.Nickname;
+
+                        msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "joined the channel");
+                        AddMessage(channel, msg);
+                    }
+
                     channelStore[channel].AddUser(parsedLine.PrefixMessage.Nickname, true);
                 }
             }
@@ -400,11 +405,15 @@ namespace WinIRC.Net
                     var users = channelStore[channel];
                     if (users.HasUser(username))
                     {
-                        Message msg = new Message();
-                        msg.Type = MessageType.Info;
-                        msg.User = parsedLine.PrefixMessage.Nickname;
-                        msg.Text = String.Format("({0}) {1}: {2}", parsedLine.PrefixMessage.Prefix, "quit the server", parsedLine.TrailMessage.TrailingContent);
-                        AddMessage(channel, msg);
+                        if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
+                        {
+                            Message msg = new Message();
+                            msg.Type = MessageType.Info;
+                            msg.User = parsedLine.PrefixMessage.Nickname;
+                            msg.Text = String.Format("({0}) {1}: {2}", parsedLine.PrefixMessage.Prefix, "quit the server", parsedLine.TrailMessage.TrailingContent);
+                            AddMessage(channel, msg);
+                        }
+
                         users.RemoveUser(username);
                     }
                 }

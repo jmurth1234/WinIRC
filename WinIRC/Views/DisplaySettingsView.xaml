@@ -20,6 +20,8 @@
                 <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
 
+                <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
 
                 <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>

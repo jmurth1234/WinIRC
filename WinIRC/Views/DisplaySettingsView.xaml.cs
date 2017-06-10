@@ -93,6 +93,16 @@ namespace WinIRC
                 this.HideStatusBar.IsOn = false;
             }
 
+            if (Config.Contains(Config.IgnoreJoinLeave))
+            {
+                this.IgnoreJoinLeave.IsOn = Config.GetBoolean(Config.IgnoreJoinLeave);
+            }
+            else
+            {
+                Config.SetBoolean(Config.IgnoreJoinLeave, false);
+                this.IgnoreJoinLeave.IsOn = false;
+            }
+
             this.SettingsLoaded = true;
         }
 
@@ -141,6 +151,16 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.HideStatusBar, HideStatusBar.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void IgnoreJoinLeave_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.IgnoreJoinLeave, IgnoreJoinLeave.IsOn);
 
             base.UpdateUi();
         }
