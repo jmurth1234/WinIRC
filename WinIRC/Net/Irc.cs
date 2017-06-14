@@ -253,12 +253,18 @@ namespace WinIRC.Net
                     {
                         channel = parsedLine.CommandMessage.Parameters[0];
                     }
-                    Message msg = new Message();
-                    msg.Type = MessageType.Info;
-                    msg.User = parsedLine.PrefixMessage.Nickname;
 
-                    msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "left the channel");
-                    AddMessage(channel, msg);
+                    if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
+                    {
+
+                        Message msg = new Message();
+                        msg.Type = MessageType.Info;
+                        msg.User = parsedLine.PrefixMessage.Nickname;
+
+                        msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "left the channel");
+                        AddMessage(channel, msg);
+                    }
+
                     channelStore[channel].RemoveUser(parsedLine.PrefixMessage.Nickname);
                 }
             }
