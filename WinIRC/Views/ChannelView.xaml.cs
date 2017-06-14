@@ -22,6 +22,8 @@ namespace WinIRC.Views
     public sealed partial class ChannelView : Page
     {
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
+        private ChannelStore store;
+        private bool ChannelLoaded;
 
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
@@ -30,20 +32,27 @@ namespace WinIRC.Views
         {
             this.InitializeComponent();
 
-            var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
+            UpdateUi();
+        }
 
-            if (uiMode == Windows.UI.ViewManagement.UserInteractionMode.Touch)
+        public ChannelView(string server, string channel)
+        {
+            this.InitializeComponent();
+
+            Loaded += (s, e) =>
             {
-                TabButton.Width = 48;
-            }
-            else
-            {
-                TabButton.Width = 0;
-            }
+                SetChannel(server, channel);
+            };
+
+            Unloaded += ChannelView_Unloaded;
 
             UpdateUi();
         }
 
+        private void ChannelView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Unload();
+        }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -52,9 +61,38 @@ namespace WinIRC.Views
             SetChannel(args[0], args[1]);
         }
 
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            var args = ((string[])e.Parameter);
+
+            Unload();
+        }
+
+        private void Unload()
+        {
+            if (ChannelLoaded)
+            {
+                messagesView.ItemsSource = null;
+                store.TopicSetEvent -= ChannelView_TopicSetEvent;
+                store = null;
+                topicText.Text = "";
+            }
+        }
 
         internal void SetChannel(string server, string channel)
         {
+            if (currentChannel != null && currentServer != null)
+            {
+                IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged -= ChannelView_CollectionChanged;
+                store.TopicSetEvent -= ChannelView_TopicSetEvent;
+            }
+            var servers = IrcHandler.connectedServers;
+
+            if (!servers.ContainsKey(server) || !servers[server].channelBuffers.ContainsKey(channel))
+            {
+                return;
+            }
+
             currentServer = server;
             currentChannel = channel;
 
@@ -62,22 +100,25 @@ namespace WinIRC.Views
 
             messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
 
-            var store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
+            store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
             store.TopicSetEvent += ChannelView_TopicSetEvent;
+
             topicText.Text = store.Topic;
 
-            IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged += (s, args) => {
-                ScrollToBottom(currentServer, currentChannel);
-            };
+            IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged += ChannelView_CollectionChanged;
 
+            ScrollToBottom(currentServer, currentChannel);
+            ChannelLoaded = true;
+        }
+
+        private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
             ScrollToBottom(currentServer, currentChannel);
         }
 
-        private void ChannelView_TopicSetEvent(object sender, EventArgs e)
+        private void ChannelView_TopicSetEvent(string topic)
         {
-            var channel = sender as ChannelStore;
-
-            topicText.Text = channel.Topic;
+            topicText.Text = topic;
         }
 
         public TextBox GetInputBox()
@@ -123,6 +164,17 @@ namespace WinIRC.Views
 
         public void UpdateUi()
         {
+            var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
+
+            if (uiMode == Windows.UI.ViewManagement.UserInteractionMode.Touch)
+            {
+                TabButton.Width = 48;
+            }
+            else
+            {
+                TabButton.Width = 0;
+            }
+
             if (Config.Contains(Config.FontFamily))
             {
                 this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));

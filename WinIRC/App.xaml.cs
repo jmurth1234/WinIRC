@@ -179,6 +179,7 @@ namespace WinIRC
                 //this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
+
             try
             {
                 var check = await BackgroundExecutionManager.RequestAccessAsync();
@@ -227,21 +228,6 @@ namespace WinIRC
                 NumberPings = 0;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
                 applicationView.SetPreferredMinSize(new Windows.Foundation.Size{Width = 360, Height = 240});
-                Connection check = new Connection();
-                if (check.HasInternetAccess)
-                {
-                    setTwitterCredentials();
-                }
-                else
-                {
-                    check.ConnectionChanged += (connected) =>
-                    {
-                        if (connected)
-                        {
-                            setTwitterCredentials();
-                        }
-                    };
-                }
             }
 
             IrcServers servers = IrcServers.Instance;
@@ -273,19 +259,6 @@ namespace WinIRC
             return loaded;
         }
 
-        public void setTwitterCredentials()
-        {
-            try
-            {
-                this.TwitterCredentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
-            }
-        }
-
         /// <summary>
         /// Invoked when Navigation to a certain page fails
         /// </summary>
@@ -306,7 +279,7 @@ namespace WinIRC
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            MainPage.instance.ExtendExecution();
+            //MainPage.instance.ExtendExecution();
             deferral.Complete();
         }
 
@@ -325,12 +298,13 @@ namespace WinIRC
         protected async Task Activated(IActivatedEventArgs e)
         {
             // Initialise the app if it's not already open
-            Frame rootFrame = Window.Current.Content as Frame;
             Debug.WriteLine("App activated!");
             var loaded = await InitApp(e);
             // Handle toast activation
-            if (e.Kind == ActivationKind.ToastNotification && loaded)
+            if (e.Kind == ActivationKind.ToastNotification && loaded && NavigationService.Content is MainPage)
             {
+                MainPage mainPage = NavigationService.Content as MainPage;
+
                 var args = e as ToastNotificationActivatedEventArgs;
                 var toastActivationArgs = args;
                 // Parse the query string
@@ -347,7 +321,6 @@ namespace WinIRC
                     string server = qryStr["server"];
                     string username = qryStr["username"];
                     var message = args.UserInput["tbReply"];
-                    var mainPage = (MainPage)rootFrame.Content;
                     if (!ircHandler.connectedServersList.Contains(server))
                     {
                         return;
@@ -363,7 +336,7 @@ namespace WinIRC
                     // The conversation ID retrieved from the toast args
                     string channel = qryStr["channel"];
                     string server = qryStr["server"];
-                    var mainPage = (MainPage)rootFrame.Content;
+
                     if (mainPage == null)
                         return;
                     if (!ircHandler.connectedServersList.Contains(server))
@@ -375,12 +348,6 @@ namespace WinIRC
                     if (!mainPage.currentChannel.Equals(channel))
                         mainPage.SwitchChannel(server, channel, false);
                 }
-
-                // If we're loading the app for the first time, place the main page on
-                // the back stack so that user can go back after they've been
-                // navigated to the specific page
-                if (rootFrame.BackStack.Count == 0)
-                    rootFrame.BackStack.Add(new PageStackEntry(typeof (MainPage), null, null));
             }
 
             if (e.Kind == ActivationKind.Protocol)

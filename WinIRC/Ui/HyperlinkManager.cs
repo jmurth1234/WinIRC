@@ -13,8 +13,6 @@ namespace WinIRC.Ui
 {
     public class HyperlinkManager
     { 
-        private Dictionary<Hyperlink, Uri> storedUris = new Dictionary<Hyperlink, Uri>();
-
         public Action<Uri> LinkClicked { get; internal set; }
 
         public void SetText(Paragraph obj, string text)
@@ -58,17 +56,18 @@ namespace WinIRC.Ui
 
                 var url = new Uri(uri);
 
-                if ((uri.Contains("twitter.com") && uri.Contains("status")) 
-                    || isImage(uri)
+                //if ((uri.Contains("twitter.com") && uri.Contains("status"))
+                if (isImage(uri)
                     || uri.Contains("youtube.com/watch")
                     || uri.Contains("youtu.be"))
                 {
                     symbol = "";
                     hyper.Click += Hyper_Click;
-                    storedUris.Add(hyper, url);
                 }
-
-                else hyper.NavigateUri = url;
+                else
+                {
+                    hyper.NavigateUri = url;
+                }
 
                 hyper.Inlines.Add(GetRunControl(uri));
 
@@ -98,8 +97,7 @@ namespace WinIRC.Ui
         // custom handling 
         private void Hyper_Click(Hyperlink sender, HyperlinkClickEventArgs args)
         {
-            Uri uri;
-            storedUris.TryGetValue(sender, out uri);
+            var uri = new Uri((sender.Inlines[0] as Run).Text);
             if (uri != null)
             {
                 Debug.WriteLine(uri);

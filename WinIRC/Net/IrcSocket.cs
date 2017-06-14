@@ -27,6 +27,9 @@ namespace WinIRC.Net
 
         public override async void Connect()
         {
+            if (server == null)
+                return;
+
             IsAuthed = false;
             ReadOrWriteFailed = false;
 
@@ -167,7 +170,8 @@ namespace WinIRC.Net
                     ReadOrWriteFailed = true;
                     IsConnected = false;
 
-                    DisconnectAsync(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
+                    if (server != null)
+                        DisconnectAsync(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
 
                     return;
                 }

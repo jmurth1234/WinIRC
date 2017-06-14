@@ -27,7 +27,8 @@
             <Paragraph x:Name="MessageParagraph" /> 
         </RichTextBlock>
 
-        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" 
+               HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0">
             
         </Frame>
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -65,6 +66,19 @@ namespace WinIRC.Ui
             this.hyperlinkManager = new HyperlinkManager();
 
             Loaded += MessageLine_Loaded;
+            Unloaded += MessageLine_Unloaded;
+        }
+
+        private void MessageLine_Unloaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = null;
+            PreviewFrame.Navigate(typeof(Page));
+
+            hyperlinkManager.SetText(MessageParagraph, "");
+            hyperlinkManager.LinkClicked -= MediaPreview_Clicked;
+            hyperlinkManager = null;
+
+            UpdateLayout();
         }
 
         private void MessageLine_Loaded(object sender, RoutedEventArgs e)
@@ -110,17 +124,20 @@ namespace WinIRC.Ui
 
         private void MediaPreview_Clicked(Uri uri)
         {
-
-            if (PreviewFrame.Visibility == Visibility.Collapsed || uri != lastUri)
+            if (PreviewFrame.Visibility == Visibility.Collapsed)
             {
                 PreviewFrame.Visibility = Visibility.Visible;
 
-                if (uri.Host.Contains("twitter.com"))
-                    PreviewFrame.Navigate(typeof(TwitterView), uri);
-                else if (uri.Host.Contains("youtube.com") || uri.Host.Contains("youtu.be")) 
-                    PreviewFrame.Navigate(typeof(YoutubeView), uri);
-                else if (HyperlinkManager.isImage(uri.ToString()))
-                    PreviewFrame.Navigate(typeof(ImageView), uri);
+                if (uri != lastUri)
+                {
+                    if (uri.Host.Contains("twitter.com"))
+                        PreviewFrame.Navigate(typeof(TwitterView), uri);
+                    else if (uri.Host.Contains("youtube.com") || uri.Host.Contains("youtu.be"))
+                        PreviewFrame.Navigate(typeof(YoutubeView), uri);
+                    else if (HyperlinkManager.isImage(uri.ToString()))
+                        PreviewFrame.Navigate(typeof(ImageView), uri);
+
+                }
 
                 lastUri = uri;
             }

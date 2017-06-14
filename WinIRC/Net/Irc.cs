@@ -22,7 +22,7 @@ using Windows.UI.Xaml;
 
 namespace WinIRC.Net
 {
-    public class Irc
+    public class Irc : IDisposable
     {
         internal StreamSocket streamSocket;
         internal DataReader reader;
@@ -91,6 +91,7 @@ namespace WinIRC.Net
             channelStore = new Dictionary<string, ChannelStore>(StringComparer.OrdinalIgnoreCase);
 
             IsAuthed = false;
+
             ConnCheck = new Connection();
 
             ConnCheck.ConnectionChanged += async (connected) =>
@@ -690,6 +691,11 @@ namespace WinIRC.Net
 
         public void SwitchChannel(string channel)
         {
+            if (channel == null)
+            {
+                return;
+            }
+
             if (channelBuffers.Keys.Contains(channel))
             {
                 currentChannel = channel;
@@ -908,6 +914,16 @@ namespace WinIRC.Net
             }
 
             return null;
+        }
+
+        public void Dispose()
+        {
+            server = null;
+
+            reader.Dispose();
+            writer.Dispose();
+
+            streamSocket.Dispose();
         }
     }
 }

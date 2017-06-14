@@ -25,12 +25,12 @@ namespace WinIRC.Net
             set
             {
                 _Topic = value;
-                TopicSetEvent?.Invoke(this, new EventArgs());
+                TopicSetEvent?.Invoke(value);
             }
         }
         public string Name { get; private set; }
 
-        public event EventHandler TopicSetEvent;
+        public event Action<string> TopicSetEvent;
 
         public ChannelStore(String name)
         {

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Tweetinvi;
+using Tweetinvi.Exceptions;
 using Tweetinvi.Models;
 using Windows.Data.Json;
 using Windows.Foundation;
@@ -53,15 +55,53 @@ namespace WinIRC.Views
             if (new Connection().HasInternetAccess)
             {
                 var uriArray = uri.ToString().Split('/');
+                // Disable the exception swallowing to allow exception to be thrown by Tweetinvi
+                ExceptionHandler.SwallowWebExceptions = false;
+
                 var tweet = await Task.Run(() =>
                 {
-                    return Tweet.GetTweet(long.Parse(uriArray[uriArray.Length - 1].Replace("?s=09", "")));
+                    try
+                    {
+                        ITwitterCredentials credentials;
+
+                        credentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
+                        Auth.InitializeApplicationOnlyCredentials();
+
+                        var id = long.Parse(uriArray[uriArray.Length - 1].Replace("?s=09", ""));
+
+                        var latestException = ExceptionHandler.GetLastException();
+                        if (latestException != null)
+                        {
+                            Debug.WriteLine(latestException.TwitterDescription);
+                        }
+
+                        return Tweet.GetTweet(id);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e);
+
+                        var latestException = ExceptionHandler.GetLastException();
+                        if (latestException != null)
+                        {
+                            Debug.WriteLine(latestException.TwitterDescription);
+                        }
+                    }
+                    return null;
                 });
 
-                Timestamp.Text = tweet.CreatedAt.ToLocalTime().ToString();
-                hyperlinkManager.SetText(TweetParagraph, tweet.Text);
-                UsernameBox.Text = tweet.CreatedBy.Name;
-                Picture.Source = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
+                if (tweet != null)
+                {
+                    Timestamp.Text = tweet.CreatedAt.ToLocalTime().ToString();
+                    hyperlinkManager.SetText(TweetParagraph, tweet.Text);
+                    UsernameBox.Text = tweet.CreatedBy.Name;
+                    Picture.Source = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
+                }
+                else
+                {
+                    hyperlinkManager.SetText(TweetParagraph, "Failed to load tweet, try again later");
+                    UsernameBox.Text = "Error loading";
+                }
             }
         }
 

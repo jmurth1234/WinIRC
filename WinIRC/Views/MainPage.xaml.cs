@@ -90,10 +90,6 @@ namespace WinIRC
                     SidebarHeader.Title = "Channel Users";
                     SidebarSplitView.IsPaneOpen = true;
                 }
-                else
-                {
-                    SidebarSplitView.IsPaneOpen = false;
-                }
 
                 _ShowingUsers = SidebarFrame.Content is UsersView && SidebarSplitView.IsPaneOpen;
                 this.NotifyPropertyChanged();
@@ -374,8 +370,8 @@ namespace WinIRC
         {
             if (GetCurrentItem() == null) return null;
 
-            var item = GetCurrentItem().Content as Frame;
-            return item.Content as ChannelView;
+            var item = GetCurrentItem().Content as ChannelView;
+            return item;
         }
 
         public TextBox GetInputBox()
@@ -455,18 +451,17 @@ namespace WinIRC
                 if (auto != lastAuto) IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
 
                 var item = GetCurrentItem();
-                var frame = item.Content as Frame;
                 lastAuto = auto;
 
                 item.Header = channel;
 
-                if (frame.Content is ChannelView)
+                if (item.Content is ChannelView)
                 {
-                    (frame.Content as ChannelView).SetChannel(server, channel);
+                    (item.Content as ChannelView).SetChannel(server, channel);
                 }
                 else
                 {
-                    frame.Navigate(typeof(ChannelView), new string[] { server, channel });
+                    item.Content = new ChannelView(server, channel);
                 }
             }
             else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
@@ -476,27 +471,44 @@ namespace WinIRC
             }
             else
             {
-                CreateNewTab(channel).Navigate(typeof(ChannelView), new string[] { server, channel });
+                CreateNewTab(server, channel);
                 IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
             }
         }
 
-        private Frame CreateNewTab(String header)
+        private PlaceholderView CreateNewTab(String header)
         {
             PivotItem p = new PivotItem();
             p.Header = header;
-            Frame frame = new Frame();
-            frame.CacheSize = 0;
+            PlaceholderView view = new PlaceholderView();
 
             p.Margin = new Thickness(0, 0, 0, -2);
 
-            p.Content = frame;
+            p.Content = view;
 
             Tabs.Items.Add(p);
 
             Tabs.SelectedItem = p;
 
-            return frame;
+            return view;
+        }
+
+        private ChannelView CreateNewTab(String server, String channel)
+        {
+            PivotItem p = new PivotItem();
+            p.Header = channel;
+
+            ChannelView view = new ChannelView(server, channel);
+
+            p.Margin = new Thickness(0, 0, 0, -2);
+
+            p.Content = view;
+
+            Tabs.Items.Add(p);
+
+            Tabs.SelectedItem = p;
+
+            return view;
         }
 
         public void UpdateInfo(string server, string channel )
@@ -557,7 +569,7 @@ namespace WinIRC
             // connect
             if (Tabs.Items.Count != 0)
             {
-                if (((Tabs.Items[0] as PivotItem).Content as Frame).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
+                if ((Tabs.Items[0] as PivotItem).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
             }
 
             if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name);
@@ -638,12 +650,25 @@ namespace WinIRC
                     channelList.ItemsSource = IrcHandler.connectedServers.Values.First().channelList;
                 }
 
+                foreach (var buffer in IrcHandler.connectedServers[irc.server.name].channelBuffers)
+                {
+                    buffer.Value.Clear();
+                }
+                var name = irc.server.name;
+
+                IrcHandler.connectedServers[irc.server.name].channelBuffers.Clear();
+                IrcHandler.connectedServers[irc.server.name].channelList.Clear();
+                IrcHandler.connectedServers[irc.server.name].channelStore.Clear();
+
                 IrcHandler.connectedServers.Remove(irc.server.name);
                 IrcHandler.connectedServersList.Remove(irc.server.name);
                 channelList.ItemsSource = null;
+                irc.HandleDisconnect = null;
+                irc.ConnCheck.ConnectionChanged = null;
+                irc.ConnCheck = null;
+                irc.Dispose();
 
                 List<PivotItem> Temp = new List<PivotItem>();
-                var name = irc.server.name;
                 Debug.WriteLine("All tabs: " + Tabs.Items.Count);
 
                 var count = Tabs.Items.Count;
@@ -652,9 +677,10 @@ namespace WinIRC
                 {
                     Debug.WriteLine("Tabs seen: " + i);
                     var item = Tabs.Items[0] as PivotItem;
-                    var content = (item.Content as Frame).Content;
+                    var content = item.Content;
                     if (content is ChannelView && (content as ChannelView).currentServer == name)
                     {
+                        item.Content = null;
                         Tabs.Items.Remove(item);
                     }
                 }
@@ -861,6 +887,8 @@ namespace WinIRC
 
         private void CloseTab_Click(object sender, RoutedEventArgs e)
         {
+            GetCurrentItem().Content = null;
+
             Tabs.Items.Remove(GetCurrentItem());
         }
 

@@ -9,10 +9,10 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"/>
+            <RowDefinition Height="40"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Background="{ThemeResource SystemChromeMediumColor}" Height="48" VerticalAlignment="Top">
+        <Grid Grid.Row="0" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
@@ -23,7 +23,7 @@
 
             <Button Grid.Column="0" x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" Click="CloseDialogClick" />
             <Grid Background="{ThemeResource SystemChromeMediumColor}" Grid.Column="1" >
-                <TextBlock Text="Connect" Style="{StaticResource AppTitleTextBlockStyle}" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" />
+                <TextBlock Text="Connect" Style="{StaticResource AppTitleTextBlockStyle}" VerticalAlignment="Center" FontSize="18" />
             </Grid>
             <Button Grid.Column="2" x:Name="SaveButton"  Content="&#xE105;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Save Server" Click="SaveButtonClick" />
             <Button Grid.Column="3" x:Name="DeleteButton"  Content="&#xE107;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Remove Server" Click="DeleteButtonClick" />
@@ -32,16 +32,16 @@
         </Grid>
 
         <ScrollViewer Grid.Row="2">
-            <StackPanel Orientation="Vertical" x:Name="pop" BorderThickness="0" Padding="6,0,14,0" >
-                <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,10"/>
+            <StackPanel Orientation="Vertical" x:Name="pop" BorderThickness="0" Padding="6,0" >
+                <ComboBox x:Name="serversSavedCombo" HorizontalAlignment="Stretch" PlaceholderText="No server selected" SelectionChanged="savedServersList_SelectionChanged" Margin="5,6"/>
 
                 <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
 
                 <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">Connection Details</TextBlock>
 
-                <TextBox  x:Name="server"  Margin="5,10" PlaceholderText="Server Name"  />
+                <TextBox  x:Name="server"  Margin="5,6" PlaceholderText="Server Name"  />
 
-                <Grid Margin="0,10" >
+                <Grid Margin="0,6" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="90" />
@@ -50,25 +50,24 @@
                     <TextBox Grid.Column="1" x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Number" PlaceholderText="Port"/>
                 </Grid>
 
-                <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,10" PlaceholderText="Server Password" />
+                <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,6" PlaceholderText="Server Password" />
 
                 <Grid Margin="5,0" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="124" />
+                        <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
                     <ToggleSwitch Grid.Column="0" x:Name="ssl" OffContent="No" OnContent="Yes" Header="Secure Connection"  />
                     <ToggleSwitch Grid.Column="1" x:Name="webSocket" OffContent="Standard" OnContent="Websocket" Toggled="webSocket_Toggled" Header="Connection Type" HorizontalAlignment="Right" Width="126" MinWidth="0" />
                 </Grid>
-
+                
                 <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">User Info</TextBlock>
                 <TextBox  x:Name="username"  Margin="5,10" PlaceholderText="Username"  />
 
-                <PasswordBox  x:Name="nickservPassword"  IsPasswordRevealButtonEnabled="True"  Margin="5,10" PlaceholderText="Nickserv Password" />
+                <PasswordBox  x:Name="nickservPassword"  IsPasswordRevealButtonEnabled="True"  Margin="5,6" PlaceholderText="Nickserv Password" />
 
-                <TextBox x:Name="channels"  Margin="5,10" PlaceholderText="Channels to Join"  />
-
+                <TextBox x:Name="channels"  Margin="5,6" PlaceholderText="Channels to Join"  />
             </StackPanel>
         </ScrollViewer>
     </Grid>

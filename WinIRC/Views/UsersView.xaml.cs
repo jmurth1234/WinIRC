@@ -119,7 +119,6 @@ namespace WinIRC
             s.Setters.Add(new Setter(RequestedThemeProperty, Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light));
             RightClick.MenuFlyoutPresenterStyle = s;
 
-
             UsernameItem.Text = UserSelected;
         }
 
@@ -235,7 +234,6 @@ namespace WinIRC
         private void KickItem_Click(object sender, RoutedEventArgs e)
         {
             commands.KickCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "KICK", UserSelected });
-
         }
 
         private void BanItem_Click(object sender, RoutedEventArgs e)

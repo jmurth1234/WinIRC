@@ -7,10 +7,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Background="{ThemeResource AppBarBackgroundThemeBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock TextWrapping="Wrap" Text="Welcome to WinIRC" HorizontalAlignment="Center" Style="{StaticResource SubheaderTextBlockStyle}"/>
         <TextBlock TextWrapping="Wrap" Text="Looks like you haven't connected to a server yet." HorizontalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}" TextAlignment="Center" Margin="0,10"/>
-        <TextBlock TextWrapping="Wrap" Text="To do so, hit the + button in the toolbar at the top" HorizontalAlignment="Center" TextAlignment="Center"/>
+        <TextBlock TextWrapping="Wrap" Text="To do so, go to Servers -> Manage Servers" HorizontalAlignment="Center" TextAlignment="Center"/>
 
     </StackPanel>
 </Page>
