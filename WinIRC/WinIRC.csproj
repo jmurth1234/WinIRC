@@ -17,8 +17,8 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>WinIRC_StoreKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>BC62619FE59A690D9F48E8B95704C07B49A31663</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>WinIRC_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>719156C34D679B6D8633DA6F4AF0A2499AD6A185</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>
@@ -107,10 +107,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Content Include="ApplicationInsights.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="ApplicationInsights.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Assets\100x100.png" />
     <Content Include="Assets\NewStoreLogo.scale-100.png" />

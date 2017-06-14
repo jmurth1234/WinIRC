@@ -19,6 +19,7 @@ namespace WinIRC
         public const string FontSize = "fontsize";
         public const string ReducedPadding = "reducedpadding";
         public const string HideStatusBar = "hidestatusbar";
+        public const string IgnoreJoinLeave = "ignorejoinleave";
 
         // handles for server storage
         public static string ServersStore = "serversstore";
