@@ -145,20 +145,9 @@ namespace WinIRC.Net
 
             if (!HasUser(username))
             {
-                string prefix = "";
-
-                if (username.Length > 2)
-                {
-                    prefix = username[0] + "" + username[1];
-                }
-                else if (username.Length > 1)
-                {
-                    prefix = username[0] + "";
-                }
                 User user = new User
                 {
-                    Nick = username.Replace("~", "").Replace("&", "").Replace("@", "").Replace("%", "").Replace("+", ""),
-                    Prefix = prefix
+                    FullUsername = username,
                 };
 
                 RawUsers.Add(user.Nick);
@@ -225,8 +214,28 @@ namespace WinIRC.Net
 
     public class User
     {
-        public string Prefix { get; set; }
-        public string Nick { get; set; }
+        public string Prefix
+        {
+            get
+            {
+                string prefix = "";
+
+                if (FullUsername.Length > 2)
+                {
+                    prefix = FullUsername[0] + "" + FullUsername[1];
+                }
+                else if (FullUsername.Length > 1)
+                {
+                    prefix = FullUsername[0] + "";
+                }
+
+                return prefix;
+            }
+        }
+
+        public string FullUsername { get; set; }
+
+        public string Nick => FullUsername.Replace("~", "").Replace("&", "").Replace("@", "").Replace("%", "").Replace("+", "");
 
         public override string ToString()
         {

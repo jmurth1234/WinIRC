@@ -339,6 +339,7 @@ namespace WinIRC
 
                     if (mainPage == null)
                         return;
+
                     if (!ircHandler.connectedServersList.Contains(server))
                     {
                         return;

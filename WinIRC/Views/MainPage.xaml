@@ -298,11 +298,11 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <bar:MenuBar x:Name="Menu" Title="WinIRC" Grid.Row="0" Background="{x:Bind AccentColor}">
+        <bar:MenuBar x:Name="Menu" Title="WinIRC" Grid.Row="0" Background="{StaticResource SystemControlBackgroundAccentBrush}">
             <bar:MenuBarButton x:Name="HamburgerButton" DisableDropdown="True" ButtonContent="&#xE700;" Icon="True" 
-                                       AccessKey="s" ButtonClicked="ToggleSplitView"/>
+                                       ButtonClicked="ToggleSplitView"/>
 
-            <bar:MenuBarButton ButtonContent="Servers">
+            <bar:MenuBarButton ButtonContent="Servers" AccessKey="s">
                 <ScrollViewer MaxHeight="150" AllowFocusOnInteraction="False" 
                                       VerticalScrollBarVisibility="Auto" >
                     <ItemsControl x:Name="Servers" Grid.Column="0">
@@ -322,7 +322,7 @@
                 <bar:MenuBarItem Text="Manage Servers" Click="ShowConnectPopup"/>
             </bar:MenuBarButton>
 
-            <bar:MenuBarButton ButtonContent="View">
+            <bar:MenuBarButton ButtonContent="View" AccessKey="v">
                 <bar:MenuBarToggleItem Text="Topic Bar" IsChecked="{x:Bind ShowTopic, Mode=TwoWay}" Click="MenuBarToggleItem_Click" />
                 <bar:MenuBarToggleItem Text="Show Channel Users" IsChecked="{x:Bind ShowingUsers, Mode=TwoWay}"  />
             </bar:MenuBarButton>

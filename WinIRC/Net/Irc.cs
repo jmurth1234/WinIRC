@@ -83,6 +83,8 @@ namespace WinIRC.Net
             }
         }
 
+        public bool IsBouncer { get; private set; }
+
         public Irc()
         {
             ircMessages = new ObservableCollection<Message>();
@@ -199,6 +201,12 @@ namespace WinIRC.Net
                 {
                     var requirements = "";
                     var compatibleFeatues = parsedLine.TrailMessage.TrailingContent;
+
+                    if (compatibleFeatues.Contains("znc"))
+                    {
+                        IsBouncer = true;
+                    }
+
                     if (compatibleFeatues.Contains("znc.in/server-time-iso"))
                     {
                         requirements += "znc.in/server-time-iso ";
@@ -208,6 +216,7 @@ namespace WinIRC.Net
                     {
                         requirements += "multi-prefix ";
                     }
+
 
                     WriteLine("CAP REQ :" + requirements);
                     WriteLine("CAP END");
@@ -639,6 +648,11 @@ namespace WinIRC.Net
 
         public async void AddMessage(string channel, Message msg)
         {
+            if (server == null)
+            {
+                return;
+            }
+
             if (!channelBuffers.ContainsKey(channel))
             {
                 await AddChannel(channel);
@@ -681,7 +695,7 @@ namespace WinIRC.Net
                 Config.SetBoolean(Config.SwitchOnJoin, true);
             }
 
-            if (channelList.Contains(channel) && Config.GetBoolean(Config.SwitchOnJoin))
+            if (channelList.Contains(channel) && Config.GetBoolean(Config.SwitchOnJoin) && !IsBouncer)
             {
                 MainPage.instance.SwitchChannel(server.name, channel, true);
             }

@@ -40,8 +40,8 @@ namespace WinIRC
         private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
         private ObjectStorageHelper<List<IrcServer>> serversListOSH;
 
-        public string currentChannel { get; set; }
-        public string currentServer { get; set; }
+        public string currentChannel { get; set; } = "";
+        public string currentServer { get; set; } = "";
 
         public ObservableCollection<String> servers { get; set; }
         public List<IrcServer> serversList { get; set; }
@@ -474,6 +474,8 @@ namespace WinIRC
                 CreateNewTab(server, channel);
                 IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
             }
+
+            serversCombo.SelectedItem = currentServer;
         }
 
         private PlaceholderView CreateNewTab(String header)
@@ -572,9 +574,6 @@ namespace WinIRC
                 if ((Tabs.Items[0] as PivotItem).Content is PlaceholderView) Tabs.Items.RemoveAt(0);
             }
 
-            if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name);
-            lastAuto = Config.GetBoolean(Config.UseTabs);
-
             irc.Connect();
 
             // link the server up to the lists
@@ -583,6 +582,9 @@ namespace WinIRC
             serversCombo.SelectedItem = irc.server.name;
             currentServer = irc.server.name;
             channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
+
+            if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name, "Server");
+            lastAuto = Config.GetBoolean(Config.UseTabs);
         }
 
         public async void ExtendExecution()

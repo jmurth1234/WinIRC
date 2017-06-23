@@ -67,6 +67,9 @@ namespace WinIRC.Ui
 
             Loaded += MessageLine_Loaded;
             Unloaded += MessageLine_Unloaded;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void MessageLine_Unloaded(object sender, RoutedEventArgs e)

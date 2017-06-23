@@ -162,6 +162,33 @@ namespace WinIRC.Net
                 try
                 {
                     await reader.LoadAsync(socketReceiveBufferSize);
+
+                    while (reader.UnconsumedBufferLength > 0)
+                    {
+                        bool breakLoop = false;
+                        byte readChar;
+                        do
+                        {
+                            if (reader.UnconsumedBufferLength > 0)
+                                readChar = reader.ReadByte();
+                            else
+                            {
+                                breakLoop = true;
+                                break;
+                            }
+                        } while (!dataStreamLineReader.Add(readChar));
+
+                        if (breakLoop)
+                            return;
+
+                        // Read next line from data stream.
+                        var line = dataStreamLineReader.SafeFlushLine();
+
+                        if (line == null) break;
+                        if (line.Length == 0) continue;
+
+                        await HandleLine(line);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -175,33 +202,6 @@ namespace WinIRC.Net
 
                     return;
                 }
-
-                while (reader.UnconsumedBufferLength > 0)
-                {
-                    bool breakLoop = false;
-                    byte readChar;
-                    do
-                    {
-                        if (reader.UnconsumedBufferLength > 0)
-                            readChar = reader.ReadByte();
-                        else
-                        {
-                            breakLoop = true;
-                            break;
-                        }
-                    } while (!dataStreamLineReader.Add(readChar));
-
-                    if (breakLoop)
-                        return;
-
-                    // Read next line from data stream.
-                    var line = dataStreamLineReader.SafeFlushLine();
-
-                    if (line == null) break;
-                    if (line.Length == 0) continue;
-
-                    await HandleLine(line);
-                }
             }
         }
 
@@ -213,7 +213,7 @@ namespace WinIRC.Net
             {
                 IsReconnecting = true;
                 ReconnectionAttempts++;
-                if (ConnCheck.HasInternetAccess)
+                if (ConnCheck != null && server != null && ConnCheck.HasInternetAccess)
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
                     {
@@ -222,7 +222,8 @@ namespace WinIRC.Net
                         else
                             await Task.Delay(60000);
 
-                        Connect();
+                        if (IsReconnecting)
+                            Connect();
                     });
                 }
             }

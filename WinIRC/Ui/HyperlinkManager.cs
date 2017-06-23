@@ -56,8 +56,8 @@ namespace WinIRC.Ui
 
                 var url = new Uri(uri);
 
-                //if ((uri.Contains("twitter.com") && uri.Contains("status"))
-                if (isImage(uri)
+                if ((uri.Contains("twitter.com") && uri.Contains("status"))
+                    || isImage(uri)
                     || uri.Contains("youtube.com/watch")
                     || uri.Contains("youtu.be"))
                 {
