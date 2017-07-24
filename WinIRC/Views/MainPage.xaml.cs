@@ -182,17 +182,7 @@ namespace WinIRC
         {
             try
             {
-                PivotItem p = new PivotItem();
-                lastAuto = true;
-                p.Header = "Welcome";
-                Frame frame = new Frame();
-
-                p.Margin = new Thickness(0, 0, 0, -2);
-
-                p.Content = frame;
-                Tabs.Items.Add(p);
-                Tabs.SelectedIndex = Tabs.Items.Count - 1;
-                frame.Navigate(typeof(PlaceholderView));
+                CreateNewTab("Welcome");
 
                 UpdateUi();
 
@@ -513,7 +503,7 @@ namespace WinIRC
             return view;
         }
 
-        public void UpdateInfo(string server, string channel )
+        public void UpdateInfo(string server, string channel)
         {
             if (currentServer != server)
             {
@@ -530,7 +520,7 @@ namespace WinIRC
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
 
-            channelList.SelectedValue = channel;
+            //channelList.SelectedValue = channel;
         }
 
         public Irc GetCurrentServer()

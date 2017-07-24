@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Services.Twitter;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -54,6 +55,12 @@ namespace WinIRC.Views
         {
             if (new Connection().HasInternetAccess)
             {
+                TwitterService.Instance.Initialize(new TwitterOAuthTokens()
+                {
+                    ConsumerKey = "eK5wblbCAVkxZlMxCmp8Di1uL",
+                    ConsumerSecret = "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7"
+                });
+
                 var uriArray = uri.ToString().Split('/');
                 // Disable the exception swallowing to allow exception to be thrown by Tweetinvi
                 ExceptionHandler.SwallowWebExceptions = false;
@@ -75,7 +82,7 @@ namespace WinIRC.Views
                             Debug.WriteLine(latestException.TwitterDescription);
                         }
 
-                        return Tweet.GetTweet(id);
+                        return Tweetinvi.Tweet.GetTweet(id);
                     }
                     catch (Exception e)
                     {

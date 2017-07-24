@@ -39,6 +39,9 @@ namespace WinIRC.Views
         {
             this.InitializeComponent();
 
+            currentServer = server;
+            currentChannel = channel;
+
             Loaded += (s, e) =>
             {
                 SetChannel(server, channel);
@@ -81,11 +84,12 @@ namespace WinIRC.Views
 
         internal void SetChannel(string server, string channel)
         {
-            if (currentChannel != null && currentServer != null)
+            if (currentChannel != null && currentServer != null && ChannelLoaded)
             {
                 IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged -= ChannelView_CollectionChanged;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
+
             var servers = IrcHandler.connectedServers;
 
             if (!servers.ContainsKey(server) || !servers[server].channelBuffers.ContainsKey(channel))
