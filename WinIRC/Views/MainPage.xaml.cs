@@ -520,7 +520,7 @@ namespace WinIRC
             if (SplitView.DisplayMode == SplitViewDisplayMode.Overlay)
                 SplitView.IsPaneOpen = false;
 
-            //channelList.SelectedValue = channel;
+            channelList.SelectedValue = channel;
         }
 
         public Irc GetCurrentServer()
