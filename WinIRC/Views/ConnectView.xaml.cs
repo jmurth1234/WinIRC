@@ -47,6 +47,8 @@ namespace WinIRC.Views
         {
             await ircServers.loadServersAsync();
             serversSavedCombo.ItemsSource = ircServers.Servers;
+
+            username.Text = Config.GetString(Config.DefaultUsername);
         }
 
         private void ConnectButtonClick(object sender, RoutedEventArgs e)

@@ -184,6 +184,30 @@ namespace WinIRC
             {
                 CreateNewTab("Welcome");
 
+                if (!Config.Contains(Config.DefaultUsername) || Config.GetString(Config.DefaultUsername) == "")
+                {
+                    var dialog = new PromptDialog
+                    (
+                        title: "Set default username",
+                        text: "WinIRC allows you to set a default username now, please set it below. This can be changed later",
+                        placeholder: "Username",
+                        confirmButton: "Set",
+                        def: "winircuser-" + (new Random()).Next(100, 1000)
+                    );
+
+                    var result = await dialog.Show();
+
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        Config.SetString(Config.DefaultUsername, dialog.Result);
+                    }
+                    else
+                    {
+                        Config.SetString(Config.DefaultUsername, "");
+                    }
+                }
+
+
                 UpdateUi();
 
                 //ChannelFrame.Navigate(typeof(PlaceholderView)); // blank the frame
@@ -260,6 +284,7 @@ namespace WinIRC
 
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 
             Window.Current.SetTitleBar(Menu.DragArea);
 
@@ -274,7 +299,7 @@ namespace WinIRC
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
             titleBar.ButtonHoverBackgroundColor = AccentColorAlt.Color;
-            titleBar.ButtonBackgroundColor = _AccentColor.Color;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = AccentColorAlt.Color;
             titleBar.ButtonForegroundColor = foreground;
 
@@ -832,49 +857,29 @@ namespace WinIRC
 
         public async void IrcPrompt(IrcServer server)
         {
-            var dialog = new ContentDialog()
+            if (!Config.Contains(Config.DefaultUsername) || Config.GetString(Config.DefaultUsername) == "")
             {
-                Title = "Join " + server.hostname,
-                RequestedTheme = ElementTheme.Dark,
-                //FullSizeDesired = true,
-                MaxWidth = this.ActualWidth // Required for Mobile!
-            };
+                var dialog = new PromptDialog
+                (
+                    title: "Set a username",
+                    text: "To connect to irc servers, enter in a username first.",
+                    placeholder: "Username",
+                    confirmButton: "Set",
+                    def: "winircuser-" + (new Random()).Next(100, 1000)
+                );
 
-            // Setup Content
-            var panel = new StackPanel();
+                var result = await dialog.Show();
 
-            panel.Children.Add(new TextBlock
-            {
-                Text = "To connect to this irc server, enter in a username first.",
-                TextWrapping = TextWrapping.Wrap,
-                Padding = new Thickness
+                if (result == ContentDialogResult.Primary)
                 {
-                    Bottom = 8,
-                },
-            });
+                    Config.SetString(Config.DefaultUsername, dialog.Result);
+                }
+            }
 
-            var username = new TextBox
-            {
-                PlaceholderText = "Username",
-                Text = "winircuser-" + (new Random()).Next(100, 1000)
-            };
-
-            panel.Children.Add(username);
-            dialog.Content = panel;
-
-            // Add Buttons
-            dialog.PrimaryButtonText = "Join";
-            dialog.PrimaryButtonClick += delegate
-            {
-                server.username = username.Text;
-
-                var irc = new Net.IrcSocket();
-                irc.server = server;
-                MainPage.instance.Connect(irc);
-            };
-
-            dialog.SecondaryButtonText = "Cancel";
-            dialog.ShowAsync();
+            server.username = Config.GetString(Config.DefaultUsername);
+            var irc = new Net.IrcSocket();
+            irc.server = server;
+            MainPage.instance.Connect(irc);
         }
 
         private void CloseTab_Click(object sender, RoutedEventArgs e)
@@ -908,6 +913,12 @@ namespace WinIRC
         private void SidebarSplitView_PaneClosed(SplitView sender, object args)
         {
             ShowingUsers = false;
+        }
+
+
+        private void ConnectionSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ShowSettings(typeof(ConnectionSettingsView));
         }
     }
 }

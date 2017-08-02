@@ -10,8 +10,11 @@ namespace WinIRC
         public const string UserListClick = "userlistclick";
         public const string SwitchOnJoin = "switchonjoin";
         public const string UseTabs = "usetabs";
+
+        // connection settings
+        public const string DefaultUsername = "defaultusername";
         public const string AutoReconnect = "autoreconnect";
-        public static string IgnoreSSL = "ignoressl";
+        public const string IgnoreSSL = "ignoressl";
 
         // display settings
         public const string DarkTheme = "darktheme";
@@ -24,6 +27,8 @@ namespace WinIRC
         // handles for server storage
         public static string ServersStore = "serversstore";
         public static string ServersListStore = "serversliststore";
+
+        public const string FirstRun = "firstrun";
 
         public static bool Contains(string key)
         {
@@ -85,6 +90,11 @@ namespace WinIRC
         internal static void RemoveKey(string key)
         {
             roamingSettings.Values.Remove(key);
+        }
+
+        internal static bool GetBoolean(object firstRun)
+        {
+            throw new NotImplementedException();
         }
     }
 }

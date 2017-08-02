@@ -36,6 +36,7 @@ using Windows.UI.Core;
 using WinIRC.Utils;
 using System.Threading.Tasks;
 using Template10.Common;
+using WinIRC.Views;
 
 namespace WinIRC
 {
@@ -220,19 +221,19 @@ namespace WinIRC
         private async Task<bool> InitApp(IActivatedEventArgs e)
         {
             var loaded = true;
+            IrcServers servers = IrcServers.Instance;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (!AppLaunched)
             {
+                await servers.loadServersAsync();
+                await servers.UpdateJumpList();
+
                 loaded = false;
                 NumberPings = 0;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
                 applicationView.SetPreferredMinSize(new Windows.Foundation.Size{Width = 360, Height = 240});
             }
-
-            IrcServers servers = IrcServers.Instance;
-            await servers.loadServersAsync();
-            await servers.UpdateJumpList();
 
             if (!(NavigationService.Content is MainPage))
             {
@@ -240,13 +241,21 @@ namespace WinIRC
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                if (e is LaunchActivatedEventArgs)
+                if (Config.Contains(Config.FirstRun) || servers.Count != 0 || Config.Contains(Config.DefaultUsername))
                 {
-                    var args = (e as LaunchActivatedEventArgs).Arguments;
-                    await NavigationService.NavigateAsync(typeof(MainPage), args);
-                } else
+                    if (e is LaunchActivatedEventArgs)
+                    {
+                        var args = (e as LaunchActivatedEventArgs).Arguments;
+                        await NavigationService.NavigateAsync(typeof(MainPage), args);
+                    }
+                    else
+                    {
+                        await NavigationService.NavigateAsync(typeof(MainPage));
+                    }
+                }
+                else
                 {
-                    await NavigationService.NavigateAsync(typeof(MainPage));
+                    await NavigationService.NavigateAsync(typeof(FirstRunPage));
                 }
             }
             else

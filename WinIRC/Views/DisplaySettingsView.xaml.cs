@@ -24,8 +24,6 @@ namespace WinIRC
     /// </summary>
     public sealed partial class DisplaySettingsView : BaseSettingsPage
     {
-        private bool SettingsLoaded;
-
         public DisplaySettingsView()
         {
             this.InitializeComponent();

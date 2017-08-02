@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.StartScreen;
+using Windows.UI.Xaml.Controls;
 using WinIRC.Net;
+using WinIRC.Ui;
 
 namespace WinIRC.Utils
 {
@@ -30,6 +32,11 @@ namespace WinIRC.Utils
                 }
                 return instance;
             }
+        }
+
+        public int Count
+        {
+            get => Servers.Count;
         }
 
         private IrcServers()
@@ -71,9 +78,14 @@ namespace WinIRC.Utils
                 serversListOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
                 var servers = await serversListOSH.LoadAsync(Config.ServersListStore);
 
-                if (servers.Count > 0)
+                if (servers != null && servers.Count > 0)
                 {
                     servers.ForEach(Servers.Add);
+                }
+                else
+                {
+                    Servers = new ObservableCollection<IrcServer>();
+                    await SaveServers();
                 }
             }
             catch (Exception e)
@@ -123,7 +135,6 @@ namespace WinIRC.Utils
 
         private async void Servers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            await SaveServers();
             await UpdateJumpList();
         }
 
@@ -158,6 +169,7 @@ namespace WinIRC.Utils
             }
 
             Servers.Add(server);
+            await SaveServers();
         }
 
         public async void DeleteServer(String name)
@@ -170,6 +182,7 @@ namespace WinIRC.Utils
                     break;
                 }
             }
+            await SaveServers();
         }
 
         public async Task SaveServers()

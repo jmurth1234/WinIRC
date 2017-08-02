@@ -8,7 +8,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:WinIRC.Ui"
     xmlns:net="using:WinIRC.Net"
-    xmlns:vm="using:WinIRC.ViewModels"
     xmlns:controls="using:Template10.Controls"
     xmlns:bar="using:Rymate.Controls.UWPMenuBar"
     mc:Ignorable="d" 
@@ -327,8 +326,9 @@
                 <bar:MenuBarToggleItem Text="Show Channel Users" IsChecked="{x:Bind ShowingUsers, Mode=TwoWay}"  />
             </bar:MenuBarButton>
 
-            <bar:MenuBarButton Icon="True" ButtonContent="&#xE10C;" VerticalContentAlignment="Top" Height="32" VerticalAlignment="Stretch" AccessKey="m" >
+            <bar:MenuBarButton Icon="True" ButtonContent="&#xE10C;" VerticalContentAlignment="Top" Height="32" VerticalAlignment="Stretch" AccessKey="m" ToolTipService.ToolTip="Settings" >
                 <bar:MenuBarItem Text="Appearance" Click="AppearanceSettings_Click"/>
+                <bar:MenuBarItem Text="Connection" Click="ConnectionSettings_Click"/>
                 <bar:MenuBarItem Text="Behaviour" Click="BehaviourSettings_Click"/>
                 <MenuFlyoutSeparator />
                 <bar:MenuBarItem Text="About" Click="AboutPage_Click"/>

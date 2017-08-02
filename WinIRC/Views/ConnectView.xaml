@@ -47,7 +47,7 @@
                         <ColumnDefinition Width="90" />
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" x:Name="hostname" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Url" PlaceholderText="Hostname or IP"/>
-                    <TextBox Grid.Column="1" x:Name="port" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Number" PlaceholderText="Port"/>
+                    <TextBox Grid.Column="1" x:Name="port" Text="6667" IsSpellCheckEnabled="True" Margin="5,1" InputScope="Number" PlaceholderText="Port"/>
                 </Grid>
 
                 <PasswordBox  x:Name="password"  IsPasswordRevealButtonEnabled="True"  Margin="5,6" PlaceholderText="Server Password" />

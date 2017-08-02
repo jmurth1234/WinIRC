@@ -1,0 +1,24 @@
+﻿<ui:BaseSettingsPage
+    xmlns:ui="using:WinIRC.Ui"
+    x:Class="WinIRC.Views.ConnectionSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderThickness="0" Padding="10,0" >
+        <TextBlock Text="Default Username" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <TextBox x:Name="DefaultUsername" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="EmailNameOrAddress" LostFocus="DefaultUsername_LostFocus"/>
+        <Button x:Name="DefaultUsernameButton"  Content="Set" Click="DefaultUsernameButton_Click"/>
+        
+        <TextBlock Text="Ignore SSL Errors" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="IgnoreSSLErrors" OffContent="No" OnContent="Yes" Toggled="IgnoreSSLErrors_Toggled"/>
+
+        <TextBlock Text="Reconnect when disconnected" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="ReconnectSwitch" OffContent="No" OnContent="Yes" Toggled="ReconnectSwitch_Toggled"/>
+
+    </StackPanel>
+</ui:BaseSettingsPage>

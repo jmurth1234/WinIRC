@@ -24,10 +24,7 @@ namespace WinIRC
     /// </summary>
     public sealed partial class BehaviourSettingsView : BaseSettingsPage
     {
-        private bool SettingsLoaded;
-
         List<String> UserListClickSettings = new List<string> { "Mention user in channel", "PM the user", "Show the context menu" };
-
 
         public BehaviourSettingsView()
         {
@@ -49,27 +46,6 @@ namespace WinIRC
                 Config.SetInt(Config.UserListClick, 0);
                 this.UserListClick.SelectedIndex = 0;
             }
-
-            if (Config.Contains(Config.IgnoreSSL))
-            {
-                this.IgnoreSSLErrors.IsOn = Config.GetBoolean(Config.IgnoreSSL);
-            }
-            else
-            {
-                Config.SetBoolean(Config.IgnoreSSL, false);
-                this.IgnoreSSLErrors.IsOn = false;
-            }
-
-            if (Config.Contains(Config.AutoReconnect))
-            {
-                this.ReconnectSwitch.IsOn = Config.GetBoolean(Config.AutoReconnect);
-            }
-            else
-            {
-                Config.SetBoolean(Config.AutoReconnect, true);
-                this.ReconnectSwitch.IsOn = true;
-            }
-
 
             if (Config.Contains(Config.SwitchOnJoin))
             {
@@ -121,21 +97,6 @@ namespace WinIRC
             base.UpdateUi();
         }
 
-        private void ReconnectSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!SettingsLoaded)
-                return;
-
-            Config.SetBoolean(Config.AutoReconnect, ReconnectSwitch.IsOn);
-        }
-
-        private void IgnoreSSLErrors_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!SettingsLoaded)
-                return;
-
-            Config.SetBoolean(Config.IgnoreSSL, IgnoreSSLErrors.IsOn);
-        }
     }
 
 
