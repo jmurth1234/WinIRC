@@ -50,7 +50,7 @@ namespace WinIRC
             roamingSettings.Values[key] = value;
         }
 
-        public static bool GetBoolean(string key)
+        public static bool GetBoolean(string key, bool def = false)
         {
             if (roamingSettings.Values[key] is bool)
             {
@@ -58,11 +58,11 @@ namespace WinIRC
             }
             else
             {
-                return false;
+                return def;
             }
         }
 
-        public static string GetString(string key)
+        public static string GetString(string key, string def = "")
         {
             var s = roamingSettings.Values[key] as string;
             if (s != null)
@@ -71,11 +71,11 @@ namespace WinIRC
             }
             else
             {
-                return "";
+                return def;
             }
         }
 
-        public static int GetInt(string key)
+        public static int GetInt(string key, int def = 0)
         {
             if (roamingSettings.Values[key] is int)
             {
@@ -83,7 +83,7 @@ namespace WinIRC
             }
             else
             {
-                return 0;
+                return def;
             }
         }
 

@@ -113,6 +113,7 @@ namespace WinIRC.Views
 
             ScrollToBottom(currentServer, currentChannel);
             ChannelLoaded = true;
+            UpdateUi();
         }
 
         private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

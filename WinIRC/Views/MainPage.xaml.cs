@@ -366,10 +366,9 @@ namespace WinIRC
 
             foreach (PivotItem item in Tabs.Items.Cast<PivotItem>())
             {
-                if (item.Content is Frame && (item.Content as Frame).Content is ChannelView)
+                if (item.Content is ChannelView)
                 {
-                    var frame = item.Content as Frame;
-                    var view = frame.Content as ChannelView;
+                    var view = item.Content as ChannelView;
 
                     view.UpdateUi();
                 }

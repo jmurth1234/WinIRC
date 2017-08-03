@@ -80,13 +80,14 @@ namespace WinIRC.Net
             }
             catch (Exception e)
             {
-                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect, true);
                 var msg = autoReconnect
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
 
                 AddError("Error whilst connecting: " + e.Message + "\n" + msg);
                 AddError(e.StackTrace);
+                AddError("If this error keeps occuring, ensure your connection settings are correct.");
 
                 DisconnectAsync(attemptReconnect: autoReconnect);
 

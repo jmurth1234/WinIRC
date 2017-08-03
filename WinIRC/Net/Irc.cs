@@ -947,12 +947,19 @@ namespace WinIRC.Net
 
         public void Dispose()
         {
-            server = null;
+            try
+            {
+                server = null;
 
-            reader.Dispose();
-            writer.Dispose();
+                if (reader != null) reader.Dispose();
+                if (writer != null) writer.Dispose();
 
-            streamSocket.Dispose();
+                if (streamSocket != null) streamSocket.Dispose();
+            }
+            catch (NullReferenceException e)
+            {
+                // catching silently, sorry
+            }
         }
     }
 }
