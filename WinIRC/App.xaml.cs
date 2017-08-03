@@ -115,7 +115,8 @@ namespace WinIRC
             {
                 if (Config.Contains(Config.DarkTheme))
                 {
-                    this.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ApplicationTheme.Dark : ApplicationTheme.Light;
+                    var darkTheme = Config.GetBoolean(Config.DarkTheme);
+                    this.RequestedTheme = darkTheme ? ApplicationTheme.Dark : ApplicationTheme.Light;
                 }
                 else
                 {

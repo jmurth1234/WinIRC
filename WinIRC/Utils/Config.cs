@@ -52,7 +52,7 @@ namespace WinIRC
 
         public static bool GetBoolean(string key, bool def = false)
         {
-            if (roamingSettings.Values[key] is bool)
+            if (Contains(key) && roamingSettings.Values[key] is bool)
             {
                 return (bool) roamingSettings.Values[key];
             }
@@ -64,10 +64,9 @@ namespace WinIRC
 
         public static string GetString(string key, string def = "")
         {
-            var s = roamingSettings.Values[key] as string;
-            if (s != null)
+            if (Contains(key) && roamingSettings.Values[key] is string)
             {
-                return s;
+                return roamingSettings.Values[key] as string; 
             }
             else
             {
@@ -77,7 +76,7 @@ namespace WinIRC
 
         public static int GetInt(string key, int def = 0)
         {
-            if (roamingSettings.Values[key] is int)
+            if (Contains(key) && roamingSettings.Values[key] is int)
             {
                 return (int) roamingSettings.Values[key];
             }
@@ -87,14 +86,9 @@ namespace WinIRC
             }
         }
 
-        internal static void RemoveKey(string key)
+        public static void RemoveKey(string key)
         {
             roamingSettings.Values.Remove(key);
-        }
-
-        internal static bool GetBoolean(object firstRun)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -77,7 +77,7 @@ namespace WinIRC
             }
             else
             {
-                Config.SetBoolean(Config.DarkTheme, false);
+                Config.SetBoolean(Config.ReducedPadding, false);
                 this.Padding.IsOn = false;
             }
 
@@ -111,8 +111,6 @@ namespace WinIRC
             Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
             (Application.Current as App).SetTheme();
 
-            //var dialog = new MessageDialog("To apply the theme, please restart WinIRC.");
-            //await dialog.ShowAsync();
             base.UpdateUi();
         }
 
