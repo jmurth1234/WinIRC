@@ -142,11 +142,9 @@ namespace WinIRC.Utils
         {
             Net.Irc irc;
             if (ircServer.webSocket)
-                irc = new Net.IrcWebSocket();
+                irc = new Net.IrcWebSocket(ircServer);
             else
-                irc = new Net.IrcSocket();
-
-            irc.server = ircServer;
+                irc = new Net.IrcSocket(ircServer);
 
             return irc;
         }

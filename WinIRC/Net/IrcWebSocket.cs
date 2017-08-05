@@ -15,6 +15,10 @@ namespace WinIRC.Net
     {
         private MessageWebSocket messageWebSocket;
 
+        public IrcWebSocket(IrcServer server) : base(server)
+        {
+        }
+
         public override async void Connect()
         {
             // Make a local copy to avoid races with Closed events.

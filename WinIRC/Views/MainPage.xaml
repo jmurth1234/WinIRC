@@ -259,6 +259,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <CollectionViewSource
+            x:Key="channelsSrc"
+            IsSourceGrouped="True" />
     </Page.Resources>
 
     <Grid x:Name="mainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -337,24 +340,30 @@
 
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240">
             <SplitView.Pane>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="40"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
+                <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}">
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <ui:ChannelListItem Margin="0" FontSize="14" Title="{Binding Server}" IsServer="True"
+                                                        ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
+                                                        ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
+                                                        ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
+                                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
 
-                    <ComboBox Grid.Row="0" RequestedTheme="Dark" Background="{x:Bind AccentColorAlt}" x:Name="serversCombo" ItemsSource="{Binding connectedServersList}" HorizontalAlignment="Stretch" PlaceholderText="Currently not connected" SelectionChanged="serversList_SelectionChanged" Style="{StaticResource CustomComboBox}" VerticalAlignment="Stretch"/>
-                    <ListView Grid.Row="1" x:Name="channelList" ItemsSource="{Binding}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding}" ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
-                                                    ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
-                                                    ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
+                                                ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
+                                                ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
+                                                VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </SplitView.Pane>
             <SplitView.Content>
                 <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed">

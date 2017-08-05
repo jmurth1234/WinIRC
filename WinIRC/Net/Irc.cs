@@ -19,6 +19,7 @@ using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
+using WinIRC.Utils;
 
 namespace WinIRC.Net
 {
@@ -40,7 +41,7 @@ namespace WinIRC.Net
         public bool IsAuthed { get; set; }
 
         public ObservableCollection<Message> ircMessages { get; set; }
-        public ObservableCollection<string> channelList { get; set; }
+        public ServerGroup channelList { get; set; }
         public Dictionary<string, ChannelStore> channelStore { get; set; }
 
         public Dictionary<string, ObservableCollection<Message>> channelBuffers { get; set; }
@@ -85,10 +86,13 @@ namespace WinIRC.Net
 
         public bool IsBouncer { get; private set; }
 
-        public Irc()
+        public Irc(IrcServer server)
         {
+            this.server = server;
             ircMessages = new ObservableCollection<Message>();
-            channelList = new ObservableCollection<string>();
+            channelList = new ServerGroup(new ObservableCollection<Channel>());
+            channelList.Server = server.name;
+
             channelBuffers = new Dictionary<string, ObservableCollection<Message>>(StringComparer.OrdinalIgnoreCase);
             channelStore = new Dictionary<string, ChannelStore>(StringComparer.OrdinalIgnoreCase);
 
@@ -229,25 +233,23 @@ namespace WinIRC.Net
                 {
                     AddChannel(channel);
                 }
-                else
+
+                if (parsedLine.CommandMessage.Parameters != null)
                 {
-                    if (parsedLine.CommandMessage.Parameters != null)
-                    {
-                        channel = parsedLine.CommandMessage.Parameters[0];
-                    }
-
-                    if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
-                    {
-                        Message msg = new Message();
-                        msg.Type = MessageType.Info;
-                        msg.User = parsedLine.PrefixMessage.Nickname;
-
-                        msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "joined the channel");
-                        AddMessage(channel, msg);
-                    }
-
-                    channelStore[channel].AddUser(parsedLine.PrefixMessage.Nickname, true);
+                    channel = parsedLine.CommandMessage.Parameters[0];
                 }
+
+                if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
+                {
+                    Message msg = new Message();
+                    msg.Type = MessageType.Info;
+                    msg.User = parsedLine.PrefixMessage.Nickname;
+
+                    msg.Text = String.Format("({0}) {1}", parsedLine.PrefixMessage.Prefix, "joined the channel");
+                    AddMessage(channel, msg);
+                }
+
+                channelStore[channel].AddUser(parsedLine.PrefixMessage.Nickname, true);
             }
             else if (parsedLine.CommandMessage.Command == "PART")
             {
@@ -374,6 +376,11 @@ namespace WinIRC.Net
                 }
 
                 channelStore[channel].AddUsers(list);
+
+                if (!IsBouncer)
+                {
+                    channelStore[channel].SortUsers();
+                }
             }
             else if (parsedLine.CommandMessage.Command == "332")
             {
@@ -418,7 +425,7 @@ namespace WinIRC.Net
                 var username = parsedLine.PrefixMessage.Nickname;
                 foreach (var channel in channelList)
                 {
-                    var users = channelStore[channel];
+                    var users = channelStore[channel.Name];
                     if (users.HasUser(username))
                     {
                         if ((!Config.Contains(Config.IgnoreJoinLeave)) || (!Config.GetBoolean(Config.IgnoreJoinLeave)))
@@ -427,7 +434,7 @@ namespace WinIRC.Net
                             msg.Type = MessageType.Info;
                             msg.User = parsedLine.PrefixMessage.Nickname;
                             msg.Text = String.Format("({0}) {1}: {2}", parsedLine.PrefixMessage.Prefix, "quit the server", parsedLine.TrailMessage.TrailingContent);
-                            AddMessage(channel, msg);
+                            AddMessage(channel.Name, msg);
                         }
 
                         users.RemoveUser(username);
@@ -670,6 +677,7 @@ namespace WinIRC.Net
 
             if (!channelBuffers.Keys.Contains(channel) && !channelStore.Keys.Contains(channel) && !channelList.Contains(channel))
             {
+                channelStore.Add(channel, new ChannelStore(channel));
                 channelBuffers.Add(channel, new ObservableCollection<Message>());
 
                 var comparer = Comparer<String>.Default;
@@ -680,12 +688,10 @@ namespace WinIRC.Net
                     i++;
                 }
 
-                while (i < channelList.Count && comparer.Compare(channelList[i].ToLower(), channel.ToLower()) < 0)
+                while (i < channelList.Count && comparer.Compare(channelList[i].Name.ToLower(), channel.ToLower()) < 0)
                     i++;
 
                 channelList.Insert(i, channel);
-
-                channelStore.Add(channel, new ChannelStore(channel));
             }
 
             await Task.Delay(1);
@@ -802,6 +808,11 @@ namespace WinIRC.Net
 
         public ObservableCollection<string> GetChannelUsers(string channel)
         {
+            if (!channelStore.ContainsKey(channel))
+            {
+                return new ObservableCollection<string>();
+            }
+
             var store = channelStore[channel];
 
             if (store.SortedUsers.Count == 0)

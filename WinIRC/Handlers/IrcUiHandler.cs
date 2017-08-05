@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using WinIRC.Commands;
+using WinIRC.Utils;
 
 namespace WinIRC.Handlers
 {
@@ -22,6 +24,7 @@ namespace WinIRC.Handlers
     {
         public Dictionary<string, Net.Irc> connectedServers { get; set; }
         public ObservableCollection<String> connectedServersList { get; set; }
+        public ObservableCollection<ServerGroup> Servers { get; set; }
         public CommandHandler CommandHandler { get; private set; }
 
         public static IrcUiHandler Instance;
@@ -30,9 +33,28 @@ namespace WinIRC.Handlers
         {
             connectedServers = new Dictionary<string, Net.Irc>();
             connectedServersList = new ObservableCollection<string>();
+            connectedServersList.CollectionChanged += ConnectedServersList_CollectionChanged;
+            Servers = new ObservableCollection<ServerGroup>();
+
             CommandHandler = new CommandHandler();
 
             Instance = this;
+        }
+
+        private void ConnectedServersList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var serverName = e.NewItems[0] as string;
+                var server = connectedServers[serverName];
+                Servers.Add(server.channelList);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var serverName = e.OldItems[0] as string;
+                var server = Servers.First(s => s.Server == serverName);
+                Servers.Remove(server);
+            }
         }
 
         public void IrcTextBoxHandler(TextBox msgBox, KeyRoutedEventArgs e, string server, string channel)
@@ -92,17 +114,14 @@ namespace WinIRC.Handlers
             }
         }
 
-        public void UpdateUsers(Frame frame, string server, string channel, bool clear = false)
+        public void UpdateUsers(Frame frame, string server, string channel)
         {
             if (server == "" || channel == "" || !connectedServers.ContainsKey(server))
             {
                 return;
             }
 
-            var users = new ObservableCollection<string>();
-
-            if (!clear)
-                users = connectedServers[server].GetChannelUsers(channel);
+            var users = connectedServers[server].GetChannelUsers(channel);
 
             if (!(frame.Content is UsersView))
             {

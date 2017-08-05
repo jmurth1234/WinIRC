@@ -24,6 +24,11 @@ namespace WinIRC.Net
         private DataReaderLoadOperation readOperation;
         private SafeLineReader dataStreamLineReader;
         private CancellationTokenSource socketCancellation;
+        private IrcServer ircServer;
+
+        public IrcSocket(IrcServer server) : base(server)
+        {
+        }
 
         public override async void Connect()
         {

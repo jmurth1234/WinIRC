@@ -29,6 +29,7 @@ using Windows.Storage;
 using Windows.ApplicationModel.ExtendedExecution;
 using Rymate.Controls.UWPMenuBar;
 using Template10.Services.SerializationService;
+using Windows.UI.Xaml.Data;
 
 namespace WinIRC
 {
@@ -442,6 +443,7 @@ namespace WinIRC
                     return;
 
                 var channel = channelList.SelectedItem.ToString();
+                currentServer = ((Channel) channelList.SelectedItem).Server;
                 SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
                 GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
@@ -457,7 +459,6 @@ namespace WinIRC
         public void SwitchChannel(string server, string channel, bool auto)
         {
             //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
-            UpdateInfo(server, channel);
             SidebarHeader.Title = "Channel Users";
 
             if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
@@ -489,7 +490,7 @@ namespace WinIRC
                 IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
             }
 
-            serversCombo.SelectedItem = currentServer;
+            UpdateInfo(server, channel);
         }
 
         private PlaceholderView CreateNewTab(String header)
@@ -531,7 +532,7 @@ namespace WinIRC
         {
             if (currentServer != server)
             {
-                serversCombo.SelectedItem = server;
+                currentServer = server;
             }
 
             if (IrcHandler.connectedServers.ContainsKey(currentServer))
@@ -545,6 +546,7 @@ namespace WinIRC
                 SplitView.IsPaneOpen = false;
 
             channelList.SelectedValue = channel;
+            IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
         }
 
         public Irc GetCurrentServer()
@@ -593,9 +595,11 @@ namespace WinIRC
             // link the server up to the lists
             IrcHandler.connectedServers.Add(irc.server.name, irc);
             IrcHandler.connectedServersList.Add(irc.server.name);
-            serversCombo.SelectedItem = irc.server.name;
             currentServer = irc.server.name;
-            channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
+            //channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
+
+            var cvs = (CollectionViewSource) Resources["channelsSrc"];
+            cvs.Source = IrcHandler.Servers;
 
             if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name, "Server");
             lastAuto = Config.GetBoolean(Config.UseTabs);
@@ -641,29 +645,14 @@ namespace WinIRC
             ExtendExecution();
         }
 
-        private void serversList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (serversCombo.SelectedItem == null)
-                return;
-
-            currentServer = serversCombo.SelectedItem.ToString();
-            channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
-
-            if (IrcHandler.connectedServers[currentServer].channelList.Contains("Server") && !Config.GetBoolean(Config.UseTabs))
-                SwitchChannel(currentServer, "Server", false);
-
-            IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel, true);
-        }
-
         public async void HandleDisconnect(Irc irc)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (IrcHandler.connectedServersList.Count > 1)
                 {
-                    serversCombo.SelectedItem = IrcHandler.connectedServersList[0];
                     currentServer = IrcHandler.connectedServersList[0];
-                    channelList.ItemsSource = IrcHandler.connectedServers.Values.First().channelList;
+                    //channelList.ItemsSource = IrcHandler.connectedServers.Values.First().channelList;
                 }
 
                 foreach (var buffer in IrcHandler.connectedServers[irc.server.name].channelBuffers)
@@ -876,8 +865,7 @@ namespace WinIRC
             }
 
             server.username = Config.GetString(Config.DefaultUsername);
-            var irc = new Net.IrcSocket();
-            irc.server = server;
+            var irc = new Net.IrcSocket(server);
             MainPage.instance.Connect(irc);
         }
 

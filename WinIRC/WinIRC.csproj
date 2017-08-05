@@ -190,6 +190,7 @@
     <Compile Include="Ui\PromptDialog.cs" />
     <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
+    <Compile Include="Utils\ServerGroup.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>

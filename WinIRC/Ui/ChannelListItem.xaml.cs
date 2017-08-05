@@ -22,6 +22,9 @@ namespace WinIRC.Ui
         internal static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
 
+        internal static readonly DependencyProperty IsServerProperty =
+            DependencyProperty.Register("IsServer", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
+
         public event EventHandler ChannelCloseClicked;
 
         public event EventHandler ChannelJoinClicked;
@@ -30,8 +33,14 @@ namespace WinIRC.Ui
 
         public string Title
         {
-            get { return (string)GetValue(TitleProperty); }
+            get { return (string) GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
+        }
+
+        public bool IsServer
+        {
+            get { return (bool) GetValue(IsServerProperty); }
+            set { SetValue(IsServerProperty, value); }
         }
 
         public ChannelListItem()
@@ -40,13 +49,16 @@ namespace WinIRC.Ui
 
             Loaded += (sender, args) =>
             {
-                if (Title == "Server")
+                if (IsServer)
                 {
                     CloseButton.Visibility = Visibility.Collapsed;
                     AddButton.Visibility = Visibility.Visible;
                     MenuButton.Visibility = Visibility.Visible;
                 }
-
+                else if (Title == "Server")
+                {
+                    CloseButton.Visibility = Visibility.Collapsed;
+                }
             };
 
             (this.Content as FrameworkElement).DataContext = this;
@@ -54,13 +66,13 @@ namespace WinIRC.Ui
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Title != "Server")
+            if (!IsServer)
                 ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Title));
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Title == "Server")
+            if (!IsServer)
                 ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text));
         }
 
@@ -71,7 +83,7 @@ namespace WinIRC.Ui
 
         private void ShowServerMenu(object sender, RoutedEventArgs e)
         {
-            if (Title == "Server")
+            if (IsServer)
             {
                 var RightClick = this.Resources["ServerContextMenu"] as MenuFlyout;
 
