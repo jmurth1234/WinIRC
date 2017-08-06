@@ -21,7 +21,7 @@
         </ScrollViewer>
 
         <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
-            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
+            <ui:MessagesView x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" ItemsChanged="messagesView_ItemsChanged" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="net:Message">
                         <ui:MessageLine CompactMode="False" MessageItem="{x:Bind}"/>
@@ -29,11 +29,10 @@
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" >
-                        </StackPanel>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"   />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            </ui:MessagesView>
         </ScrollViewer>
 
         <Grid Grid.Row="2" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >

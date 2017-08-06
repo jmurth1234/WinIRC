@@ -25,22 +25,33 @@ namespace WinIRC.Ui
         internal static readonly DependencyProperty IsServerProperty =
             DependencyProperty.Register("IsServer", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
 
+        internal static readonly DependencyProperty HideChromeProperty =
+            DependencyProperty.Register("HideChrome", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
+
+
         public event EventHandler ChannelCloseClicked;
 
         public event EventHandler ChannelJoinClicked;
 
         public event EventHandler ServerRightClickEvent;
+        public event EventHandler ServerClickEvent;
 
         public string Title
         {
-            get { return (string) GetValue(TitleProperty); }
+            get { return (string)GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
         }
 
         public bool IsServer
         {
-            get { return (bool) GetValue(IsServerProperty); }
+            get { return (bool)GetValue(IsServerProperty); }
             set { SetValue(IsServerProperty, value); }
+        }
+
+        public bool HideChrome
+        {
+            get { return (bool)GetValue(HideChromeProperty); }
+            set { SetValue(HideChromeProperty, value); }
         }
 
         public ChannelListItem()
@@ -55,7 +66,7 @@ namespace WinIRC.Ui
                     AddButton.Visibility = Visibility.Visible;
                     MenuButton.Visibility = Visibility.Visible;
                 }
-                else if (Title == "Server")
+                else if (HideChrome)
                 {
                     CloseButton.Visibility = Visibility.Collapsed;
                 }
@@ -100,17 +111,43 @@ namespace WinIRC.Ui
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(ServerRightClickType.CLOSE));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Title, ServerRightClickType.CLOSE));
         }
 
         private void ReconnectItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(ServerRightClickType.RECONNECT));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Title, ServerRightClickType.RECONNECT));
         }
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
             ShowServerMenu(sender, e);
+        }
+
+        private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (IsServer)
+            {
+                ServerClickEvent?.Invoke(this, new EventArgs());
+            }
+        }
+
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+        {
+            if (IsServer)
+            {
+                this.CapturePointer(e.Pointer);
+                VisualStateManager.GoToState(this, "PointerDown", true);
+            }
+        }
+
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+        {
+            if (IsServer)
+            {
+                VisualStateManager.GoToState(this, "PointerUp", true);
+                this.ReleasePointerCapture(e.Pointer);
+            }
         }
     }
 
@@ -121,11 +158,13 @@ namespace WinIRC.Ui
 
     public class ServerRightClickArgs : EventArgs
     {
+        public string server { get; private set; }
         public ServerRightClickType type { get; private set; }
 
-        public ServerRightClickArgs(ServerRightClickType type)
+        public ServerRightClickArgs(string title, ServerRightClickType type)
         {
             this.type = type;
+            this.server = title;
         }
     }
 

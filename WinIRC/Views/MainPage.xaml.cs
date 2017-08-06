@@ -220,6 +220,8 @@ namespace WinIRC
             }
 
             Servers.ItemsSource = IrcServers.Instance.Servers;
+            var cvs = (CollectionViewSource)Resources["channelsSrc"];
+            cvs.Source = IrcHandler.Servers;
 
             if (e.Parameter != null)
             {
@@ -432,7 +434,7 @@ namespace WinIRC
                 this.mainGrid.Margin = new Thickness(0, -70, 0, args.OccludedRect.Height);
                 args.EnsuredFocusedElementInView = true;
             }
-            GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
+            GetCurrentChannelView().ScrollToBottom();
         }
 
         private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -446,7 +448,7 @@ namespace WinIRC
                 currentServer = ((Channel) channelList.SelectedItem).Server;
                 SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
-                GetCurrentChannelView().ScrollToBottom(currentServer, currentChannel);
+                GetCurrentChannelView().ScrollToBottom();
             }
             catch (Exception ex)
             {
@@ -596,10 +598,6 @@ namespace WinIRC
             IrcHandler.connectedServers.Add(irc.server.name, irc);
             IrcHandler.connectedServersList.Add(irc.server.name);
             currentServer = irc.server.name;
-            //channelList.ItemsSource = IrcHandler.connectedServers[currentServer].channelList;
-
-            var cvs = (CollectionViewSource) Resources["channelsSrc"];
-            cvs.Source = IrcHandler.Servers;
 
             if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name, "Server");
             lastAuto = Config.GetBoolean(Config.UseTabs);
@@ -659,6 +657,7 @@ namespace WinIRC
                 {
                     buffer.Value.Clear();
                 }
+
                 var name = irc.server.name;
 
                 IrcHandler.connectedServers[irc.server.name].channelBuffers.Clear();
@@ -667,7 +666,6 @@ namespace WinIRC
 
                 IrcHandler.connectedServers.Remove(irc.server.name);
                 IrcHandler.connectedServersList.Remove(irc.server.name);
-                channelList.ItemsSource = null;
                 irc.HandleDisconnect = null;
                 irc.ConnCheck.ConnectionChanged = null;
                 irc.ConnCheck = null;
@@ -885,11 +883,12 @@ namespace WinIRC
         private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)
         {
             var args = e as ServerRightClickArgs;
+            var server = IrcHandler.connectedServers[args.server];
 
             if (args.type == ServerRightClickType.RECONNECT)
-                GetCurrentServer().DisconnectAsync(attemptReconnect: true);
+                server.DisconnectAsync(attemptReconnect: true);
             else if (args.type == ServerRightClickType.CLOSE)
-                GetCurrentServer().DisconnectAsync(attemptReconnect: false);
+                server.DisconnectAsync(attemptReconnect: false);
         }
 
         private void MenuBarToggleItem_Click(object sender, RoutedEventArgs e)
@@ -902,10 +901,16 @@ namespace WinIRC
             ShowingUsers = false;
         }
 
-
         private void ConnectionSettings_Click(object sender, RoutedEventArgs e)
         {
             ShowSettings(typeof(ConnectionSettingsView));
+        }
+
+        private void ChannelListItem_ServerClickEvent(object sender, EventArgs e)
+        {
+            var header = sender as ChannelListItem;
+
+            SwitchChannel(header.Title, "Server", false);
         }
     }
 }

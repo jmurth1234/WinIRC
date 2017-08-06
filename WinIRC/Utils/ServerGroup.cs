@@ -14,6 +14,8 @@ namespace WinIRC.Utils
         {
         }
 
+        private bool ServerAdded;
+
         public bool Contains(String s)
         {
             return this.Any(chan => chan.Name == s );
@@ -30,6 +32,12 @@ namespace WinIRC.Utils
 
         public void Insert(int i, String s)
         {
+            if (s == "Server" && !ServerAdded)
+            {
+                ServerAdded = true;
+                return;
+            }
+
             this.Insert(i, new Channel
             {
                 Name = s,
@@ -50,6 +58,7 @@ namespace WinIRC.Utils
     {
         public string Server { get; set; }
         public string Name { get; set; }
+        public bool ServerLog => Name == "Server";
 
         public override string ToString()
         {

@@ -184,6 +184,7 @@
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Ui\MessagesView.cs" />
     <Compile Include="Ui\PivotPage.xaml.cs">
       <DependentUpon>PivotPage.xaml</DependentUpon>
     </Compile>

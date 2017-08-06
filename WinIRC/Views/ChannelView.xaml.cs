@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
 using WinIRC.Net;
+using WinIRC.Ui;
 
 namespace WinIRC.Views
 {
@@ -103,7 +104,6 @@ namespace WinIRC.Views
             messagesView.ItemsSource = null;
 
             messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
-
             store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 
@@ -111,14 +111,14 @@ namespace WinIRC.Views
 
             IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged += ChannelView_CollectionChanged;
 
-            ScrollToBottom(currentServer, currentChannel);
+            ScrollToBottom();
             ChannelLoaded = true;
             UpdateUi();
         }
 
         private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            ScrollToBottom(currentServer, currentChannel);
+            ScrollToBottom();
         }
 
         private void ChannelView_TopicSetEvent(string topic)
@@ -131,16 +131,12 @@ namespace WinIRC.Views
             return ircMsgBox;
         }
 
-        internal async void ScrollToBottom(string server, string channel)
+        internal void ScrollToBottom()
         {
-            if (channel != currentChannel || server != currentServer)
-            {
-                return;
-            }
-
             if (messagesScroll != null)
             {
-                await Task.Delay(1); // wait a millisecond to render first
+                messagesView.UpdateLayout();
+                messagesScroll.Measure(messagesScroll.RenderSize);
                 messagesScroll.ChangeView(null, messagesScroll.ScrollableHeight, null, false);
             }
         }
@@ -198,6 +194,12 @@ namespace WinIRC.Views
             {
                 topicScroll.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void messagesView_ItemsChanged(object sender, EventArgs e)
+        {
+            var args = e as MessagesViewItemsChangedArgs;
+            ScrollToBottom();
         }
     }
 }

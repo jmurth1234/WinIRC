@@ -36,7 +36,17 @@ namespace WinIRC.Views
 
             this.uri = e.Parameter as Uri;
 
-            Image.Source = new BitmapImage(uri);
+            if (uri.ToString().Contains("imgur"))
+            {
+                var id = uri.ToString().Split('/').Last();
+
+                var imageUri = new Uri("https://i.imgur.com/" + id + ".png");
+                Image.Source = new BitmapImage(imageUri);
+            }
+            else
+            {
+                Image.Source = new BitmapImage(uri);
+            }
         }
 
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)

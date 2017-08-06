@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -87,10 +88,12 @@ namespace WinIRC.Ui
 
         public static bool isImage(string uri)
         {
+            var split = uri.Split('/');
             return uri.EndsWith(".png")
                 || uri.EndsWith(".jpg")
                 || uri.EndsWith(".jpeg")
-                || uri.EndsWith(".gif");
+                || uri.EndsWith(".gif")
+                || (uri.Contains("imgur") && !uri.Contains("/a/") && !(uri.Contains("/r/") && split.Length == 5));
 
         }
 

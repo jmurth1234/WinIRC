@@ -41,6 +41,7 @@ namespace WinIRC.Net
         public bool IsAuthed { get; set; }
 
         public ObservableCollection<Message> ircMessages { get; set; }
+
         public ServerGroup channelList { get; set; }
         public Dictionary<string, ChannelStore> channelStore { get; set; }
 
@@ -90,6 +91,7 @@ namespace WinIRC.Net
         {
             this.server = server;
             ircMessages = new ObservableCollection<Message>();
+
             channelList = new ServerGroup(new ObservableCollection<Channel>());
             channelList.Server = server.name;
 
@@ -99,6 +101,7 @@ namespace WinIRC.Net
             IsAuthed = false;
 
             ConnCheck = new Connection();
+            AddChannel("Server");
 
             ConnCheck.ConnectionChanged += async (connected) =>
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
@@ -683,10 +686,6 @@ namespace WinIRC.Net
                 var comparer = Comparer<String>.Default;
 
                 int i = 0;
-                if (channelList.Count >= 1)
-                {
-                    i++;
-                }
 
                 while (i < channelList.Count && comparer.Compare(channelList[i].Name.ToLower(), channel.ToLower()) < 0)
                     i++;

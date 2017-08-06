@@ -338,18 +338,21 @@
             </bar:MenuBarButton>
         </bar:MenuBar>
 
-        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240">
+        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" >
             <SplitView.Pane>
-                <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}" HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}" ItemContainerStyle="{Binding ListBoxItemStyle}">
+                <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}"
+                          HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}"
+                          ItemContainerStyle="{Binding ListBoxItemStyle}" >
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
                                     <ui:ChannelListItem Margin="0" FontSize="14" Title="{Binding Server}" IsServer="True"
+                                                        ServerClickEvent="ChannelListItem_ServerClickEvent"
                                                         ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                         ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
                                                         ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
+                                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                         </GroupStyle>
@@ -357,7 +360,8 @@
 
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
+                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" HideChrome="{Binding ServerLog}"
+                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                 ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
                                                 ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
                                                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>

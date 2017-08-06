@@ -19,7 +19,23 @@
     </UserControl.Resources>
 
 
-    <Grid Width="220"  RightTapped="Grid_RightTapped" Background="#00000000">
+    <Grid x:Name="ContainerGrid" Width="220" RightTapped="Grid_RightTapped"  Background="#00000000">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="TapStates">
+                <VisualState x:Name="Normal"/>
+                <VisualState x:Name="PointerDown">
+                    <Storyboard>
+                        <PointerDownThemeAnimation TargetName="ContainerGrid"/>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="PointerUp">
+                    <Storyboard>
+                        <PointerUpThemeAnimation TargetName="ContainerGrid"/>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -27,7 +43,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" >
+        <Grid Grid.Column="0" Tapped="Grid_Tapped">
             <TextBlock Text="{Binding Title, FallbackValue=Channel Name}" VerticalAlignment="Center" />
         </Grid>
 
