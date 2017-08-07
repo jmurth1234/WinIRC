@@ -1,22 +1,4 @@
-# Changelog
------
-
-## 1.5.0
-
-This release introduces a major overhaul of the UI, making the app more desktop friendly whilst still being touch friendly for mobiles and tablets! The major changes are:
- - The app now has a menu bar embedded in the title bar rather than a basic toolbar, where all of the previous buttons from the toolbar can be found
- - The topic is always showing now as a topic bar above the channel messages.
- - The list of channels on the right now includes all channels from all currently connected servers, grouped by server, rather than switching servers via a drop down
- 
-For new users, there's now a setup wizard that shows on the first launch, where users can enter a default username and select some sample servers to add to their server list. Existing users will be prompted on launch to set a default username.
-
-Other improvements and fixes include:
- - Support for viewing more imgur links inline
- - Support for more server operator modes as used by some irc servers (contributed by TriJetScud)
- - Option to hide messages when a user joins or leaves a channel (conbtributed by owensdj)
- - Some small optimisations to joining ZNCs
- - Fixed out of control memory usage when connected to large amounts of channels
-
+	# Changelog
 ## 1.4.2
 
 Fixes to a couple bugs found since the last update. Also attempts to fix a memory leak.
