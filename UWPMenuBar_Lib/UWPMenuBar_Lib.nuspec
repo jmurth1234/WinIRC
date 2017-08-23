@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Rymate.Controls.UWPMenuBar</id>
+    <version>1.0.0-beta3</version>
+    <title>UWP Menu Bar</title>
+    <authors>rymate1234</authors>
+    <owners>rymate1234</owners>
+    <licenseUrl>https://github.com/rymate1234/UWPMenuBar/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/rymate1234/UWPMenuBar/blob/master/README.md</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      This project aims to reimplement the classic menu bar component as a UWP library.
+
+      Currently the library has the following features:
+
+      ## Menu Bar
+
+      The main component is the Menu Bar, which defines a container which can hold Menu Bar buttons, and an optional area which can be used as a drag area for a title bar. It also holds the hover behaviour for opening menu bar items on hover when another one is opened.
+
+      ## Menu Bar Buttons
+
+      These can either have a dropdown (like a menu bar) or are standalone buttons, which can be used for revealing a SplitView. They're also AccessKey aware, meaning users can activate them via `alt + access key`.
+
+      Additionally, they can either display a label or an icon from the built in Segoe MDL2 icon font.
+
+      ## Menu Bar Item / Menu Bar Toggle Item
+
+      These are essentially very small wrappers that wrap the equivalent `MenuFlyoutItem` in order to reduce the default padding on them.
+
+      The padding can be increased / decreased via the normal methods still.
+    </description>
+    <summary>Small library to reimplement the menu bar in UWP</summary>
+    <releaseNotes>This beta release adds a small animation to the menu when it's opened.</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>UWP Control MenuBar Menu Bar</tags>
+  </metadata>
+
+  <files>
+    <file src="bin\Release\Rymate.Controls.UWPMenuBar**" target="lib\uap10.0" />
+  </files>
+  
+</package>

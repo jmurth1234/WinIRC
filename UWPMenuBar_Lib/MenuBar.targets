@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <MenuBar-Platform Condition="'$(Platform)' == 'Win32'">x86</MenuBar-Platform>
+        <MenuBar-Platform Condition="'$(Platform)' != 'Win32'">$(Platform)</MenuBar-Platform>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'UAP'">
+        <Reference Include="$(MSBuildThisFileDirectory)\Rymate.Controls.UWPMenuBar.winmd">
+            <Implementation>Rymate.Controls.UWPMenuBar.dll</Implementation>
+        </Reference>
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\runtimes\win10-$(ImageEnhancer-Platform)\native\Rymate.Controls.UWPMenuBar.dll" />
+    </ItemGroup>
+</Project>
