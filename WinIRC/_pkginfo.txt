@@ -1,1 +1,1 @@
-C:\Users\Ryan\Documents\Visual Studio 2017\Projects\WinIRC\WinIRC\bin\ARM\Release\Upload\WinIRC_1.5.0.0\WinIRC_1.5.0.0_x86_x64_arm.appxbundle
+C:\Users\Ryan\Documents\WinIRC\WinIRC\bin\ARM\Release\Upload\WinIRC_1.5.0.0\WinIRC_1.5.0.0_x86_x64_arm.appxbundle
