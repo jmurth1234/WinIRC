@@ -46,7 +46,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Rectangle x:Name="TitleRect" Fill="{ThemeResource AccentButtonBackground}" />
+        <Rectangle x:Name="TitleRect" Fill="{ThemeResource SystemAccentColor}" />
         <TextBlock Padding="8,0,8,8"  x:Name="Title" FontSize="48" FontWeight="Medium" >
             Welcome to WinIRC
         </TextBlock>
@@ -73,7 +73,7 @@
 
             </StackPanel>
         </ScrollViewer>
-        <Button Margin="8,0,8,8" x:Name="ConfirmButton" Grid.Row="2" Content="Start using WinIRC" HorizontalAlignment="Right" Background="{ThemeResource AccentButtonBackground}" Click="ConfirmButton_Click"/>
+        <Button Margin="8,0,8,8" x:Name="ConfirmButton" Grid.Row="2" Content="Start using WinIRC" HorizontalAlignment="Right" Background="{ThemeResource SystemAccentColor}" Click="ConfirmButton_Click"/>
 
     </Grid>
 </Page>
