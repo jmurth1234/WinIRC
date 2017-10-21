@@ -173,11 +173,24 @@ namespace WinIRC
 
             Window.Current.SizeChanged += Current_SizeChanged;
             SidebarFrame.Navigated += SidebarFrame_Navigated;
+            WindowStates.CurrentStateChanged += WindowStates_CurrentStateChanged;
+            WindowStates.CurrentStateChanging += WindowStates_CurrentStateChanging; ;
 
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
             this.CommandHandler = IrcHandler.CommandHandler;
 
             instance = this;
+        }
+
+        private void WindowStates_CurrentStateChanging(object sender, VisualStateChangedEventArgs e)
+        {
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF000000") : ParseColor("#FFEEEEEE");
+            SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
+        }
+
+        private void WindowStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e)
+        {
+            UpdateUi();
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -367,10 +380,11 @@ namespace WinIRC
             {
                 if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5))
                 {
+                    var source = WindowStates.CurrentState == WideState ? AcrylicBackgroundSource.HostBackdrop : AcrylicBackgroundSource.Backdrop;
                     var brush = new Windows.UI.Xaml.Media.AcrylicBrush
                     {
                         FallbackColor = sidebarColor,
-                        BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
+                        BackgroundSource = source,
                         TintColor = sidebarColor,
                         TintOpacity = 0.75
                     };
@@ -379,12 +393,11 @@ namespace WinIRC
                 }
                 else if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 4))
                 {
-                    var brush = new AcrylicHostBrush
-                    {
-                        TintColor = sidebarColor,
-                        BlurAmount = 5,
-                        BackdropFactor = 0.2
-                    };
+                    var backdrop = WindowStates.CurrentState == WideState;
+                    AcrylicBrushBase brush = backdrop ? (AcrylicBrushBase) new AcrylicHostBrush() : new Ui.Brushes.AcrylicBrush();
+                    brush.TintColor = sidebarColor;
+                    brush.BlurAmount = backdrop ? 5 : 15; 
+                    brush.BackdropFactor = backdrop ? 0.2 : 1;
 
                     SplitView.PaneBackground = brush;
                 }

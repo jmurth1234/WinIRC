@@ -127,7 +127,7 @@ namespace WinIRC.Ui
                 {
                     var graph = await OpenGraph.ParseUrlAsync(hyperlinkManager.FirstLink);
 
-                    if (graph.Values.Count > 0)
+                    if (graph.Values.Count > 0 && graph.Title != "" && graph["description"] != "")
                     {
                         PreviewFrame.Visibility = Visibility.Visible;
                         PreviewFrame.Navigate(typeof(LinkView), graph);
