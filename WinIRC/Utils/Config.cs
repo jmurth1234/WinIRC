@@ -29,6 +29,7 @@ namespace WinIRC
         public static string ServersListStore = "serversliststore";
 
         public const string FirstRun = "firstrun";
+        public const string Blurred = "blurredback";
 
         public static bool Contains(string key)
         {

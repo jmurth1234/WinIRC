@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:WinIRC.Ui"
+    xmlns:brushes="using:WinIRC.Ui.Brushes"
     xmlns:net="using:WinIRC.Net"
     xmlns:controls="using:Template10.Controls"
     xmlns:bar="using:Rymate.Controls.UWPMenuBar"
@@ -262,6 +263,7 @@
         <CollectionViewSource
             x:Key="channelsSrc"
             IsSourceGrouped="True" />
+
     </Page.Resources>
 
     <Grid x:Name="mainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

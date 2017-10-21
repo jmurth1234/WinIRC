@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Template10.Common;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.ExtendedExecution;
@@ -221,8 +222,7 @@ namespace WinIRC.Net
                 ReconnectionAttempts++;
                 if (ConnCheck != null && server != null && ConnCheck.HasInternetAccess)
                 {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
-                    {
+                    await WindowWrapper.Current().Dispatcher.DispatchAsync(async () => {
                         if (ReconnectionAttempts < 3)
                             await Task.Delay(1000);
                         else

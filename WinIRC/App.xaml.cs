@@ -103,8 +103,6 @@ namespace WinIRC
                 current.Value.Unregister(true);
             }
 
-            this.Suspending += OnSuspending;
-            this.Resuming += App_Resuming;
         }
 
         private Boolean CanBackground = false;
@@ -222,6 +220,7 @@ namespace WinIRC
         private async Task<bool> InitApp(IActivatedEventArgs e)
         {
             var loaded = true;
+            AutoExtendExecutionSession = true;
             IrcServers servers = IrcServers.Instance;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -279,24 +278,6 @@ namespace WinIRC
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
-        /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
-        /// without knowing whether the application will be terminated or resumed with the contents
-        /// of memory still intact.
-        /// </summary>
-        /// <param name = "sender">The source of the suspend request.</param>
-        /// <param name = "e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
-        {
-            var deferral = e.SuspendingOperation.GetDeferral();
-            //MainPage.instance.ExtendExecution();
-            deferral.Complete();
-        }
-
-        private void App_Resuming(object sender, object e)
-        {
-            MainPage.instance.ExtendExecution();
-        }
 
         private void ShowToast(string title, string message)
         {

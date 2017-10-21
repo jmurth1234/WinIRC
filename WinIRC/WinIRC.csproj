@@ -11,7 +11,7 @@
     <AssemblyName>WinIRC</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.15063.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
@@ -180,6 +180,15 @@
     <Compile Include="Net\IrcWebSocket.cs" />
     <Compile Include="Net\Message.cs" />
     <Compile Include="Net\ReplyConstants.cs" />
+    <Compile Include="OpenGraph\HttpDownloader.cs" />
+    <Compile Include="OpenGraph\InvalidSpecificationException.cs" />
+    <Compile Include="OpenGraph\OpenGraph.cs" />
+    <Compile Include="OpenGraph\ReadOnlyDictionaryException.cs" />
+    <Compile Include="Ui\Brushes\AcrylicBrush.cs" />
+    <Compile Include="Ui\Brushes\AcrylicBrushBase.cs" />
+    <Compile Include="Ui\Brushes\AcrylicHostBrush.cs" />
+    <Compile Include="Ui\Brushes\CompositionBrushBuilder.cs" />
+    <Compile Include="Ui\Brushes\CompositionExtensions.cs" />
     <Compile Include="Ui\ChannelListItem.xaml.cs">
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
@@ -215,8 +224,11 @@
     <Compile Include="Views\FirstRunPage.xaml.cs">
       <DependentUpon>FirstRunPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ImageView.xaml.cs">
+    <Compile Include="Views\InlineViewers\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InlineViewers\LinkView.xaml.cs">
+      <DependentUpon>LinkView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -234,7 +246,7 @@
     <Compile Include="Ui\HeaderBlock.xaml.cs">
       <DependentUpon>HeaderBlock.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TwitterView.xaml.cs">
+    <Compile Include="Views\InlineViewers\TwitterView.xaml.cs">
       <DependentUpon>TwitterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UsersView.xaml.cs">
@@ -243,7 +255,7 @@
     <Compile Include="Views\DisplaySettingsView.xaml.cs">
       <DependentUpon>DisplaySettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\YoutubeView.xaml.cs">
+    <Compile Include="Views\InlineViewers\YoutubeView.xaml.cs">
       <DependentUpon>YoutubeView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -300,7 +312,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ImageView.xaml">
+    <Page Include="Views\InlineViewers\ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InlineViewers\LinkView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -324,7 +340,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TwitterView.xaml">
+    <Page Include="Views\InlineViewers\TwitterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -336,16 +352,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\YoutubeView.xaml">
+    <Page Include="Views\InlineViewers\YoutubeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="WindowsDesktop, Version=10.0.15063.0">
+    <SDKReference Include="WindowsDesktop, Version=10.0.16299.0">
       <Name>Windows Desktop Extensions for the UWP</Name>
     </SDKReference>
-    <SDKReference Include="WindowsMobile, Version=10.0.15063.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.16299.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
@@ -353,6 +369,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.6.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights">
       <Version>2.4.0</Version>
     </PackageReference>

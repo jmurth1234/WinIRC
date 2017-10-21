@@ -12,7 +12,10 @@
         <Grid>
             <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
                 <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" />
+                <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
+                
+                <TextBlock Text="Blurred Background Sidebar" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Static" OnContent="Blurred" Toggled="BlurredBack_Toggled" />
 
                 <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />

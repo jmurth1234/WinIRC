@@ -80,9 +80,18 @@ namespace WinIRC.Views
                         if (latestException != null)
                         {
                             Debug.WriteLine(latestException.TwitterDescription);
+                            return null;
                         }
 
-                        return Tweetinvi.Tweet.GetTweet(id);
+                        var t = Tweetinvi.Tweet.GetTweet(id);
+
+                        latestException = ExceptionHandler.GetLastException();
+                        if (latestException != null)
+                        {
+                            Debug.WriteLine(latestException.TwitterDescription);
+                            return null;
+                        }
+                        return t;
                     }
                     catch (Exception e)
                     {

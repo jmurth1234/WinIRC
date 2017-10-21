@@ -30,6 +30,7 @@ using Windows.ApplicationModel.ExtendedExecution;
 using Rymate.Controls.UWPMenuBar;
 using Template10.Services.SerializationService;
 using Windows.UI.Xaml.Data;
+using WinIRC.Ui.Brushes;
 
 namespace WinIRC
 {
@@ -116,7 +117,7 @@ namespace WinIRC
 
         public static MainPage instance;
         private bool lastAuto;
-        private ExtendedExecutionSession session;
+
 
         private SolidColorBrush _AccentColor;
 
@@ -297,7 +298,7 @@ namespace WinIRC
 
             var background = ParseColor("#FF1F1F1F");
             var backgroundInactive = ParseColor("#FF2B2B2B");
-            var foreground = ParseColor("#FFFFFFFF");
+            var foreground = ParseColor("#FFFFFFFF");             
 
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
@@ -359,6 +360,38 @@ namespace WinIRC
                     else
                         statusBar.ShowAsync();
                 }
+            }
+
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF000000") : ParseColor("#FFEEEEEE");
+            if (Config.GetBoolean(Config.Blurred, true))
+            {
+                if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5))
+                {
+                    var brush = new Windows.UI.Xaml.Media.AcrylicBrush
+                    {
+                        FallbackColor = sidebarColor,
+                        BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
+                        TintColor = sidebarColor,
+                        TintOpacity = 0.75
+                    };
+
+                    SplitView.PaneBackground = brush;
+                }
+                else if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 4))
+                {
+                    var brush = new AcrylicHostBrush
+                    {
+                        TintColor = sidebarColor,
+                        BlurAmount = 5,
+                        BackdropFactor = 0.2
+                    };
+
+                    SplitView.PaneBackground = brush;
+                }
+            }
+            else
+            {
+                SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
             }
 
             if (Config.Contains(Config.UseTabs))
@@ -582,8 +615,6 @@ namespace WinIRC
             if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
             if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
 
-            ExtendExecution();
-
             irc.HandleDisconnect += HandleDisconnect;
 
             // connect
@@ -601,46 +632,6 @@ namespace WinIRC
 
             if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name, "Server");
             lastAuto = Config.GetBoolean(Config.UseTabs);
-        }
-
-        public async void ExtendExecution()
-        {
-            if (session == null)
-            {
-                try
-                {
-                    session = new ExtendedExecutionSession();
-
-                    session.Reason = ExtendedExecutionReason.Unspecified;
-                    session.Description = "Keeping IRC Connected";
-                    session.Revoked += session_Revoked;
-
-                    ExtendedExecutionResult result = await session.RequestExtensionAsync();
-
-                    switch (result)
-                    {
-                        case ExtendedExecutionResult.Allowed:
-                            Debug.WriteLine("Extended execution allowed.");
-                            break;
-                        default:
-                        case ExtendedExecutionResult.Denied:
-                            Debug.WriteLine("Extended execution denied.");
-                            session.Dispose();
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-            }
-        }
-
-        private void session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
-        {
-            session.Dispose();
-            session = null;
-            ExtendExecution();
         }
 
         public async void HandleDisconnect(Irc irc)
@@ -869,9 +860,11 @@ namespace WinIRC
 
         private void CloseTab_Click(object sender, RoutedEventArgs e)
         {
-            GetCurrentItem().Content = null;
-
-            Tabs.Items.Remove(GetCurrentItem());
+            if (GetCurrentItem() != null)
+            {
+                GetCurrentItem().Content = null;
+                Tabs.Items.Remove(GetCurrentItem());
+            }
         }
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)

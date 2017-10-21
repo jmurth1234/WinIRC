@@ -1,12 +1,14 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:WinIRC">
+    xmlns:local="using:WinIRC"
+    xmlns:brushes="using:WinIRC.Ui.Brushes">
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="StatusTextColour" Color="#FFBBBBBB" />
+            <SolidColorBrush x:Key="StatusTextColour" Color="#FFAAAAAA" />
             <SolidColorBrush x:Key="ChatTextColour" Color="#FFFFFFFF" />
         </ResourceDictionary>
+
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="StatusTextColour" Color="#FF444444" />
             <SolidColorBrush x:Key="ChatTextColour" Color="#FF000000" />

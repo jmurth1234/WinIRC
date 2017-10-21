@@ -38,8 +38,7 @@ namespace WinIRC.Views
 
             if (uri.ToString().Contains("imgur"))
             {
-                var id = uri.ToString().Split('/').Last();
-
+                var id = uri.ToString().Split('/').Last().Replace(".gifv", "");
                 var imageUri = new Uri("https://i.imgur.com/" + id + ".png");
                 Image.Source = new BitmapImage(imageUri);
             }

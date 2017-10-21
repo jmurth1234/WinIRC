@@ -15,6 +15,8 @@ namespace WinIRC.Ui
     public class HyperlinkManager
     { 
         public Action<Uri> LinkClicked { get; internal set; }
+        public Uri FirstLink { get; private set; }
+        public bool InlineLink { get; private set; }
 
         public void SetText(Paragraph obj, string text)
         {
@@ -64,10 +66,16 @@ namespace WinIRC.Ui
                 {
                     symbol = "";
                     hyper.Click += Hyper_Click;
+                    InlineLink = true;
                 }
                 else
                 {
                     hyper.NavigateUri = url;
+                }
+
+                if (FirstLink == null)
+                {
+                    FirstLink = url;
                 }
 
                 hyper.Inlines.Add(GetRunControl(uri));

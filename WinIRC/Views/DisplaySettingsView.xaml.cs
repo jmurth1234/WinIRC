@@ -28,8 +28,6 @@ namespace WinIRC
         {
             this.InitializeComponent();
             Title = "Display";
-
-            Theme.Toggled += theme_Toggled;
             LoadSettings();
         }
 
@@ -49,6 +47,16 @@ namespace WinIRC
             {
                 Config.SetBoolean(Config.DarkTheme, true);
                 this.Theme.IsOn = true;
+            }
+
+            if (Config.Contains(Config.Blurred))
+            {
+                this.BlurredBack.IsOn = Config.GetBoolean(Config.Blurred);
+            }
+            else
+            {
+                Config.SetBoolean(Config.Blurred, true);
+                this.BlurredBack.IsOn = true;
             }
 
             if (Config.Contains(Config.FontFamily))
@@ -108,10 +116,11 @@ namespace WinIRC
         {
             if (!SettingsLoaded)
                 return;
-            Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
-            (Application.Current as App).SetTheme();
 
+            Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
             base.UpdateUi();
+
+            (Application.Current as App).SetTheme();
         }
 
         private void FontCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -157,6 +166,16 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.IgnoreJoinLeave, IgnoreJoinLeave.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void BlurredBack_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.Blurred, BlurredBack.IsOn);
 
             base.UpdateUi();
         }

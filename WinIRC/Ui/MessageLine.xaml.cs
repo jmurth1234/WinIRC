@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenGraph_Net;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +17,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Net;
 using WinIRC.Views;
+using WinIRC.Views.InlineViewers;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -81,7 +83,7 @@ namespace WinIRC.Ui
             UpdateLayout();
         }
 
-        private void MessageLine_Loaded(object sender, RoutedEventArgs e)
+        private async void MessageLine_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = MessageItem;
             UpdateLayout();
@@ -118,6 +120,21 @@ namespace WinIRC.Ui
                 hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
                 hyperlinkManager.LinkClicked += MediaPreview_Clicked;
             }
+
+            try
+            {
+                if (!hyperlinkManager.InlineLink && hyperlinkManager.FirstLink != null)
+                {
+                    var graph = await OpenGraph.ParseUrlAsync(hyperlinkManager.FirstLink);
+
+                    if (graph.Values.Count > 0)
+                    {
+                        PreviewFrame.Visibility = Visibility.Visible;
+                        PreviewFrame.Navigate(typeof(LinkView), graph);
+                    }
+                }
+            }
+            catch { } // swallow exceptions
 
             this.HasLoaded = true;
         }
