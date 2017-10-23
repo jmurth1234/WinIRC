@@ -320,7 +320,7 @@ namespace WinIRC.Net
 
                 if ((parsedLine.TrailMessage.TrailingContent.Contains(server.username) || parsedLine.CommandMessage.Parameters[0] == server.username))
                 {
-                    if (currentChannel != destination)
+                    if (currentChannel != destination || (App.Current as App).IncrementPings == true || MainPage.instance.currentServer == this.server.name)
                     {
                         var toast = CreateMentionToast(parsedLine.PrefixMessage.Nickname, destination, content);
                         toast.ExpirationTime = DateTime.Now.AddDays(2);

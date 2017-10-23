@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace WinIRC.Views
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
         private ChannelStore store;
         private bool ChannelLoaded;
+        private AdvancedCollectionView messagesCollectionView;
 
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
@@ -32,7 +34,6 @@ namespace WinIRC.Views
         public ChannelView()
         {
             this.InitializeComponent();
-
             UpdateUi();
         }
 
@@ -51,6 +52,15 @@ namespace WinIRC.Views
             Unloaded += ChannelView_Unloaded;
 
             UpdateUi();
+        }
+
+        private bool Filter(object item)
+        {
+            if (!(item is Message)) {
+                return false;
+            }
+
+            return messagesCollectionView.IndexOf(item) > messagesCollectionView.Count - 1000;
         }
 
         private void ChannelView_Unloaded(object sender, RoutedEventArgs e)
@@ -103,7 +113,10 @@ namespace WinIRC.Views
 
             messagesView.ItemsSource = null;
 
-            messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
+            messagesCollectionView = new AdvancedCollectionView(IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel]);
+            messagesCollectionView.Filter = item => Filter(item);
+
+            messagesView.ItemsSource = messagesCollectionView;
             store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 

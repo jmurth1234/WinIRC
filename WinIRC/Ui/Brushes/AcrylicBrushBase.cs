@@ -65,6 +65,7 @@ namespace WinIRC.Ui.Brushes
                 .SetTintColorFactor((float)TintColorFactor)
                 .SetBlurAmount((float)BlurAmount)
                 .Build(_compositor);
+
             CompositionBrush = _brush;
         }
 
