@@ -7,33 +7,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    
+    <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
+            <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ScrollViewer>
-            <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
-                <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
-                
-                <TextBlock Text="Sidebar Background" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Static" OnContent="Blurred" Toggled="BlurredBack_Toggled" />
+            <TextBlock Text="Sidebar Background" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Static" OnContent="Blurred" Toggled="BlurredBack_Toggled" />
 
-                <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
+            <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
 
-                <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
+            <TextBlock Text="Link Metadata in Chat" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="LinkMetadata" OffContent="Hidden" OnContent="Displayed" Toggled="LinkMetadata_Toggled" />
 
-                <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
+            <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
 
-                <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>
+            <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
 
-                <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
+            <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>
 
-            </StackPanel>
+            <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
 
-        </ScrollViewer>
-    </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </ui:BaseSettingsPage>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.AccessCache;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -67,6 +68,16 @@ namespace WinIRC
                 this.TabsSwitch.IsOn = true;
             }
 
+            if (Config.Contains(Config.EnableLogs))
+            {
+                this.TabsSwitch.IsOn = Config.GetBoolean(Config.EnableLogs);
+            }
+            else
+            {
+                Config.SetBoolean(Config.EnableLogs, false);
+                this.TabsSwitch.IsOn = false;
+            }
+
 
             this.SettingsLoaded = true;
         }
@@ -97,6 +108,42 @@ namespace WinIRC
             base.UpdateUi();
         }
 
+        private void LogFolder_Click(object sender, RoutedEventArgs e)
+        {
+            ChooseFolder();
+        }
+
+        private async void ChooseFolder()
+        {
+            var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+            folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder;
+            folderPicker.FileTypeFilter.Add("*");
+
+            Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                // Application now has read/write access to all contents in the picked folder
+                // (including other sub-folder contents)
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace(Config.LogsFolder, folder);
+            }
+            else
+            {
+                LogChannels.IsOn = false;
+            }
+        }
+
+        private void LogChannels_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.EnableLogs, LogChannels.IsOn);
+
+            if (LogChannels.IsOn)
+            {
+                ChooseFolder();
+            }
+        }
     }
 
 

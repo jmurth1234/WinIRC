@@ -61,6 +61,11 @@ namespace WinIRC.Net
         public string Text { get; set; }
         public bool Mention { get; internal set; }
         public MessageType Type { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{Timestamp}] {User} {Text}";
+        }
     }
 
     public enum MessageType

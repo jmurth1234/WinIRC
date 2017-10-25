@@ -26,7 +26,6 @@ namespace WinIRC.Views
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
         private ChannelStore store;
         private bool ChannelLoaded;
-        private AdvancedCollectionView messagesCollectionView;
 
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
@@ -52,15 +51,6 @@ namespace WinIRC.Views
             Unloaded += ChannelView_Unloaded;
 
             UpdateUi();
-        }
-
-        private bool Filter(object item)
-        {
-            if (!(item is Message)) {
-                return false;
-            }
-
-            return messagesCollectionView.IndexOf(item) > messagesCollectionView.Count - 1000;
         }
 
         private void ChannelView_Unloaded(object sender, RoutedEventArgs e)
@@ -113,10 +103,8 @@ namespace WinIRC.Views
 
             messagesView.ItemsSource = null;
 
-            messagesCollectionView = new AdvancedCollectionView(IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel]);
-            messagesCollectionView.Filter = item => Filter(item);
+            messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
 
-            messagesView.ItemsSource = messagesCollectionView;
             store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 

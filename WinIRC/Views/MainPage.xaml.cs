@@ -184,7 +184,7 @@ namespace WinIRC
 
         private void WindowStates_CurrentStateChanging(object sender, VisualStateChangedEventArgs e)
         {
-            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF000000") : ParseColor("#FFEEEEEE");
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF111111") : ParseColor("#FFEEEEEE");
             SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
         }
 
@@ -375,29 +375,29 @@ namespace WinIRC
                 }
             }
 
-            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF000000") : ParseColor("#FFEEEEEE");
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF111111") : ParseColor("#FFEEEEEE");
             if (Config.GetBoolean(Config.Blurred, true))
             {
+                var hostBackdrop = WindowStates.CurrentState == WideState;
                 if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5))
                 {
-                    var source = WindowStates.CurrentState == WideState ? AcrylicBackgroundSource.HostBackdrop : AcrylicBackgroundSource.Backdrop;
+                    var source = hostBackdrop ? AcrylicBackgroundSource.HostBackdrop : AcrylicBackgroundSource.Backdrop;
                     var brush = new Windows.UI.Xaml.Media.AcrylicBrush
                     {
                         FallbackColor = sidebarColor,
                         BackgroundSource = source,
                         TintColor = sidebarColor,
-                        TintOpacity = 0.75
+                        TintOpacity = hostBackdrop ? 0.75 : 0.55
                     };
 
                     SplitView.PaneBackground = brush;
                 }
                 else if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 4))
                 {
-                    var backdrop = WindowStates.CurrentState == WideState;
-                    AcrylicBrushBase brush = backdrop ? (AcrylicBrushBase) new AcrylicHostBrush() : new Ui.Brushes.AcrylicBrush();
+                    AcrylicBrushBase brush = hostBackdrop ? (AcrylicBrushBase) new AcrylicHostBrush() : new Ui.Brushes.AcrylicBrush();
                     brush.TintColor = sidebarColor;
-                    brush.BlurAmount = backdrop ? 5 : 15; 
-                    brush.BackdropFactor = backdrop ? 0.2 : 1;
+                    brush.BlurAmount = hostBackdrop ? 5 : 15; 
+                    brush.BackdropFactor = hostBackdrop ? 0.2 : 1;
 
                     SplitView.PaneBackground = brush;
                 }
@@ -602,7 +602,20 @@ namespace WinIRC
             try
             {
                 return IrcHandler.connectedServers[currentServer];
-            } catch
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public Irc GetServer(string server)
+        {
+            try
+            {
+                return IrcHandler.connectedServers[server];
+            }
+            catch
             {
                 return null;
             }
@@ -829,7 +842,7 @@ namespace WinIRC
             var channelArgs = e as ChannelEventArgs;
             var channel = channelArgs.Channel;
 
-            CommandHandler.PartCommandHandler(GetCurrentServer(), new string[] { "PART ", channel });
+            CommandHandler.PartCommandHandler(GetServer(channelArgs.Server), new string[] { "PART ", channel });
         }
 
         private void ChannelListItem_ChannelJoinClicked(object sender, EventArgs e)
@@ -837,7 +850,7 @@ namespace WinIRC
             var channelArgs = e as ChannelEventArgs;
             var channel = channelArgs.Channel;
 
-            GetCurrentServer().JoinChannel(channel);
+            GetServer(channelArgs.Server).JoinChannel(channel);
         }
 
         internal void CloseConnectView()
@@ -918,5 +931,7 @@ namespace WinIRC
 
             SwitchChannel(header.Title, "Server", false);
         }
+
+
     }
 }

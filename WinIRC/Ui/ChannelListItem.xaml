@@ -15,6 +15,10 @@
             <MenuFlyoutItem x:Name="ReconnectItem" Text="Reconnect to server" Click="ReconnectItem_Click"  />
             <MenuFlyoutItem x:Name="CloseItem" Text="Close server" Click="CloseItem_Click"  />
         </MenuFlyout>
+        
+        <MenuFlyout x:Key="ChannelContextMenu" >
+            <ToggleMenuFlyoutItem x:Name="AlwaysPing" Text="Notify for all messages" Click="AlwaysPing_Click"  />
+        </MenuFlyout>
 
     </UserControl.Resources>
 

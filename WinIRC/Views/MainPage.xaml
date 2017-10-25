@@ -362,7 +362,7 @@
 
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" HideChrome="{Binding ServerLog}"
+                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" Server="{Binding Server}" HideChrome="{Binding ServerLog}"
                                                 ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                 ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
                                                 ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 

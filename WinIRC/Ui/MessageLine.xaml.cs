@@ -123,7 +123,7 @@ namespace WinIRC.Ui
 
             try
             {
-                if (!hyperlinkManager.InlineLink && hyperlinkManager.FirstLink != null)
+                if (!hyperlinkManager.InlineLink && hyperlinkManager.FirstLink != null && Config.GetBoolean(Config.ShowMetadata, true))
                 {
                     var graph = await OpenGraph.ParseUrlAsync(hyperlinkManager.FirstLink);
 

@@ -109,6 +109,16 @@ namespace WinIRC
                 this.IgnoreJoinLeave.IsOn = false;
             }
 
+            if (Config.Contains(Config.ShowMetadata))
+            {
+                this.LinkMetadata.IsOn = Config.GetBoolean(Config.ShowMetadata);
+            }
+            else
+            {
+                Config.SetBoolean(Config.ShowMetadata, true);
+                this.LinkMetadata.IsOn = true;
+            }
+
             this.SettingsLoaded = true;
         }
 
@@ -176,6 +186,16 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.Blurred, BlurredBack.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void LinkMetadata_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.ShowMetadata, LinkMetadata.IsOn);
 
             base.UpdateUi();
         }

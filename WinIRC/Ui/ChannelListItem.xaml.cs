@@ -25,12 +25,14 @@ namespace WinIRC.Ui
         internal static readonly DependencyProperty IsServerProperty =
             DependencyProperty.Register("IsServer", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
 
+        internal static readonly DependencyProperty ServerProperty =
+            DependencyProperty.Register("Server", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
+
         internal static readonly DependencyProperty HideChromeProperty =
             DependencyProperty.Register("HideChrome", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
 
 
         public event EventHandler ChannelCloseClicked;
-
         public event EventHandler ChannelJoinClicked;
 
         public event EventHandler ServerRightClickEvent;
@@ -48,6 +50,12 @@ namespace WinIRC.Ui
             set { SetValue(IsServerProperty, value); }
         }
 
+        public string Server
+        {
+            get { return (string)GetValue(ServerProperty); }
+            set { SetValue(ServerProperty, value); }
+        }
+
         public bool HideChrome
         {
             get { return (bool)GetValue(HideChromeProperty); }
@@ -57,6 +65,7 @@ namespace WinIRC.Ui
         public ChannelListItem()
         {
             this.InitializeComponent();
+            (this.Content as FrameworkElement).DataContext = this;
 
             Loaded += (sender, args) =>
             {
@@ -71,42 +80,45 @@ namespace WinIRC.Ui
                     CloseButton.Visibility = Visibility.Collapsed;
                 }
             };
-
-            (this.Content as FrameworkElement).DataContext = this;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (!IsServer)
-                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Title));
+                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Title, Server));
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!IsServer)
-                ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text));
+            ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text, Server));
         }
 
         private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            ShowServerMenu(sender, e);
+            ShowRightClickMenu(sender, e);
         }
 
-        private void ShowServerMenu(object sender, RoutedEventArgs e)
+        private void ShowRightClickMenu(object sender, RoutedEventArgs e)
         {
-            if (IsServer)
+            string menu = IsServer ? "ServerContextMenu" : "ChannelContextMenu";
+
+            var RightClick = this.Resources[menu] as MenuFlyout;
+
+            if (e is RightTappedRoutedEventArgs)
+                RightClick.ShowAt(null, (e as RightTappedRoutedEventArgs).GetPosition(null));
+            else
+                RightClick.ShowAt(sender as FrameworkElement);
+
+            Style s = new Windows.UI.Xaml.Style { TargetType = typeof(MenuFlyoutPresenter) };
+            s.Setters.Add(new Setter(RequestedThemeProperty, Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light));
+            RightClick.MenuFlyoutPresenterStyle = s;
+
+            if (!IsServer)
             {
-                var RightClick = this.Resources["ServerContextMenu"] as MenuFlyout;
-
-                if (e is RightTappedRoutedEventArgs)
-                    RightClick.ShowAt(null, (e as RightTappedRoutedEventArgs).GetPosition(null));
-                else
-                    RightClick.ShowAt(sender as FrameworkElement);
-
-                Style s = new Windows.UI.Xaml.Style { TargetType = typeof(MenuFlyoutPresenter) };
-                s.Setters.Add(new Setter(RequestedThemeProperty, Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light));
-                RightClick.MenuFlyoutPresenterStyle = s;
+                var key = Config.PerChannelSetting(Server, Title, Config.AlwaysNotify);
+                AlwaysPing.IsChecked = Config.GetBoolean(key, false);
             }
+
         }
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
@@ -121,7 +133,7 @@ namespace WinIRC.Ui
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowServerMenu(sender, e);
+            ShowRightClickMenu(sender, e);
         }
 
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
@@ -149,6 +161,15 @@ namespace WinIRC.Ui
                 this.ReleasePointerCapture(e.Pointer);
             }
         }
+
+        private void AlwaysPing_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsServer)
+            {
+                var key = Config.PerChannelSetting(Server, Title, Config.AlwaysNotify);
+                Config.SetBoolean(key, AlwaysPing.IsChecked);
+            }
+        }
     }
 
     public enum ServerRightClickType
@@ -170,11 +191,13 @@ namespace WinIRC.Ui
 
     public class ChannelEventArgs : EventArgs
     {
-        public ChannelEventArgs(string channel)
+        public ChannelEventArgs(string channel, string server)
         {
             this.Channel = channel;
-        } 
+            this.Server = server;
+        }
 
         public string Channel { get; private set; }
+        public string Server { get; private set; }
     }
 }

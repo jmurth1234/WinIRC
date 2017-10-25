@@ -199,6 +199,7 @@
     </Compile>
     <Compile Include="Ui\PromptDialog.cs" />
     <Compile Include="Utils\IrcServers.cs" />
+    <Compile Include="Utils\MessageCollection.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
     <Compile Include="Utils\ServerGroup.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
