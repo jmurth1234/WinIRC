@@ -24,8 +24,11 @@ namespace WinIRC.Utils
         public MessageCollection(int size, string server, string channel) : base()
         {
             this.MaxSize = size;
-            this.LogWriter = new MessageCollectionLogWriter(this, server, channel);
-            Task.Run(this.LogWriter.Process);
+            if (Config.GetBoolean(Config.EnableLogs))
+            {
+                this.LogWriter = new MessageCollectionLogWriter(this, server, channel);
+                Task.Run(this.LogWriter.Process);
+            }
         }
 
         public new void Add(Message message)
@@ -35,7 +38,7 @@ namespace WinIRC.Utils
                 RemoveAt(0);
             }
 
-            if (!LogWriter.Error) LogWriter.Add(message);
+            if (LogWriter != null && !LogWriter.Error) LogWriter.Add(message);
 
             base.Add(message);
         }

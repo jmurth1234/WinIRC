@@ -843,6 +843,7 @@ namespace WinIRC
             var channel = channelArgs.Channel;
 
             CommandHandler.PartCommandHandler(GetServer(channelArgs.Server), new string[] { "PART ", channel });
+            GetServer(channelArgs.Server).RemoveChannel(channel);
         }
 
         private void ChannelListItem_ChannelJoinClicked(object sender, EventArgs e)

@@ -349,7 +349,8 @@
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
-                                    <ui:ChannelListItem Margin="0" FontSize="14" Title="{Binding Server}" IsServer="True"
+                                    <ui:ChannelListItem Margin="0" FontSize="14" Title="{Binding Server}"
+                                                        Server="{Binding Server}" IsServer="True"
                                                         ServerClickEvent="ChannelListItem_ServerClickEvent"
                                                         ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                         ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
