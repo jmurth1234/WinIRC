@@ -66,7 +66,7 @@ namespace WinIRC
 
         private async void VisitGithub(object sender, RoutedEventArgs e)
         {
-            var uri = new Uri("https://github.com/rymate1234/WinIRC");
+            var uri = new Uri("https://github.com/rymate1234/WinIRC/issues/");
             await Windows.System.Launcher.LaunchUriAsync(uri);
         }
     }
