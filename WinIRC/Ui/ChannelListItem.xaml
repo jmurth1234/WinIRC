@@ -55,7 +55,7 @@
             <Button.Flyout>
                 <Flyout Placement="Bottom">
                     <StackPanel>
-                        <TextBox x:Name="channel" PlaceholderText="Channel or user to message" Margin="0,0,0,10" TextWrapping="Wrap" Width="220"/>
+                        <TextBox x:Name="channel" PlaceholderText="Channel" Margin="0,0,0,10" TextWrapping="Wrap" Width="220"/>
                         <Button Click="AddButton_Click" Content="Join Channel" Background="{ThemeResource SystemControlForegroundAccentBrush}" />
                     </StackPanel>
                 </Flyout>

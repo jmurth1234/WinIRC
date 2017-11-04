@@ -1,6 +1,26 @@
 # Changelog
 -----
 
+# 1.6.0
+
+WinIRC 1.6 updates the SDK used to the fall creators update SDK, meaning you'll see some fluent design within the application! Specifically:
+
+ - The sidebar has some acrylic blur applied to it
+ - Fluent light effects are also present on the sidebar
+
+In none fluent design related updates, there's a number of new features, including:
+
+ - Link metadata previews! In chat you can now see previews of any links following the OpenGraph standard, allowing you see a thumbnail, the title and a brief description. This can be disabled in settings
+ - Channel logging! This allows you to take logs of all your current channels and save it to a folder of your choice
+ - You can now right click on a channel, and enable notifications for all messages to that channel.
+
+Various other small changes and fixes include:
+ - The twitter previewing is disabled on fall creators update devicesdue to a bug in the library used
+ - Channels now only render the last 1k messages
+ - Notifications are more reliable
+
+This is quite possibly the last major release for a while - the next 2.0 release will be a near full recode. However, bugfixes will still be released for the 1.6 update for the foreseeable future.
+
 ## 1.5.0
 
 This release introduces a major overhaul of the UI, making the app more desktop friendly whilst still being touch friendly for mobiles and tablets! The major changes are:
