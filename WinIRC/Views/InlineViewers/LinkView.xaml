@@ -22,7 +22,7 @@
         <Image x:Name="ArticleImage" Grid.RowSpan="4" MaxWidth="150" MaxHeight="100" Margin="0,0,5,0" />
 
         <TextBlock x:Name="Title" Grid.Row="0" Grid.Column="1" Text="Title Test" FontSize="20" FontWeight="Bold"/>
-        <TextBlock x:Name="Body" Grid.Row="1" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="Body Text Test" />
+        <TextBlock x:Name="Body" Grid.Row="1" MaxLines="3" Grid.Column="1" Style="{ThemeResource BodyTextBlockStyle}" Text="Body Text Test" />
 
         <TextBlock Grid.Row="2" Grid.Column="1" Foreground="{ThemeResource HyperlinkButtonForeground}" 
                    Tapped="TextBlock_Tapped" FontWeight="Bold" Margin="0" PointerEntered="TextBlock_PointerEntered"
