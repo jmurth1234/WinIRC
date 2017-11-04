@@ -70,12 +70,12 @@ namespace WinIRC
 
             if (Config.Contains(Config.EnableLogs))
             {
-                this.TabsSwitch.IsOn = Config.GetBoolean(Config.EnableLogs);
+                this.LogChannels.IsOn = Config.GetBoolean(Config.EnableLogs);
             }
             else
             {
                 Config.SetBoolean(Config.EnableLogs, false);
-                this.TabsSwitch.IsOn = false;
+                this.LogChannels.IsOn = false;
             }
 
 

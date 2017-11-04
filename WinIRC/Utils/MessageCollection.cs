@@ -133,6 +133,11 @@ namespace WinIRC.Utils
                             await WriteLine(msg.ToString());
                         }
                     }
+                    else
+                    {
+                        Error = true;
+                        break;
+                    }
                 }
                 catch (Exception e)
                 {
