@@ -93,6 +93,11 @@ namespace OpenGraph_Net
         /// <returns></returns>
         private string ProcessContent(HttpWebResponse response)
         {
+            if (!response.ContentType.Contains("text/html"))
+            {
+                return "";
+            }
+
             this.SetEncodingFromHeader(response);
 
             Stream s = response.GetResponseStream();
