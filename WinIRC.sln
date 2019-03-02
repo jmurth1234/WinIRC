@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27019.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinIRC", "WinIRC\WinIRC.csproj", "{014C237E-8D09-4459-BBCF-EF5663A6A355}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UWPMenuBar_Lib", "UWPMenuBar_Lib\UWPMenuBar_Lib.csproj", "{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -35,18 +33,6 @@ Global
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|x86.ActiveCfg = Release|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|x86.Build.0 = Release|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|x86.Deploy.0 = Release|x86
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|ARM.ActiveCfg = Debug|ARM
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|ARM.Build.0 = Debug|ARM
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|x64.ActiveCfg = Debug|x64
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|x64.Build.0 = Debug|x64
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|x86.ActiveCfg = Debug|x86
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Debug|x86.Build.0 = Debug|x86
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|ARM.ActiveCfg = Release|ARM
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|ARM.Build.0 = Release|ARM
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|x64.ActiveCfg = Release|x64
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|x64.Build.0 = Release|x64
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|x86.ActiveCfg = Release|x86
-		{2B61E461-36A9-4365-8BB7-BD76A4CF5EEB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

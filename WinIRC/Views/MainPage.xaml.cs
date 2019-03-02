@@ -27,7 +27,6 @@ using WinIRC.Handlers;
 using WinIRC.Utils;
 using Windows.Storage;
 using Windows.ApplicationModel.ExtendedExecution;
-using Rymate.Controls.UWPMenuBar;
 using Template10.Services.SerializationService;
 using Windows.UI.Xaml.Data;
 using WinIRC.Ui.Brushes;
@@ -233,7 +232,7 @@ namespace WinIRC
                 await dialog.ShowAsync();
             }
 
-            Servers.ItemsSource = IrcServers.Instance.Servers;
+            // Servers.ItemsSource = IrcServers.Instance.Servers;
             var cvs = (CollectionViewSource)Resources["channelsSrc"];
             cvs.Source = IrcHandler.Servers;
 
@@ -257,7 +256,7 @@ namespace WinIRC
 
         private void MenuBarItem_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as MenuBarItem;
+            var button = sender as MenuFlyoutItem;
 
             var server = button.DataContext as IrcServer;
             Connect(IrcServers.Instance.CreateConnection(server));
@@ -303,7 +302,7 @@ namespace WinIRC
             coreTitleBar.ExtendViewIntoTitleBar = true;
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 
-            Window.Current.SetTitleBar(Menu.DragArea);
+            Window.Current.SetTitleBar(TitleBarPadding);
 
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
@@ -321,7 +320,6 @@ namespace WinIRC
             titleBar.ButtonForegroundColor = foreground;
 
             Menu.Background = AccentColor;
-            Menu.Foreground = new SolidColorBrush(ParseColor("#FFFFFFFF"));
         }
 
 

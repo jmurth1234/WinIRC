@@ -10,7 +10,7 @@
     xmlns:brushes="using:WinIRC.Ui.Brushes"
     xmlns:net="using:WinIRC.Net"
     xmlns:controls="using:Template10.Controls"
-    xmlns:bar="using:Rymate.Controls.UWPMenuBar"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d" 
     NavigationCacheMode="Disabled">
     <Page.Resources>
@@ -278,7 +278,6 @@
                         <Setter Target="HamburgerButton.Width" Value="0" />
                         <Setter Target="SplitView.DisplayMode" Value="Inline" />
                         <Setter Target="SplitView.IsPaneOpen" Value="True" />
-                        <Setter Target="Menu.TitleVisible" Value="Visible" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="NarrowState">
@@ -291,7 +290,6 @@
                         <Setter Target="PinButton.Width" Value="0" />
 
                         <Setter Target="SplitView.IsPaneOpen" Value="False" />
-                        <Setter Target="Menu.TitleVisible" Value="Collapsed" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -302,44 +300,37 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <bar:MenuBar x:Name="Menu" Title="WinIRC" Grid.Row="0" Background="{StaticResource SystemControlBackgroundAccentBrush}">
-            <bar:MenuBarButton x:Name="HamburgerButton" DisableDropdown="True" ButtonContent="&#xE700;" Icon="True" 
-                                       ButtonClicked="ToggleSplitView"/>
+        <Grid Background="{StaticResource SystemControlBackgroundAccentBrush}" RequestedTheme="Dark" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-            <bar:MenuBarButton ButtonContent="Servers" AccessKey="s">
-                <ScrollViewer MaxHeight="150" AllowFocusOnInteraction="False" 
-                                      VerticalScrollBarVisibility="Auto" >
-                    <ItemsControl x:Name="Servers" Grid.Column="0">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="net:IrcServer">
-                                <bar:MenuBarItem Click="MenuBarItem_Click" Text="{x:Bind name}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-                <MenuFlyoutSeparator />
-                <bar:MenuBarItem Text="Manage Servers" Click="ShowConnectPopup"/>
-            </bar:MenuBarButton>
+            <Button x:Name="HamburgerButton" Content="&#xE700;" FontFamily="Segoe MDL2 Assets" Click="ToggleSplitView" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="40" Background="{x:Null}"/>
 
-            <bar:MenuBarButton ButtonContent="View" AccessKey="v">
-                <bar:MenuBarToggleItem Text="Topic Bar" IsChecked="{x:Bind ShowTopic, Mode=TwoWay}" Click="MenuBarToggleItem_Click" />
-                <bar:MenuBarToggleItem Text="Show Channel Users" IsChecked="{x:Bind ShowingUsers, Mode=TwoWay}"  />
-            </bar:MenuBarButton>
+            <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" >
+                <winui:MenuBarItem Title="WinIRC" AccessKey="f">
+                    <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
+                </winui:MenuBarItem>
 
-            <bar:MenuBarButton Icon="True" ButtonContent="&#xE10C;" VerticalContentAlignment="Top" Height="32" VerticalAlignment="Stretch" AccessKey="m" ToolTipService.ToolTip="Settings" >
-                <bar:MenuBarItem Text="Appearance" Click="AppearanceSettings_Click"/>
-                <bar:MenuBarItem Text="Connection" Click="ConnectionSettings_Click"/>
-                <bar:MenuBarItem Text="Behaviour" Click="BehaviourSettings_Click"/>
-                <MenuFlyoutSeparator />
-                <bar:MenuBarItem Text="About" Click="AboutPage_Click"/>
-            </bar:MenuBarButton>
-        </bar:MenuBar>
+                <winui:MenuBarItem Title="View" AccessKey="v" Foreground="White">
+                    <ToggleMenuFlyoutItem Text="Topic Bar" IsChecked="{x:Bind ShowTopic, Mode=TwoWay}" Click="MenuBarToggleItem_Click" />
+                    <ToggleMenuFlyoutItem Text="Show Channel Users" IsChecked="{x:Bind ShowingUsers, Mode=TwoWay}"  />
+                </winui:MenuBarItem>
 
+                <winui:MenuBarItem Title="Settings" VerticalContentAlignment="Top" Height="32" VerticalAlignment="Stretch" AccessKey="s" Foreground="White">
+                    <MenuFlyoutItem Text="Appearance" Click="AppearanceSettings_Click"/>
+                    <MenuFlyoutItem Text="Connection" Click="ConnectionSettings_Click"/>
+                    <MenuFlyoutItem Text="Behaviour" Click="BehaviourSettings_Click"/>
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="About" Click="AboutPage_Click"/>
+                </winui:MenuBarItem>
+            </winui:MenuBar>
+
+            <Grid x:Name="TitleBarPadding" Background="Transparent" Grid.Column="2" />
+        </Grid>
+        
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" >
             <SplitView.Pane>
                 <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}"
