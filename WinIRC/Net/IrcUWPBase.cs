@@ -1,0 +1,360 @@
+﻿using IrcClientCore;
+using Microsoft.QueryStringDotNET;
+using NotificationsExtensions;
+using NotificationsExtensions.Toasts;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
+using Windows.UI;
+using Windows.UI.Core;
+using Windows.UI.Notifications;
+using Windows.UI.Popups;
+using Windows.UI.Text;
+using Windows.UI.Xaml;
+using WinIRC.Utils;
+
+namespace WinIRC.Net
+{
+    public abstract class IrcUWPBase : Irc, IDisposable
+    {
+        internal StreamSocket streamSocket;
+        internal DataReader reader;
+        internal DataWriter writer;
+
+        public String BackgroundTaskName {
+            get
+            {
+                return "WinIRCBackgroundTask." + Server.Name;
+            }
+        }
+
+        Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
+
+        public string buffer;
+        public string currentChannel;
+
+        private string lightTextColor;
+        private string chatTextColor;
+        internal Connection ConnCheck;
+
+        internal bool IsReconnecting;
+
+        internal int ReconnectionAttempts;
+        private readonly int MAX_MESSAGES = 1000;
+
+        public bool IsBouncer { get; private set; }
+        public new Action<IrcUWPBase> HandleDisconnect { get; set; }
+        public ObservableCollection<Message> ircMessages { get; set; }
+
+        public IrcUWPBase(WinIrcServer server) : base(server)
+        {
+            ConnCheck = new Connection();
+            ConnCheck.ConnectionChanged += async (connected) =>
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
+            );
+
+            Mentions.CollectionChanged += Mentions_CollectionChanged;
+        }
+
+        private void Mentions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            var message = e.NewItems[0] as Message;
+
+            var key = Config.PerChannelSetting(this.Server.Name, message.Channel, Config.AlwaysNotify);
+            var ping = Config.GetBoolean(key, false);
+
+            if (currentChannel != message.Channel || (App.Current as App).IncrementPings == true || MainPage.instance.currentServer == this.Server.Name || ping)
+            {
+                var toast = CreateMentionToast(message.Text, message.Channel, message.Text);
+                toast.ExpirationTime = DateTime.Now.AddDays(2);
+                ToastNotificationManager.CreateToastNotifier().Show(toast);
+                (App.Current as App).NumberPings++;
+            }
+        }
+
+        private void ConnectionChanged(bool connected)
+        {
+            if (connected && Config.GetBoolean(Config.AutoReconnect))
+            {
+                foreach (Channel channel in ChannelList)
+                {
+                    channel.ClientMessage("Reconnecting...");
+                }
+                Connect();
+            }
+            else
+            {
+                foreach (Channel channel in ChannelList)
+                {
+                    channel.ClientMessage("Disconnected from IRC");
+                }
+                DisconnectAsync(attemptReconnect: true);
+            }
+        }
+
+        public virtual async void Connect() { }
+        public virtual async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false) { }
+        public virtual async void SocketTransfer() { }
+        public virtual async void SocketReturn() { }
+
+        public void SendMessage(string message)
+        {
+            this.CommandManager.HandleCommand(currentChannel, message);
+        }
+
+        public new async Task<bool> AddChannel(string channel)
+        {
+            await base.AddChannel(channel);
+
+            if (!Config.Contains(Config.SwitchOnJoin))
+            {
+                Config.SetBoolean(Config.SwitchOnJoin, true);
+            }
+
+            if (ChannelList.Contains(channel) && Config.GetBoolean(Config.SwitchOnJoin) && !IsBouncer)
+            {
+                MainPage.instance.SwitchChannel(Server.Name, channel, true);
+            }
+
+            return ChannelList.Contains(channel);
+        }
+
+        public new void RemoveChannel(string channel)
+        {
+            base.RemoveChannel(channel);
+
+            if (currentChannel == channel)
+            {
+                currentChannel = "";
+            }
+        }
+
+        public void SwitchChannel(string channel)
+        {
+            if (channel == null)
+            {
+                return;
+            }
+
+            if (ChannelList.Contains(channel))
+            {
+                currentChannel = channel;
+                ircMessages = ChannelList[channel].Buffers;
+            }
+        }
+
+        public void ClientMessage(string channel, string text)
+        {
+            Message msg = new Message();
+            msg.User = "";
+            msg.Type = MessageType.Info;
+            msg.Text = text;
+
+            this.AddMessage(channel, msg);
+        }
+
+        public void ClientMessage(string text)
+        {
+            Message msg = new Message();
+            msg.User = "";
+            msg.Type = MessageType.Info;
+            msg.Text = text;
+
+            this.AddMessage(currentChannel, msg);
+        }
+
+        public override async void WriteLine(string str)
+        {
+            await WriteLine(writer, str);
+        }
+
+        public async Task WriteLine(DataWriter writer, string str)
+        {
+            if (ReadOrWriteFailed)
+                return;
+
+            try
+            {
+                if (ConnCheck.HasInternetAccess && !IsReconnecting)
+                {
+                    writer.WriteString(str + "\r\n");
+                    await writer.StoreAsync();
+                    await writer.FlushAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                ReadOrWriteFailed = true;
+                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
+
+                var msg = autoReconnect
+                    ? "Attempting to reconnect..."
+                    : "Please try again later.";
+
+                AddError("Error whilst connecting: " + e.Message + "\n" + msg);
+                AddError(e.StackTrace);
+
+                DisconnectAsync(attemptReconnect: autoReconnect);
+
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
+        }
+
+        public static ToastNotification CreateBasicToast(string title, string msg)
+        {
+            try
+            {
+                ToastVisual visual = new ToastVisual()
+                {
+                    BindingGeneric = new ToastBindingGeneric()
+                    {
+                        Children =
+                        {
+                            new AdaptiveText { Text = title },
+                            new AdaptiveText { Text = msg }
+                        },
+                        Attribution = new ToastGenericAttributionText
+                        {
+                            Text = "Information"
+                        },
+                    }
+                };
+
+                // Now we can construct the final toast content
+                ToastContent toastContent = new ToastContent()
+                {
+                    Visual = visual,
+                };
+
+                // And create the toast notification
+                return new ToastNotification(toastContent.GetXml());
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+            }
+
+            return null;
+        }
+
+        public ToastNotification CreateMentionToast(string username, string channel, string text)
+        {
+            try
+            {
+                AdaptiveText message;
+                if (text.StartsWith("ACTION"))
+                {
+                    message = new AdaptiveText
+                    {
+                        Text = text.Replace("ACTION", " * " + username)
+                    };
+                }
+                else
+                {
+                    message = new AdaptiveText
+                    {
+                        Text = text
+                    };
+                }
+                // Construct the visuals of the toast
+                ToastVisual visual = new ToastVisual()
+                {
+                    BindingGeneric = new ToastBindingGeneric()
+                    {
+                        Children =
+                        {
+                            new AdaptiveText {Text = "Message from " + username },
+                            message
+                        },
+                        Attribution = new ToastGenericAttributionText
+                        {
+                            Text = "Mention in " + channel
+                        },
+                    }
+                };
+
+                ToastActionsCustom actions = new ToastActionsCustom()
+                {
+                    Inputs =
+                    {
+                        new ToastTextBox("tbReply")
+                        {
+                            PlaceholderContent = "Reply to this mention..."
+                        }
+                    },
+                    Buttons =
+                    {
+                        new ToastButton("Reply", new QueryString()
+                        {
+                            { "action", "reply" },
+                            { "server", Server.Name },
+                            { "channel", channel },
+                            { "username", username }
+
+                        }.ToString())
+                        {
+                            ActivationType = ToastActivationType.Foreground,
+                            ImageUri = "Assets/Send.png",
+                            TextBoxId = "tbReply"
+                        },
+                    },
+                };
+
+                // Now we can construct the final toast content
+                ToastContent toastContent = new ToastContent()
+                {
+                    Visual = visual,
+                    Actions = actions, 
+
+                    // Arguments when the user taps body of toast
+                    Launch = new QueryString()
+                    {
+                        { "action", "viewConversation" },
+                        { "server", Server.Name },
+                        { "channel",  channel }
+
+                    }.ToString()
+                };
+
+                // And create the toast notification
+                return new ToastNotification(toastContent.GetXml());
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.StackTrace);
+
+            }
+
+            return null;
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                Server = null;
+
+                if (reader != null) reader.Dispose();
+                if (writer != null) writer.Dispose();
+
+                if (streamSocket != null) streamSocket.Dispose();
+            }
+            catch (NullReferenceException e)
+            {
+                // catching silently, sorry
+            }
+        }
+    }
+}

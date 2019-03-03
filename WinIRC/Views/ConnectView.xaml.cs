@@ -86,12 +86,12 @@ namespace WinIRC.Views
 
             ircServers.AddServer(ircServer);
             serversSavedCombo.ItemsSource = ircServers.Servers;
-            serversSavedCombo.SelectedItem = ircServer.name;
+            serversSavedCombo.SelectedItem = ircServer.Name;
         }
 
-        internal IrcServer CreateIrcServer()
+        internal WinIrcServer CreateIrcServer()
         {
-            IrcServer ircServer = new IrcServer();
+            WinIrcServer ircServer = new WinIrcServer();
 
             if (hostname.Text == "")
             {
@@ -125,20 +125,20 @@ namespace WinIRC.Views
                 return ShowFormError("Usernames cannot contain spaces!");
             }
 
-            ircServer.hostname = hostname.Text;
-            ircServer.port = portInt;
-            ircServer.ssl = ssl.IsOn;
-            ircServer.username = username.Text;
-            ircServer.password = password.Password;
-            ircServer.nickservPassword = nickservPassword.Password;
-            ircServer.name = server.Text;
+            ircServer.Hostname = hostname.Text;
+            ircServer.Port = portInt;
+            ircServer.Ssl = ssl.IsOn;
+            ircServer.Username = username.Text;
+            ircServer.Password = password.Password;
+            ircServer.NickservPassword = nickservPassword.Password;
+            ircServer.Name = server.Text;
             ircServer.webSocket = webSocket.IsOn;
-            ircServer.channels = channels.Text;
+            ircServer.Channels = channels.Text;
             ircServer.invalid = false;
 
             formError.Height = 0;
 
-            if (ircServer.name == "") ircServer.name = ircServer.hostname;
+            if (ircServer.Name == "") ircServer.Name = ircServer.Hostname;
 
             return ircServer;
         }
@@ -149,11 +149,11 @@ namespace WinIRC.Views
         }
 
         // kek
-        private IrcServer ShowFormError(string error)
+        private WinIrcServer ShowFormError(string error)
         {
             formError.Height = 19;
             formError.Text = error;
-            return new IrcServer
+            return new WinIrcServer
             {
                 invalid = true
             };
@@ -179,27 +179,27 @@ namespace WinIRC.Views
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them");
                 await dialog.ShowAsync();
 
-                ircServers.Servers = new ObservableCollection<IrcServer>();
+                ircServers.Servers = new ObservableCollection<WinIrcServer>();
                 serversSavedCombo.ItemsSource = ircServers;
                 return;
             }
 
             var ircServer = ircServers.Get(serversSavedCombo.SelectedItem.ToString());
 
-            hostname.Text = ircServer.hostname;
+            hostname.Text = ircServer.Hostname;
 
-            port.Text = ircServer.port.ToString();
-            ssl.IsOn = ircServer.ssl;
-            username.Text = ircServer.username;
-            password.Password = ircServer.password;
-            server.Text = ircServer.name;
+            port.Text = ircServer.Port.ToString();
+            ssl.IsOn = ircServer.Ssl;
+            username.Text = ircServer.Username;
+            password.Password = ircServer.Password;
+            server.Text = ircServer.Name;
             webSocket.IsOn = ircServer.webSocket;
 
-            if (ircServer.channels != null)
-                channels.Text = ircServer.channels;
+            if (ircServer.Channels != null)
+                channels.Text = ircServer.Channels;
 
-            if (ircServer.nickservPassword != null)
-                nickservPassword.Password = ircServer.nickservPassword;
+            if (ircServer.NickservPassword != null)
+                nickservPassword.Password = ircServer.NickservPassword;
 
         }
 

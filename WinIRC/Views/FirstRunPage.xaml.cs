@@ -31,67 +31,67 @@ namespace WinIRC.Views
     /// </summary>
     public sealed partial class FirstRunPage : Page
     {
-        public ObservableCollection<IrcServer> Servers = new ObservableCollection<IrcServer>();
+        public ObservableCollection<WinIrcServer> Servers = new ObservableCollection<WinIrcServer>();
         private string RegexPattern = "((?:[A-z]+[a-z0-9_|-]*))+";
         public FirstRunPage()
         {
             this.InitializeComponent();
 
             // totally a great way of doing this
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "Esper",
-                hostname = "irc.esper.net",
-                port = 6697,
-                ssl = true,
+                Name = "Esper",
+                Hostname = "irc.esper.net",
+                Port = 6697,
+                Ssl = true,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "Freenode",
-                hostname = "chat.freenode.net",
-                port = 6697,
-                ssl = true,
+                Name = "Freenode",
+                Hostname = "chat.freenode.net",
+                Port = 6697,
+                Ssl = true,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "IRCNet",
-                hostname = "irc.atw-inter.net",
-                port = 6667,
-                ssl = false,
+                Name = "IRCNet",
+                Hostname = "irc.atw-inter.net",
+                Port = 6667,
+                Ssl = false,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "QuakeNet",
-                hostname = "irc.quakenet.org",
-                port = 6667,
-                ssl = false,
+                Name = "QuakeNet",
+                Hostname = "irc.quakenet.org",
+                Port = 6667,
+                Ssl = false,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "EFNet",
-                hostname = "efnet.port80.se",
-                port = 6697,
-                ssl = true,
+                Name = "EFNet",
+                Hostname = "efnet.Port80.se",
+                Port = 6697,
+                Ssl = true,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "Rizon",
-                hostname = "irc.rizon.net",
-                port = 6697,
-                ssl = true,
+                Name = "Rizon",
+                Hostname = "irc.rizon.net",
+                Port = 6697,
+                Ssl = true,
             });
 
-            Servers.Add(new IrcServer()
+            Servers.Add(new WinIrcServer()
             {
-                name = "Undernet",
-                hostname = "ix1.undernet.org",
-                port = 6667,
-                ssl = false,
+                Name = "Undernet",
+                Hostname = "ix1.undernet.org",
+                Port = 6667,
+                Ssl = false,
             });
 
             Loaded += FirstRunPage_Loaded;
@@ -127,9 +127,9 @@ namespace WinIRC.Views
                 Config.SetString(Config.DefaultUsername, Username.Text);
             }
 
-            foreach (IrcServer server in ServListBox.SelectedItems)
+            foreach (WinIrcServer server in ServListBox.SelectedItems)
             {
-                server.username = Username.Text;
+                server.Username = Username.Text;
                 await store.AddServer(server);
             }
 

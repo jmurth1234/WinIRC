@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml.Controls;
 using WinIRC.Net;
 using WinIRC.Ui;
+using System.IO;
 
 namespace WinIRC.Utils
 {
@@ -17,10 +19,10 @@ namespace WinIRC.Utils
     {
         private static IrcServers instance;
 
-        private ObjectStorageHelper<List<IrcServer>> serversListOSH;
+        private ObjectStorageHelper<List<WinIrcServer>> serversListOSH;
         private bool loaded = false;
 
-        public ObservableCollection<IrcServer> Servers { get; set; } = new ObservableCollection<IrcServer>();
+        public ObservableCollection<WinIrcServer> Servers { get; set; } = new ObservableCollection<WinIrcServer>();
 
         public static IrcServers Instance
         {
@@ -54,7 +56,7 @@ namespace WinIRC.Utils
             jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
             jumpList.Items.Clear();
 
-            foreach (IrcServer server in Servers)
+            foreach (WinIrcServer server in Servers)
             {
                 JumpListItem item = JumpListItem.CreateWithArguments(server.ToString(), server.ToString());
                 item.GroupName = "Servers";
@@ -75,7 +77,8 @@ namespace WinIRC.Utils
             try
             {
                 await MigrateIfNeeded();
-                serversListOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
+                serversListOSH = new ObjectStorageHelper<List<WinIrcServer>>(StorageType.Roaming);
+                await ConvertIfNeeded();
                 var servers = await serversListOSH.LoadAsync(Config.ServersListStore);
 
                 if (servers != null && servers.Count > 0)
@@ -84,7 +87,7 @@ namespace WinIRC.Utils
                 }
                 else
                 {
-                    Servers = new ObservableCollection<IrcServer>();
+                    Servers = new ObservableCollection<WinIrcServer>();
                     await SaveServers();
                 }
             }
@@ -93,22 +96,60 @@ namespace WinIRC.Utils
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them. \n\nError: " + e.Message);
                 await dialog.ShowAsync();
 
-                Servers = new ObservableCollection<IrcServer>();
+                Servers = new ObservableCollection<WinIrcServer>();
                 await SaveServers();
             }
 
             if (Servers == null)
             {
-                Servers = new ObservableCollection<IrcServer>();
+                Servers = new ObservableCollection<WinIrcServer>();
             }
             loaded = true;
 
             Servers.CollectionChanged += Servers_CollectionChanged;
         }
 
+        private async Task ConvertIfNeeded()
+        {
+            var folder = serversListOSH.GetFolder(StorageType.Roaming);
+            var file = await serversListOSH.GetFileIfExistsAsync(folder, Config.ServersListStore);
+            var stream = await file.OpenReadAsync();
+            XDocument loadedData = XDocument.Load(stream.AsStream());
+
+            if ((await folder.GetItemsAsync()).Count == 0 && !(await serversListOSH.FileExists(folder, "converted")))
+            {
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+                return;
+            }
+
+            if (!(await serversListOSH.FileExists(folder, "converted")))
+            {
+                var data = from query in loadedData.Descendants("IrcServer")
+                           select new WinIrcServer
+                           {
+                               Name = (string)query.Element("name"),
+                               Hostname = (string)query.Element("hostname"),
+                               Port = (int)query.Element("port"),
+                               Ssl = (bool)query.Element("ssl"),
+                               webSocket = (bool)query.Element("webSocket"),
+                               Username = (string)query.Element("username"),
+                               Password = (string)query.Element("password"),
+                               NickservPassword = (string)query.Element("nickservPassword"),
+                               Channels = (string)query.Element("channels")
+                           };
+                foreach (var server in data.ToArray())
+                {
+                    Servers.Add(server);
+                }
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+
+                await SaveServers();
+            }
+        }
+
         private async Task MigrateIfNeeded()
         {
-            var serversOSH = new ObjectStorageHelper<List<IrcServer>>(StorageType.Roaming);
+            var serversOSH = new ObjectStorageHelper<List<WinIrcServer>>(StorageType.Roaming);
 
             var folder = serversOSH.GetFolder(StorageType.Roaming);
 
@@ -124,7 +165,7 @@ namespace WinIRC.Utils
             }
 
             if (!(await serversOSH.FileExists(folder, "migrated")))
-            { 
+            {
                 var servers = await serversOSH.LoadAsync();
                 await serversOSH.MigrateAsync(servers, Config.ServersStore);
 
@@ -138,9 +179,9 @@ namespace WinIRC.Utils
             await UpdateJumpList();
         }
 
-        internal Irc CreateConnection(IrcServer ircServer)
+        internal IrcUWPBase CreateConnection(WinIrcServer ircServer)
         {
-            Net.Irc irc;
+            Net.IrcUWPBase irc;
             if (ircServer.webSocket)
                 irc = new Net.IrcWebSocket(ircServer);
             else
@@ -149,18 +190,18 @@ namespace WinIRC.Utils
             return irc;
         }
 
-        public async Task AddServer(IrcServer server)
+        public async Task AddServer(WinIrcServer server)
         {
             if (Servers == null)
             {
-                Servers = new ObservableCollection<IrcServer>();
+                Servers = new ObservableCollection<WinIrcServer>();
             }
 
             foreach (var serverCheck in Servers)
             {
-                if (serverCheck.name == server.name)
+                if (serverCheck.Name == server.Name)
                 {
-                    var name = serverCheck.name;
+                    var name = serverCheck.Name;
                     Servers.Remove(serverCheck);
                     break;
                 }
@@ -174,7 +215,7 @@ namespace WinIRC.Utils
         {
             foreach (var ircServer in Servers)
             {
-                if (ircServer.name == name)
+                if (ircServer.Name == name)
                 {
                     Servers.Remove(ircServer);
                     break;
@@ -185,14 +226,38 @@ namespace WinIRC.Utils
 
         public async Task SaveServers()
         {
-            var servers = new List<IrcServer>(Servers);
+            var servers = new List<WinIrcServer>(Servers);
             await serversListOSH.SaveAsync(servers, Config.ServersListStore);
         }
 
-        public IrcServer Get(String name)
+        public WinIrcServer Get(String name)
         {
-            if (!Servers.Any(server => server.name == name)) return new IrcServer();
-            return Servers.First(server => server.name == name);
+            if (!Servers.Any(server => server.Name == name)) return new WinIrcServer();
+            return Servers.First(server => server.Name == name);
+        }
+
+        // this is only used here to convert old servers
+        private class OldIrcServer
+        {
+            public bool invalid { get; set; }
+
+            public string name { get; set; } = "";
+            public string hostname { get; set; } = "";
+            public int port { get; set; } = 6667;
+            public bool ssl { get; set; } = false;
+            public bool webSocket { get; set; } = false;
+            public string username { get; set; } = "";
+            public string password { get; set; } = "";
+            public string nickservPassword { get; set; } = "";
+
+            // channels are a string seperated by commas
+            public string channels { get; set; } = "";
+
+            public override String ToString()
+            {
+                return name;
+            }
         }
     }
+
 }

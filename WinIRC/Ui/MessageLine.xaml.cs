@@ -1,4 +1,5 @@
-﻿using OpenGraph_Net;
+﻿using IrcClientCore;
+using OpenGraph_Net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

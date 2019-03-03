@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IrcClientCore;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -12,8 +13,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using WinIRC.Commands;
-using WinIRC.Utils;
+using WinIRC.Net;
 
 namespace WinIRC.Handlers
 {
@@ -22,21 +22,19 @@ namespace WinIRC.Handlers
 
     public class IrcUiHandler
     {
-        public Dictionary<string, Net.Irc> connectedServers { get; set; }
-        public ObservableCollection<String> connectedServersList { get; set; }
-        public ObservableCollection<ServerGroup> Servers { get; set; }
-        public CommandHandler CommandHandler { get; private set; }
-
+        public Dictionary<string, IrcUWPBase> connectedServers { get; set; }
+        public ObservableCollection<string> connectedServersList { get; set; }
+        public ObservableCollection<ChannelsGroup> Servers { get; set; }
         public static IrcUiHandler Instance;
 
         public IrcUiHandler ()
         {
-            connectedServers = new Dictionary<string, Net.Irc>();
+            connectedServers = new Dictionary<string, IrcUWPBase>();
             connectedServersList = new ObservableCollection<string>();
             connectedServersList.CollectionChanged += ConnectedServersList_CollectionChanged;
-            Servers = new ObservableCollection<ServerGroup>();
+            Servers = new ObservableCollection<ChannelsGroup>();
 
-            CommandHandler = new CommandHandler();
+            // CommandHandler = new CommandHandler();
 
             Instance = this;
         }
@@ -47,7 +45,7 @@ namespace WinIRC.Handlers
             {
                 var serverName = e.NewItems[0] as string;
                 var server = connectedServers[serverName];
-                Servers.Add(server.channelList);
+                Servers.Add(server.ChannelList);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -66,7 +64,7 @@ namespace WinIRC.Handlers
 
             if ((e.Key == Windows.System.VirtualKey.Enter) && (msgBox.Text != ""))
             {
-                CommandHandler.HandleCommand(connectedServers[server], msgBox.Text);
+                connectedServers[server].CommandManager.HandleCommand(channel, msgBox.Text);
 
                 msgBox.Text = "";
             }

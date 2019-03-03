@@ -18,22 +18,24 @@ using Windows.UI.Notifications;
 
 namespace WinIRC.Net
 {
-    public class IrcSocket : Irc
+    public class IrcSocket : IrcUWPBase
     {
         private const int socketReceiveBufferSize = 1024;
         private IBackgroundTaskRegistration task = null;
         private DataReaderLoadOperation readOperation;
         private SafeLineReader dataStreamLineReader;
         private CancellationTokenSource socketCancellation;
-        private IrcServer ircServer;
 
-        public IrcSocket(IrcServer server) : base(server)
+        public Connection ConnCheck { get; private set; }
+
+        public IrcSocket(WinIrcServer server) : base(server)
         {
+            ConnCheck = new Connection();
         }
 
         public override async void Connect()
         {
-            if (server == null)
+            if (Server == null)
                 return;
 
             IsAuthed = false;
@@ -46,7 +48,7 @@ namespace WinIRC.Net
                     ? "We'll try to connect once a connection is available." 
                     : "Please try again once your connection is restored";
 
-                var error = Irc.CreateBasicToast("No connection detected.", msg);
+                var error = IrcUWPBase.CreateBasicToast("No connection detected.", msg);
                 error.ExpirationTime = DateTime.Now.AddDays(2);
                 ToastNotificationManager.CreateToastNotifier().Show(error);
 
@@ -71,9 +73,9 @@ namespace WinIRC.Net
 
             try
             { 
-                var protectionLevel = server.ssl ? SocketProtectionLevel.Tls12 : SocketProtectionLevel.PlainSocket;
+                var protectionLevel = Server.Ssl ? SocketProtectionLevel.Tls12 : SocketProtectionLevel.PlainSocket;
                 Debug.WriteLine("Attempting to connect...");
-                await streamSocket.ConnectAsync(new Windows.Networking.HostName(server.hostname), server.port.ToString(), protectionLevel);
+                await streamSocket.ConnectAsync(new Windows.Networking.HostName(Server.Hostname), Server.Port.ToString(), protectionLevel);
                 Debug.WriteLine("Connected!");
 
                 reader = new DataReader(streamSocket.InputStream);
@@ -130,7 +132,7 @@ namespace WinIRC.Net
                 await streamSocket.CancelIOAsync();
 
                 // transfer the socket
-                streamSocket.TransferOwnership(server.name);
+                streamSocket.TransferOwnership(Server.Name);
                 streamSocket = null;
             }
             catch (Exception e)
@@ -145,7 +147,7 @@ namespace WinIRC.Net
         public override void SocketReturn()
         {
             SocketActivityInformation socketInformation;
-            if (SocketActivityInformation.AllSockets.TryGetValue(server.name, out socketInformation))
+            if (SocketActivityInformation.AllSockets.TryGetValue(Server.Name, out socketInformation))
             {
                 // take the socket back, and hook up all the readers and writers so we can do stuff again
                 streamSocket = socketInformation.StreamSocket;
@@ -204,7 +206,7 @@ namespace WinIRC.Net
                     ReadOrWriteFailed = true;
                     IsConnected = false;
 
-                    if (server != null)
+                    if (Server != null)
                         DisconnectAsync(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
 
                     return;
@@ -220,7 +222,7 @@ namespace WinIRC.Net
             {
                 IsReconnecting = true;
                 ReconnectionAttempts++;
-                if (ConnCheck != null && server != null && ConnCheck.HasInternetAccess)
+                if (ConnCheck != null && Server != null && ConnCheck.HasInternetAccess)
                 {
                     await WindowWrapper.Current().Dispatcher.DispatchAsync(async () => {
                         if (ReconnectionAttempts < 3)

@@ -52,13 +52,13 @@ namespace WinIRC
 
         private void JoinSupport(object sender, RoutedEventArgs e)
         {
-            IrcServer server = new IrcServer
+            WinIrcServer server = new WinIrcServer
             {
-                name = "WinIRC Support (Freenode)",
-                hostname = "chat.freenode.net",
-                port = 6697,
-                ssl = true,
-                channels = "#winirc"
+                Name = "WinIRC Support (Freenode)",
+                Hostname = "chat.freenode.net",
+                Port = 6697,
+                Ssl = true,
+                Channels = "#winirc"
             };
 
             MainPage.instance.IrcPrompt(server);

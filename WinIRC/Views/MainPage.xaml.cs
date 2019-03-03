@@ -5,7 +5,6 @@ using Windows.Foundation.Metadata;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
@@ -13,23 +12,21 @@ using Windows.ApplicationModel.Core;
 using Windows.UI;
 using System.Globalization;
 using System.Collections.ObjectModel;
-using WinIRC.Net;
 using Windows.UI.Popups;
 using Windows.UI.Notifications;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using WinIRC.Commands;
 using System.Diagnostics;
 using WinIRC.Ui;
-using System.Threading.Tasks;
 using WinIRC.Views;
 using WinIRC.Handlers;
 using WinIRC.Utils;
-using Windows.Storage;
-using Windows.ApplicationModel.ExtendedExecution;
 using Template10.Services.SerializationService;
 using Windows.UI.Xaml.Data;
 using WinIRC.Ui.Brushes;
+using WinIRC.Net;
+using IrcClientCore;
+using WinIrcServer = WinIRC.Net.WinIrcServer;
 
 namespace WinIRC
 {
@@ -39,13 +36,13 @@ namespace WinIRC
     public sealed partial class MainPage : INotifyPropertyChanged
     {
         private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
-        private ObjectStorageHelper<List<IrcServer>> serversListOSH;
+        private ObjectStorageHelper<List<WinIrcServer>> serversListOSH;
 
         public string currentChannel { get; set; } = "";
         public string currentServer { get; set; } = "";
 
         public ObservableCollection<String> servers { get; set; }
-        public List<IrcServer> serversList { get; set; }
+        public List<WinIrcServer> serversList { get; set; }
         public bool SettingsLoaded = false;
         private bool loadedSavedServer;
 
@@ -109,8 +106,6 @@ namespace WinIRC
                 NotifyPropertyChanged();
             }
         }
-
-        public CommandHandler CommandHandler { get; private set; }
 
         internal IrcUiHandler IrcHandler { get; private set; }
 
@@ -176,7 +171,6 @@ namespace WinIRC
             WindowStates.CurrentStateChanging += WindowStates_CurrentStateChanging; ;
 
             this.ListBoxItemStyle = Application.Current.Resources["ListBoxItemStyle"] as Style;
-            this.CommandHandler = IrcHandler.CommandHandler;
 
             instance = this;
         }
@@ -243,7 +237,6 @@ namespace WinIRC
                 var launchEvent = serv.Deserialize<String>(e.Parameter as String);
                 this.ConnectViaName(launchEvent);
             }
-
         }
 
         public void ConnectViaName(string args)
@@ -258,7 +251,7 @@ namespace WinIRC
         {
             var button = sender as MenuFlyoutItem;
 
-            var server = button.DataContext as IrcServer;
+            var server = button.DataContext as Net.WinIrcServer;
             Connect(IrcServers.Instance.CreateConnection(server));
         }
 
@@ -496,7 +489,7 @@ namespace WinIRC
             }
             catch (Exception ex)
             {
-                var toast = Irc.CreateBasicToast(ex.Message, ex.StackTrace);
+                var toast = IrcUWPBase.CreateBasicToast(ex.Message, ex.StackTrace);
                 toast.ExpirationTime = DateTime.Now.AddDays(2);
                 ToastNotificationManager.CreateToastNotifier().Show(toast);
             }
@@ -509,7 +502,7 @@ namespace WinIRC
 
             if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
             {
-                if (auto != lastAuto) IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
+                if (auto != lastAuto) IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
 
                 var item = GetCurrentItem();
                 lastAuto = auto;
@@ -528,12 +521,12 @@ namespace WinIRC
             else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
             {
                 Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item => item.Header as string == channel);
-                IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
+                IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
             }
             else
             {
                 CreateNewTab(server, channel);
-                IrcHandler.connectedServers[currentServer].channelStore[channel].SortUsers();
+                IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
             }
 
             UpdateInfo(server, channel);
@@ -595,7 +588,7 @@ namespace WinIRC
             IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
         }
 
-        public Irc GetCurrentServer()
+        public IrcUWPBase GetCurrentServer()
         {
             try
             {
@@ -607,7 +600,7 @@ namespace WinIRC
             }
         }
 
-        public Irc GetServer(string server)
+        public IrcUWPBase GetServer(string server)
         {
             try
             {
@@ -634,10 +627,10 @@ namespace WinIRC
             serverConnect.IsModal = !serverConnect.IsModal;
         }
 
-        public async void Connect(Irc irc)
+        public async void Connect(IrcUWPBase irc)
         {
-            if (IrcHandler.connectedServersList.Contains(irc.server.name)) return;
-            if (IrcHandler.connectedServersList.Contains(irc.server.hostname)) return;
+            if (IrcHandler.connectedServersList.Contains(irc.Server.Name)) return;
+            if (IrcHandler.connectedServersList.Contains(irc.Server.Hostname)) return;
 
             irc.HandleDisconnect += HandleDisconnect;
 
@@ -650,15 +643,15 @@ namespace WinIRC
             irc.Connect();
 
             // link the server up to the lists
-            IrcHandler.connectedServers.Add(irc.server.name, irc);
-            IrcHandler.connectedServersList.Add(irc.server.name);
-            currentServer = irc.server.name;
+            IrcHandler.connectedServers.Add(irc.Server.Name, irc);
+            IrcHandler.connectedServersList.Add(irc.Server.Name);
+            currentServer = irc.Server.Name;
 
-            if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.server.name, "Server");
+            if (Config.GetBoolean(Config.UseTabs)) CreateNewTab(irc.Server.Name, "Server");
             lastAuto = Config.GetBoolean(Config.UseTabs);
         }
 
-        public async void HandleDisconnect(Irc irc)
+        public async void HandleDisconnect(IrcUWPBase irc)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -668,19 +661,17 @@ namespace WinIRC
                     //channelList.ItemsSource = IrcHandler.connectedServers.Values.First().channelList;
                 }
 
-                foreach (var buffer in IrcHandler.connectedServers[irc.server.name].channelBuffers)
+                foreach (var channel in IrcHandler.connectedServers[irc.Server.Name].ChannelList)
                 {
-                    buffer.Value.Clear();
+                    channel.Buffers.Clear();
                 }
 
-                var name = irc.server.name;
+                var name = irc.Server.Name;
 
-                IrcHandler.connectedServers[irc.server.name].channelBuffers.Clear();
-                IrcHandler.connectedServers[irc.server.name].channelList.Clear();
-                IrcHandler.connectedServers[irc.server.name].channelStore.Clear();
+                IrcHandler.connectedServers[irc.Server.Name].ChannelList.Clear();
 
-                IrcHandler.connectedServers.Remove(irc.server.name);
-                IrcHandler.connectedServersList.Remove(irc.server.name);
+                IrcHandler.connectedServers.Remove(irc.Server.Name);
+                IrcHandler.connectedServersList.Remove(irc.Server.Name);
                 irc.HandleDisconnect = null;
                 irc.ConnCheck.ConnectionChanged = null;
                 irc.ConnCheck = null;
@@ -840,8 +831,7 @@ namespace WinIRC
             var channelArgs = e as ChannelEventArgs;
             var channel = channelArgs.Channel;
 
-            CommandHandler.PartCommandHandler(GetServer(channelArgs.Server), new string[] { "PART ", channel });
-            GetServer(channelArgs.Server).RemoveChannel(channel);
+            GetServer(channelArgs.Server).PartChannel(channel);
         }
 
         private void ChannelListItem_ChannelJoinClicked(object sender, EventArgs e)
@@ -857,7 +847,7 @@ namespace WinIRC
             serverConnect.IsModal = !serverConnect.IsModal;
         }
 
-        public async void IrcPrompt(IrcServer server)
+        public async void IrcPrompt(WinIrcServer server)
         {
             if (!Config.Contains(Config.DefaultUsername) || Config.GetString(Config.DefaultUsername) == "")
             {
@@ -878,7 +868,7 @@ namespace WinIRC
                 }
             }
 
-            server.username = Config.GetString(Config.DefaultUsername);
+            server.Username = Config.GetString(Config.DefaultUsername);
             var irc = new Net.IrcSocket(server);
             MainPage.instance.Connect(irc);
         }

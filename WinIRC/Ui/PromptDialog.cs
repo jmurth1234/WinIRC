@@ -50,8 +50,7 @@ namespace WinIRC.Ui
 
             // Add Buttons
             dialog.PrimaryButtonText = confirmButton;
-            dialog.SecondaryButtonText = "Cancel";
-            
+            dialog.SecondaryButtonText = "Cancel";          
         }
 
         public async Task<ContentDialogResult> Show()

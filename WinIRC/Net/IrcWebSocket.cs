@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace WinIRC.Net
 {
-    public class IrcWebSocket : Irc
+    public class IrcWebSocket : IrcUWPBase
     {
         private MessageWebSocket messageWebSocket;
 
-        public IrcWebSocket(IrcServer server) : base(server)
+        public IrcWebSocket(WinIrcServer server) : base(server)
         {
         }
 
@@ -25,8 +25,8 @@ namespace WinIRC.Net
             MessageWebSocket webSocket = messageWebSocket;
             try
             {
-                var protectionLevel = server.ssl ? "wss" : "ws";
-                var socketUri = new Uri(protectionLevel + "://" + server.hostname + ":" + server.port + "/", UriKind.Absolute);
+                var protectionLevel = Server.Ssl ? "wss" : "ws";
+                var socketUri = new Uri(protectionLevel + "://" + Server.Hostname + ":" + Server.Port + "/", UriKind.Absolute);
                 Debug.WriteLine("Attempting to connect...");
 
                 if (webSocket == null)
@@ -77,7 +77,7 @@ namespace WinIRC.Net
                 ? "Attempting to reconnect..."
                 : "Please try again later.";
 
-            var error = Irc.CreateBasicToast("Websocket closed", msg);
+            var error = IrcUWPBase.CreateBasicToast("Websocket closed", msg);
 
             ToastNotificationManager.CreateToastNotifier().Show(error);
 

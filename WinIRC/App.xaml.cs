@@ -281,7 +281,7 @@ namespace WinIRC
 
         private void ShowToast(string title, string message)
         {
-            var toast = Irc.CreateBasicToast(title, message);
+            var toast = IrcUWPBase.CreateBasicToast(title, message);
             var toastNotifier = ToastNotificationManager.CreateToastNotifier();
             toastNotifier.Show(toast);
         }
@@ -358,10 +358,15 @@ namespace WinIRC
                     port = uri.Port;
                 }
 
-                IrcServer server = new IrcServer{name = uri.Host, hostname = uri.Host, port = port, ssl = uri.Scheme == "ircs", };
+                WinIrcServer server = new WinIrcServer {
+                    Name = uri.Host,
+                    Hostname = uri.Host,
+                    Port = port,
+                    Ssl = uri.Scheme == "ircs"
+                };
                 if (uri.Segments.Length >= 2)
                 {
-                    server.channels += "#" + uri.Segments[1];
+                    server.Channels += "#" + uri.Segments[1];
                 }
 
                 MainPage.instance.IrcPrompt(server);

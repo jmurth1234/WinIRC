@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.Uwp.UI;
+﻿using IrcClientCore;
+using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
-using WinIRC.Net;
 using WinIRC.Ui;
 
 namespace WinIRC.Views
@@ -87,13 +87,13 @@ namespace WinIRC.Views
         {
             if (currentChannel != null && currentServer != null && ChannelLoaded)
             {
-                IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged -= ChannelView_CollectionChanged;
+                IrcHandler.connectedServers[currentServer].ChannelList[currentChannel].Buffers.CollectionChanged -= ChannelView_CollectionChanged;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
             var servers = IrcHandler.connectedServers;
 
-            if (!servers.ContainsKey(server) || !servers[server].channelBuffers.ContainsKey(channel))
+            if (!servers.ContainsKey(server) || !servers[server].ChannelList.Contains(channel))
             {
                 return;
             }
@@ -102,15 +102,15 @@ namespace WinIRC.Views
             currentChannel = channel;
 
             messagesView.ItemsSource = null;
+            var channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+            messagesView.ItemsSource = channelStore.Buffers;
 
-            messagesView.ItemsSource = IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel];
-
-            store = IrcHandler.connectedServers[currentServer].channelStore[currentChannel];
+            store = channelStore.Store;
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 
             topicText.Text = store.Topic;
 
-            IrcHandler.connectedServers[currentServer].channelBuffers[currentChannel].CollectionChanged += ChannelView_CollectionChanged;
+            channelStore.Buffers.CollectionChanged += ChannelView_CollectionChanged;
 
             ScrollToBottom();
             ChannelLoaded = true;

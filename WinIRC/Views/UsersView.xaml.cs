@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IrcClientCore.Commands;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -14,7 +15,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using WinIRC.Commands;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -27,7 +27,8 @@ namespace WinIRC
     {
         public String UserSelected;
         private int UserClickBehaviour = 0;
-        private CommandHandler commands;
+        private CommandManager commands;
+        private string channel;
 
         public UsersView()
         {
@@ -37,7 +38,8 @@ namespace WinIRC
         public void UpdateUsers(ObservableCollection<string> users)
         {
             this.usersList.ItemsSource = users;
-            commands = MainPage.instance.CommandHandler;
+            commands = MainPage.instance.GetCurrentServer().CommandManager;
+            channel = MainPage.instance.currentChannel;
 
             if (Config.Contains(Config.ReducedPadding))
             {
@@ -192,55 +194,54 @@ namespace WinIRC
 
         private void SendPrivateMessage()
         {
-            commands.QueryCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "QUERY", UserSelected });
+            commands.HandleCommand(channel, "/query " + UserSelected);
         }
 
         private void WhoisItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.WhoisCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "WHOIS", UserSelected });
+            commands.HandleCommand(channel, "/whois " + UserSelected);
         }
 
         private void OpItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.OpCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "OP", UserSelected });
+            commands.HandleCommand(channel, "/op " + UserSelected);
         }
 
         private void DeopItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.OpCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "DEOP", UserSelected });
+            commands.HandleCommand(channel, "/deop " + UserSelected);
         }
 
         private void VoiceItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.VoiceCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "VOICE", UserSelected });
+            commands.HandleCommand(channel, "/voice " + UserSelected);
         }
 
         private void DevoiceItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.VoiceCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "DEVOICE", UserSelected });
+            commands.HandleCommand(channel, "/devoice " + UserSelected);
         }
 
         private void MuteItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.QuietCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "MUTE", UserSelected });
+            commands.HandleCommand(channel, "/mute " + UserSelected);
         }
 
         private void UnmuteItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.QuietCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "UNMUTE", UserSelected });
+            commands.HandleCommand(channel, "/unmute " + UserSelected);
 
         }
 
         private void KickItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.KickCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "KICK", UserSelected });
+            commands.HandleCommand(channel, "/kick " + UserSelected);
         }
 
         private void BanItem_Click(object sender, RoutedEventArgs e)
         {
-            commands.BanCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "BAN", UserSelected });
-            commands.KickCommandHandler(MainPage.instance.GetCurrentServer(), new string[] { "KICK", UserSelected });
-
+            commands.HandleCommand(channel, "/ban " + UserSelected);
+            commands.HandleCommand(channel, "/kick " + UserSelected);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IrcClientCore;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -146,7 +147,6 @@ namespace WinIRC.Utils
                     {
                         User = "Error",
                         Type = MessageType.Info,
-                        Mention = true,
                         Text = e.Message + "\r\n Logging disabled for this channel"
                     };
                     msgs.Add(error);
