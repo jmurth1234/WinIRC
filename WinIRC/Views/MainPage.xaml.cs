@@ -492,6 +492,7 @@ namespace WinIRC
                 var toast = IrcUWPBase.CreateBasicToast(ex.Message, ex.StackTrace);
                 toast.ExpirationTime = DateTime.Now.AddDays(2);
                 ToastNotificationManager.CreateToastNotifier().Show(toast);
+                Debug.WriteLine(ex);
             }
         }
 
@@ -499,6 +500,19 @@ namespace WinIRC
         {
             //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
             SidebarHeader.Title = "Channel Users";
+
+            if (channel == "Server")
+            {
+                if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
+                {
+                    Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item => item.Header as string == channel);
+                }
+                else
+                {
+                    CreateNewTab(server, channel);
+                }
+                return;
+            }
 
             if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
             {

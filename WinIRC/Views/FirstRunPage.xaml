@@ -68,7 +68,7 @@
                         Add some servers
                     </TextBlock>
 
-                    <ListBox x:Name="ServListBox" ItemsSource="{x:Bind Servers}" DisplayMemberPath="name" VerticalContentAlignment="Stretch" SelectionMode="Multiple" Background="{x:Null}" />
+                    <ListBox x:Name="ServListBox" ItemsSource="{x:Bind Servers}" DisplayMemberPath="Name" VerticalContentAlignment="Stretch" SelectionMode="Multiple" Background="{x:Null}" />
                 </StackPanel>
 
             </StackPanel>

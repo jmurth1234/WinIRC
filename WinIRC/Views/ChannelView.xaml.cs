@@ -87,22 +87,36 @@ namespace WinIRC.Views
         {
             if (currentChannel != null && currentServer != null && ChannelLoaded)
             {
-                IrcHandler.connectedServers[currentServer].ChannelList[currentChannel].Buffers.CollectionChanged -= ChannelView_CollectionChanged;
+                var chan = currentChannel == "Server"
+                    ? IrcHandler.connectedServers[currentServer].ChannelList.ServerLog
+                    : IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+                chan.Buffers.CollectionChanged -= ChannelView_CollectionChanged;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
             var servers = IrcHandler.connectedServers;
 
-            if (!servers.ContainsKey(server) || !servers[server].ChannelList.Contains(channel))
+            if (!servers.ContainsKey(server))
             {
                 return;
             }
-
             currentServer = server;
             currentChannel = channel;
-
             messagesView.ItemsSource = null;
-            var channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+
+            Channel channelStore = null;
+
+            if (servers[server].ChannelList.Contains(channel))
+            {
+                channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+            }
+            else if (channel == "Server" || channel == "")
+            {
+                channelStore = IrcHandler.connectedServers[currentServer].ChannelList.ServerLog;
+            }
+
+            if (channel == null) return;
+
             messagesView.ItemsSource = channelStore.Buffers;
 
             store = channelStore.Store;
@@ -113,8 +127,9 @@ namespace WinIRC.Views
             channelStore.Buffers.CollectionChanged += ChannelView_CollectionChanged;
 
             ScrollToBottom();
-            ChannelLoaded = true;
             UpdateUi();
+
+            ChannelLoaded = true;
         }
 
         private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -113,6 +113,11 @@ namespace WinIRC.Utils
         {
             var folder = serversListOSH.GetFolder(StorageType.Roaming);
             var file = await serversListOSH.GetFileIfExistsAsync(folder, Config.ServersListStore);
+            if (file == null)
+            {
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+                return;
+            }
             var stream = await file.OpenReadAsync();
             XDocument loadedData = XDocument.Load(stream.AsStream());
 
