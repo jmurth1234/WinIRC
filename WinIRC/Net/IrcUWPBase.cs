@@ -69,7 +69,7 @@ namespace WinIRC.Net
 
             if (currentChannel != message.Channel || (App.Current as App).IncrementPings == true || MainPage.instance.currentServer == this.Server.Name || ping)
             {
-                var toast = CreateMentionToast(message.Text, message.Channel, message.Text);
+                var toast = CreateMentionToast(message.User, message.Channel, message.Text);
                 toast.ExpirationTime = DateTime.Now.AddDays(2);
                 ToastNotificationManager.CreateToastNotifier().Show(toast);
                 (App.Current as App).NumberPings++;
