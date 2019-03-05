@@ -30,19 +30,27 @@ namespace WinIRC.Utils
                 this.LogWriter = new MessageCollectionLogWriter(this, server, channel);
                 Task.Run(this.LogWriter.Process);
             }
+
+            this.CollectionChanged += MessageCollection_CollectionChanged;
         }
 
-        public new void Add(Message message)
+        private void MessageCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (this.Count > MaxSize)
             {
                 RemoveAt(0);
             }
 
-            if (LogWriter != null && !LogWriter.Error) LogWriter.Add(message);
 
-            base.Add(message);
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                var items = e.NewItems;
+
+                if (LogWriter != null && !LogWriter.Error)
+                    foreach (var item in items) LogWriter.Add(item as Message);
+            }
         }
+
     }
 
     public class MessageCollectionLogWriter
@@ -97,6 +105,26 @@ namespace WinIRC.Utils
             //await FileIO.AppendTextAsync(LogFile, str + "\r\n");
         }
 
+        private string MessageToString(Message msg)
+        {
+            var user = "";
+
+            if (msg.Type == MessageType.Action || msg.Type == MessageType.Info)
+            {
+                user = String.Format("* {0}", msg.User);
+            }
+            else if (msg.User == "")
+            {
+                user = "*";
+            }
+            else
+            {
+                user = String.Format("<{0}>", msg.User);
+            }
+
+            return $"[{msg.Timestamp}] {user} {msg.Text}";
+        }
+
         public async Task Process()
         {
             while (!Error)
@@ -131,7 +159,7 @@ namespace WinIRC.Utils
 
                         if (msg != null)
                         {
-                            await WriteLine(msg.ToString());
+                            await WriteLine(MessageToString(msg));
                         }
                     }
                     else

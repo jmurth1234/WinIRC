@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="TimestampBox" Grid.Column="0" Padding="0,0,5,0" Text="{x:Bind MessageItem.Timestamp, FallbackValue='Timestamp' }"  />
-        <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" Text="{x:Bind MessageItem.User, FallbackValue='Username'}" FontWeight="Bold" />
+        <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" Text="{x:Bind Username, FallbackValue='Username'}" FontWeight="Bold" />
         <RichTextBlock x:Name="MessageBox" Grid.Row="0" Grid.ColumnSpan="3" Padding="0,0,5,0" TextWrapping="WrapWholeWords" >
             <Paragraph x:Name="MessageParagraph" /> 
         </RichTextBlock>

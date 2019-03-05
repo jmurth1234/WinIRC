@@ -23,7 +23,6 @@ using WinIRC.Handlers;
 using WinIRC.Utils;
 using Template10.Services.SerializationService;
 using Windows.UI.Xaml.Data;
-using WinIRC.Ui.Brushes;
 using WinIRC.Net;
 using IrcClientCore;
 using WinIrcServer = WinIRC.Net.WinIrcServer;
@@ -370,28 +369,16 @@ namespace WinIRC
             if (Config.GetBoolean(Config.Blurred, true))
             {
                 var hostBackdrop = WindowStates.CurrentState == WideState;
-                if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5))
+                var source = hostBackdrop ? Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.HostBackdrop : Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
+                var brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
                 {
-                    var source = hostBackdrop ? AcrylicBackgroundSource.HostBackdrop : AcrylicBackgroundSource.Backdrop;
-                    var brush = new Windows.UI.Xaml.Media.AcrylicBrush
-                    {
-                        FallbackColor = sidebarColor,
-                        BackgroundSource = source,
-                        TintColor = sidebarColor,
-                        TintOpacity = hostBackdrop ? 0.75 : 0.55
-                    };
+                    FallbackColor = sidebarColor,
+                    BackgroundSource = source,
+                    TintColor = sidebarColor,
+                    TintOpacity = hostBackdrop ? 0.75 : 0.55
+                };
 
-                    SplitView.PaneBackground = brush;
-                }
-                else if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 4))
-                {
-                    AcrylicBrushBase brush = hostBackdrop ? (AcrylicBrushBase) new AcrylicHostBrush() : new Ui.Brushes.AcrylicBrush();
-                    brush.TintColor = sidebarColor;
-                    brush.BlurAmount = hostBackdrop ? 5 : 15; 
-                    brush.BackdropFactor = hostBackdrop ? 0.2 : 1;
-
-                    SplitView.PaneBackground = brush;
-                }
+                SplitView.PaneBackground = brush;
             }
             else
             {

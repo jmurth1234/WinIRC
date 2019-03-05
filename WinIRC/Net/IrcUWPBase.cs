@@ -42,13 +42,8 @@ namespace WinIRC.Net
         public string buffer;
         public string currentChannel;
 
-        private string lightTextColor;
-        private string chatTextColor;
         internal Connection ConnCheck;
 
-        internal bool IsReconnecting;
-
-        internal int ReconnectionAttempts;
         private readonly int MAX_MESSAGES = 1000;
 
         public bool IsBouncer { get; private set; }
@@ -101,14 +96,15 @@ namespace WinIRC.Net
             }
         }
 
-        public virtual async void Connect() { }
-        public virtual async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false) { }
-        public virtual async void SocketTransfer() { }
-        public virtual async void SocketReturn() { }
-
         public void SendMessage(string message)
         {
             this.CommandManager.HandleCommand(currentChannel, message);
+        }
+
+        public override ObservableCollection<Message> CreateChannelBuffer(string channel)
+        {
+            Debug.WriteLine("logging " + channel);
+            return new MessageCollection(1000, Server.Name, channel);
         }
 
         public new async Task<bool> AddChannel(string channel)
@@ -174,6 +170,7 @@ namespace WinIRC.Net
 
         public override async void WriteLine(string str)
         {
+            Debug.WriteLine(str);
             await WriteLine(writer, str);
         }
 

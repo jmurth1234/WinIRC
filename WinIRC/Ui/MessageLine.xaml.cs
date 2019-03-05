@@ -49,6 +49,21 @@ namespace WinIRC.Ui
             set { SetValue(MessageProperty, value); }
         }
 
+        public string Username
+        {
+            get
+            {
+                if (MessageItem.Type == MessageType.Action)
+                {
+                    return String.Format("* {0}", MessageItem.User);
+                }
+                else
+                {
+                    return String.Format("<{0}>", MessageItem.User);
+                }
+            }
+        }
+
         public bool CompactMode
         {
             get
