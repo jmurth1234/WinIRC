@@ -312,6 +312,8 @@
             <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" >
                 <winui:MenuBarItem Title="WinIRC" AccessKey="f">
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="List Channels" Click="ListChannels_Click"/>
                 </winui:MenuBarItem>
 
                 <winui:MenuBarItem Title="View" AccessKey="v" Foreground="White">

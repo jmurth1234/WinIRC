@@ -26,6 +26,7 @@ using Windows.UI.Xaml.Data;
 using WinIRC.Net;
 using IrcClientCore;
 using WinIrcServer = WinIRC.Net.WinIrcServer;
+using IrcClientCore.Handlers.BuiltIn;
 
 namespace WinIRC
 {
@@ -240,7 +241,7 @@ namespace WinIRC
 
         public void ConnectViaName(string args)
         {
-            if (args == "") return; 
+            if (args == "") return;
 
             var server = IrcServers.Instance.Get(args);
             Connect(IrcServers.Instance.CreateConnection(server));
@@ -274,7 +275,7 @@ namespace WinIRC
                 this.RequestedTheme = ElementTheme.Dark;
             }
 
-            if (!Config.Contains(Config.UseTabs)) 
+            if (!Config.Contains(Config.UseTabs))
             {
                 Config.SetBoolean(Config.UseTabs, true);
             }
@@ -302,7 +303,7 @@ namespace WinIRC
 
             var background = ParseColor("#FF1F1F1F");
             var backgroundInactive = ParseColor("#FF2B2B2B");
-            var foreground = ParseColor("#FFFFFFFF");             
+            var foreground = ParseColor("#FFFFFFFF");
 
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
@@ -366,24 +367,32 @@ namespace WinIRC
             }
 
             var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF111111") : ParseColor("#FFEEEEEE");
-            if (Config.GetBoolean(Config.Blurred, true))
+            Brush brush;
+            try
             {
-                var hostBackdrop = WindowStates.CurrentState == WideState;
-                var source = hostBackdrop ? Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.HostBackdrop : Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
-                var brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
+                if (Config.GetBoolean(Config.Blurred, true))
                 {
-                    FallbackColor = sidebarColor,
-                    BackgroundSource = source,
-                    TintColor = sidebarColor,
-                    TintOpacity = hostBackdrop ? 0.75 : 0.55
-                };
-
-                SplitView.PaneBackground = brush;
+                    var hostBackdrop = WindowStates.CurrentState == WideState;
+                    var source = hostBackdrop ? Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.HostBackdrop : Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
+                    brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
+                    {
+                        FallbackColor = sidebarColor,
+                        BackgroundSource = source,
+                        TintColor = sidebarColor,
+                        TintOpacity = hostBackdrop ? 0.75 : 0.55
+                    };
+                }
+                else
+                {
+                    brush = new SolidColorBrush(sidebarColor);
+                }
             }
-            else
+            catch (Exception e)
             {
-                SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
+                brush = new SolidColorBrush(sidebarColor);
             }
+
+            SplitView.PaneBackground = brush;
 
             if (Config.Contains(Config.UseTabs))
             {
@@ -418,7 +427,7 @@ namespace WinIRC
         public TextBox GetInputBox()
         {
             if (GetCurrentChannelView() != null)
-                return GetCurrentChannelView().GetInputBox(); 
+                return GetCurrentChannelView().GetInputBox();
             else return null;
         }
 
@@ -438,7 +447,7 @@ namespace WinIRC
         {
             if (!(ConnectFrame.Content is ConnectView))
                 ConnectFrame.Navigate(typeof(ConnectView));
-            
+
             var bounds = Window.Current.Bounds;
             double height = bounds.Height;
             connectDialogRoot.MaxHeight = height;
@@ -469,7 +478,7 @@ namespace WinIRC
                     return;
 
                 var channel = channelList.SelectedItem.ToString();
-                currentServer = ((Channel) channelList.SelectedItem).Server;
+                currentServer = ((Channel)channelList.SelectedItem).Server;
                 SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
                 GetCurrentChannelView().ScrollToBottom();
@@ -567,6 +576,24 @@ namespace WinIRC
 
             return view;
         }
+
+        internal ChannelListView ShowChannelsList(List<IrcClientCore.Handlers.BuiltIn.ChannelListItem> obj)
+        {
+            PivotItem p = new PivotItem();
+            p.Header = "Channels";
+            ChannelListView view = new ChannelListView(obj);
+
+            p.Margin = new Thickness(0, 0, 0, -2);
+
+            p.Content = view;
+
+            Tabs.Items.Add(p);
+
+            Tabs.SelectedItem = p;
+
+            return view;
+        }
+
 
         public void UpdateInfo(string server, string channel)
         {
@@ -917,11 +944,14 @@ namespace WinIRC
 
         private void ChannelListItem_ServerClickEvent(object sender, EventArgs e)
         {
-            var header = sender as ChannelListItem;
+            var header = sender as Ui.ChannelListItem;
 
             SwitchChannel(header.Title, "Server", false);
         }
 
-
+        private void ListChannels_Click(object sender, RoutedEventArgs e)
+        {
+            GetCurrentServer().CommandManager.HandleCommand(currentChannel, "/list");
+        }
     }
 }

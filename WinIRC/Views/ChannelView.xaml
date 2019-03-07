@@ -35,12 +35,12 @@
             </ui:MessagesView>
         </ScrollViewer>
 
-        <Grid Grid.Row="2" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" Height="40" VerticalAlignment="Bottom" >
+        <Grid Grid.Row="2" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" Padding="5" VerticalAlignment="Bottom" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="20" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" />
+            <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
 
             <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
         </Grid>

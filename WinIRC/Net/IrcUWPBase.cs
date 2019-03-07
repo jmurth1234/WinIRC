@@ -1,4 +1,5 @@
 ﻿using IrcClientCore;
+using IrcClientCore.Handlers.BuiltIn;
 using Microsoft.QueryStringDotNET;
 using NotificationsExtensions;
 using NotificationsExtensions.Toasts;
@@ -6,20 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Notifications;
-using Windows.UI.Popups;
-using Windows.UI.Text;
-using Windows.UI.Xaml;
 using WinIRC.Utils;
 
 namespace WinIRC.Net
@@ -58,6 +51,19 @@ namespace WinIRC.Net
             );
 
             Mentions.CollectionChanged += Mentions_CollectionChanged;
+            HandleDisplayChannelList = ShowChannels;
+        }
+
+        private void ShowChannels(List<ChannelListItem> obj)
+        {
+            var dialog = MainPage.instance.ShowChannelsList(obj);
+            dialog.JoinChannelClick += Dialog_JoinChannelClick; 
+        }
+
+        private void Dialog_JoinChannelClick(ChannelListItem item)
+        {
+            JoinChannel(item.Channel);
+            MainPage.instance.SwitchChannel(Server.Name, item.Channel, true);
         }
 
         private void Mentions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -76,7 +82,7 @@ namespace WinIRC.Net
             }
         }
 
-        private void ConnectionChanged(bool connected)
+        private new void ConnectionChanged(bool connected)
         {
             if (connected && Config.GetBoolean(Config.AutoReconnect))
             {
