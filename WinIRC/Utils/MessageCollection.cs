@@ -38,7 +38,7 @@ namespace WinIRC.Utils
         {
             if (this.Count > MaxSize)
             {
-                RemoveAt(0);
+                Task.Run(() => RemoveAt(0));
             }
 
 

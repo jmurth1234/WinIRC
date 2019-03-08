@@ -2,8 +2,11 @@
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -21,19 +24,36 @@ using WinIRC.Ui;
 
 namespace WinIRC.Views
 {
-    public sealed partial class ChannelView : Page
+    public sealed partial class ChannelView : Page, INotifyPropertyChanged
     {
         private IrcUiHandler IrcHandler = IrcUiHandler.Instance;
         private ChannelStore store;
         private bool ChannelLoaded;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
+
+        private ObservableCollection<Message> currentBuffer;
+        public ObservableCollection<Message> CurrentBuffer
+        {
+            get => currentBuffer; set
+            {
+                currentBuffer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         public ChannelView()
         {
             this.InitializeComponent();
             UpdateUi();
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public ChannelView(string server, string channel)
@@ -76,7 +96,7 @@ namespace WinIRC.Views
         {
             if (ChannelLoaded)
             {
-                messagesView.ItemsSource = null;
+                CurrentBuffer = null;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
                 store = null;
                 topicText.Text = "";
@@ -85,12 +105,12 @@ namespace WinIRC.Views
 
         internal void SetChannel(string server, string channel)
         {
-            if (currentChannel != null && currentServer != null && ChannelLoaded)
+            if (currentChannel != null && currentServer != null && CurrentBuffer != null && ChannelLoaded)
             {
                 var chan = currentChannel == "Server"
                     ? IrcHandler.connectedServers[currentServer].ChannelList.ServerLog
                     : IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
-                chan.Buffers.CollectionChanged -= ChannelView_CollectionChanged;
+                CurrentBuffer.CollectionChanged -= ChannelView_CollectionChanged;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
@@ -102,8 +122,6 @@ namespace WinIRC.Views
             }
             currentServer = server;
             currentChannel = channel;
-            messagesView.ItemsSource = null;
-
             Channel channelStore = null;
 
             if (servers[server].ChannelList.Contains(channel))
@@ -117,16 +135,16 @@ namespace WinIRC.Views
 
             if (channel == null) return;
 
-            messagesView.ItemsSource = channelStore.Buffers;
+            CurrentBuffer = channelStore.Buffers;
 
             store = channelStore.Store;
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 
             topicText.Text = store.Topic;
 
-            channelStore.Buffers.CollectionChanged += ChannelView_CollectionChanged;
+            CurrentBuffer.CollectionChanged += ChannelView_CollectionChanged;
 
-            ScrollToBottom();
+            // ScrollToBottom();
             UpdateUi();
 
             ChannelLoaded = true;
@@ -134,7 +152,7 @@ namespace WinIRC.Views
 
         private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            ScrollToBottom();
+            // ScrollToBottom();
         }
 
         private void ChannelView_TopicSetEvent(string topic)
@@ -145,16 +163,6 @@ namespace WinIRC.Views
         public TextBox GetInputBox()
         {
             return ircMsgBox;
-        }
-
-        internal void ScrollToBottom()
-        {
-            if (messagesScroll != null)
-            {
-                messagesView.UpdateLayout();
-                messagesScroll.Measure(messagesScroll.RenderSize);
-                messagesScroll.ChangeView(null, messagesScroll.ScrollableHeight, null, false);
-            }
         }
 
         public void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -210,12 +218,6 @@ namespace WinIRC.Views
             {
                 topicScroll.Visibility = Visibility.Collapsed;
             }
-        }
-
-        private void messagesView_ItemsChanged(object sender, EventArgs e)
-        {
-            var args = e as MessagesViewItemsChangedArgs;
-            ScrollToBottom();
         }
     }
 }

@@ -20,19 +20,19 @@
             <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="{x:Null}" IsReadOnly="True"  />
         </ScrollViewer>
 
-        <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
-            <ui:MessagesView x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" ItemsChanged="messagesView_ItemsChanged" Background="Black" >
+        <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" Padding="5">
+            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="net:Message">
-                        <ui:MessageLine CompactMode="False" MessageItem="{x:Bind}"/>
+                        <ui:MessageLine CompactMode="False" MessageItem="{x:Bind Mode=OneWay}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom"   />
+                        <ItemsStackPanel Orientation="Vertical" VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" CacheLength="10" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-            </ui:MessagesView>
+            </ItemsControl>
         </ScrollViewer>
 
         <Grid Grid.Row="2" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" Padding="5" VerticalAlignment="Bottom" >

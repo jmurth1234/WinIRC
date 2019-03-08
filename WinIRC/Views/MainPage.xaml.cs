@@ -467,7 +467,6 @@ namespace WinIRC
                 this.mainGrid.Margin = new Thickness(0, -70, 0, args.OccludedRect.Height);
                 args.EnsuredFocusedElementInView = true;
             }
-            GetCurrentChannelView().ScrollToBottom();
         }
 
         private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -481,7 +480,6 @@ namespace WinIRC
                 currentServer = ((Channel)channelList.SelectedItem).Server;
                 SwitchChannel(currentServer, channel, false);
                 IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
-                GetCurrentChannelView().ScrollToBottom();
             }
             catch (Exception ex)
             {
