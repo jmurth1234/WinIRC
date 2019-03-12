@@ -1,7 +1,10 @@
-﻿using System;
+﻿using IrcClientCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -17,10 +20,10 @@ using Windows.UI.Xaml.Navigation;
 
 namespace WinIRC.Ui
 {
-    public sealed partial class ChannelListItem : UserControl
+    public sealed partial class ChannelListItem : UserControl, INotifyPropertyChanged
     {
-        internal static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
+        internal static readonly DependencyProperty ChannelProperty =
+            DependencyProperty.Register("Channel", typeof(Channel), typeof(ChannelListItem), new PropertyMetadata(null));
 
         internal static readonly DependencyProperty IsServerProperty =
             DependencyProperty.Register("IsServer", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
@@ -28,9 +31,8 @@ namespace WinIRC.Ui
         internal static readonly DependencyProperty ServerProperty =
             DependencyProperty.Register("Server", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
 
-        internal static readonly DependencyProperty HideChromeProperty =
-            DependencyProperty.Register("HideChrome", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
-
+        internal static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register("Title", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
 
         public event EventHandler ChannelCloseClicked;
         public event EventHandler ChannelJoinClicked;
@@ -38,28 +40,44 @@ namespace WinIRC.Ui
         public event EventHandler ServerRightClickEvent;
         public event EventHandler ServerClickEvent;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public string Title
         {
             get { return (string)GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
         }
 
+
+        public Channel Channel
+        {
+            get { return (Channel)GetValue(ChannelProperty); }
+            set
+            {
+                SetValue(ChannelProperty, value);
+            }
+        }
+
         public bool IsServer
         {
             get { return (bool)GetValue(IsServerProperty); }
-            set { SetValue(IsServerProperty, value); }
+            set
+            {
+                SetValue(IsServerProperty, value);
+            }
         }
 
         public string Server
         {
             get { return (string)GetValue(ServerProperty); }
-            set { SetValue(ServerProperty, value); }
-        }
-
-        public bool HideChrome
-        {
-            get { return (bool)GetValue(HideChromeProperty); }
-            set { SetValue(HideChromeProperty, value); }
+            set
+            {
+                SetValue(ServerProperty, value);
+            }
         }
 
         public ChannelListItem()
@@ -72,10 +90,11 @@ namespace WinIRC.Ui
                 if (IsServer)
                 {
                     CloseButton.Visibility = Visibility.Collapsed;
+                    UnreadIndicator.Visibility = Visibility.Collapsed;
                     AddButton.Visibility = Visibility.Visible;
                     MenuButton.Visibility = Visibility.Visible;
                 }
-                else if (HideChrome)
+                else if (Channel.ServerLog)
                 {
                     CloseButton.Visibility = Visibility.Collapsed;
                 }
@@ -85,7 +104,7 @@ namespace WinIRC.Ui
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (!IsServer)
-                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Title, Server));
+                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Channel.Name, Server));
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -115,7 +134,7 @@ namespace WinIRC.Ui
 
             if (!IsServer)
             {
-                var key = Config.PerChannelSetting(Server, Title, Config.AlwaysNotify);
+                var key = Config.PerChannelSetting(Server, Channel.Name, Config.AlwaysNotify);
                 AlwaysPing.IsChecked = Config.GetBoolean(key, false);
             }
 
@@ -123,12 +142,12 @@ namespace WinIRC.Ui
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Title, ServerRightClickType.CLOSE));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Channel.Name, ServerRightClickType.CLOSE));
         }
 
         private void ReconnectItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Title, ServerRightClickType.RECONNECT));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Channel.Name, ServerRightClickType.RECONNECT));
         }
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)
@@ -166,7 +185,7 @@ namespace WinIRC.Ui
         {
             if (!IsServer)
             {
-                var key = Config.PerChannelSetting(Server, Title, Config.AlwaysNotify);
+                var key = Config.PerChannelSetting(Server, Channel.Name, Config.AlwaysNotify);
                 Config.SetBoolean(key, AlwaysPing.IsChecked);
             }
         }

@@ -83,25 +83,26 @@ namespace WinIRC.Handlers
                 return;
             }
 
-            var users = connectedServers[server].GetRawUsers(channel);
+            var position = msgBox.SelectionStart;
             var words = msgBox.Text.Split(' ');
             var word = words[words.Length - 1];
             var isFirst = (words.Length == 1);
+            var completions = GetTabCompletions(server, channel, msgBox.Text, word, words.Length - 1);
 
             if (word.Length == 0)
                 return;
 
-            foreach (var user in users)
+            foreach (var item in completions)
             {
-                if (user.ToLower().StartsWith(word.ToLower()))
+                if (item.ToLower().StartsWith(word.ToLower()))
                 {
-                    if (isFirst)
+                    if (isFirst && !word.StartsWith("/"))
                     {
-                        msgBox.Text = user + ": ";
+                        msgBox.Text = item + ": ";
                     }
                     else
                     {
-                        words[words.Length - 1] = words[words.Length - 1].Replace(word, user);
+                        words[words.Length - 1] = words[words.Length - 1].Replace(word, item);
                         msgBox.Text = String.Join(" ", words) + " ";
                     }
                     msgBox.SelectionStart = msgBox.Text.Length;
@@ -111,6 +112,37 @@ namespace WinIRC.Handlers
                 }
             }
         }
+
+        public string[] GetTabCompletions(string server, string channel, string message, string current, int position)
+        {
+            var array = message.Split(' ');
+            var Handler = connectedServers[server].CommandManager;
+            if (message.StartsWith("/"))
+            {
+                if (array.Length > 1)
+                {
+                    var completions = Handler.GetCompletions(channel, array[0], current);
+                    return completions.Length > 0 ? completions : GetUserCompletions(server, channel, current);
+                }
+
+                var commands = Handler.CommandList.Where(cmd => cmd.StartsWith(current));
+                return commands.ToArray();
+            }
+
+            if ((message.StartsWith("/") && position > 0 || !message.StartsWith("/")) && channel != null)
+            {
+                return GetUserCompletions(server, channel, current);
+            }
+
+            return new string[0];
+        }
+
+        private string[] GetUserCompletions(string server, string channel, string word)
+        {
+            var users = connectedServers[server].ChannelList[channel].Store.RawUsers;
+            return users.Where(cmd => cmd.StartsWith(word)).ToArray();
+        }
+
 
         public void UpdateUsers(Frame frame, string server, string channel)
         {

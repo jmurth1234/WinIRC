@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -107,6 +109,12 @@ namespace WinIRC.Ui
             Unloaded += MessageLine_Unloaded;
             Loaded += MessageLine_Loaded;
             LayoutUpdated += MessageLine_LayoutUpdated;
+            MainPage.instance.UiUpdated += Instance_UiUpdated;
+        }
+
+        private void Instance_UiUpdated(object sender, EventArgs e)
+        {
+            UpdateUi();
         }
 
         private void MessageLine_LayoutUpdated(object sender, object e)
@@ -123,7 +131,7 @@ namespace WinIRC.Ui
             UpdateUi();
         }
 
-        private void UpdateUi()
+        public void UpdateUi()
         {
             InvalidateMeasure();
             UpdateLayout();
@@ -154,6 +162,17 @@ namespace WinIRC.Ui
                     UsernameBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
                     MessageBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
                 }
+
+                var color = ColorUtils.GenerateColor(MessageItem.User);
+                if (Config.GetBoolean(Config.DarkTheme, true))
+                {
+                    color = ColorUtils.ChangeColorBrightness(color, 0.2f);
+                }
+                else
+                {
+                    color = ColorUtils.ChangeColorBrightness(color, -0.4f);
+                }
+                UsernameBox.Foreground = new SolidColorBrush(color);
 
                 if (MessageItem.Mention)
                 {
@@ -197,7 +216,7 @@ namespace WinIRC.Ui
             hyperlinkManager.SetText(MessageParagraph, "");
             hyperlinkManager.LinkClicked -= MediaPreview_Clicked;
             hyperlinkManager = null;
-
+            MainPage.instance.UiUpdated -= Instance_UiUpdated;
             UpdateLayout();
         }
 

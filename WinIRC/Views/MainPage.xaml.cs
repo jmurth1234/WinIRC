@@ -52,6 +52,8 @@ namespace WinIRC
 
         public bool ShowTopic { get; set; } = true;
 
+        public event EventHandler UiUpdated;
+
         public Visibility _TabsVisible = Visibility.Visible;
         public Visibility TabsVisible
         {
@@ -409,6 +411,8 @@ namespace WinIRC
                     view.UpdateUi();
                 }
             }
+
+            UiUpdated?.Invoke(this, new EventArgs());
         }
 
         public PivotItem GetCurrentItem()
@@ -944,7 +948,7 @@ namespace WinIRC
         {
             var header = sender as Ui.ChannelListItem;
 
-            SwitchChannel(header.Title, "Server", false);
+            SwitchChannel(header.Server, "Server", false);
         }
 
         private void ListChannels_Click(object sender, RoutedEventArgs e)

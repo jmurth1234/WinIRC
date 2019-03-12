@@ -7,10 +7,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:WinIRC.Ui"
-    xmlns:brushes="using:WinIRC.Ui.Brushes"
     xmlns:net="using:WinIRC.Net"
     xmlns:controls="using:Template10.Controls"
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+    xmlns:ircclientcore="using:IrcClientCore"
     mc:Ignorable="d" 
     NavigationCacheMode="Disabled">
     <Page.Resources>
@@ -341,9 +341,9 @@
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <ui:ChannelListItem Margin="0" FontSize="14" Title="{Binding Server}"
-                                                        Server="{Binding Server}" IsServer="True"
+                                <DataTemplate x:DataType="ircclientcore:Channel">
+                                    <ui:ChannelListItem Margin="0" FontSize="14" Channel="{x:Bind Mode=TwoWay}"
+                                                        Server="{Binding Server}" IsServer="True" Title="{Binding Server}"
                                                         ServerClickEvent="ChannelListItem_ServerClickEvent"
                                                         ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                         ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
@@ -355,9 +355,10 @@
                     </ListView.GroupStyle>
 
                     <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ui:ChannelListItem Margin="0" FontSize="12" Title="{Binding Name}" Server="{Binding Server}" HideChrome="{Binding ServerLog}"
-                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
+                        <DataTemplate x:DataType="ircclientcore:Channel">
+                            <ui:ChannelListItem Margin="0" FontSize="12" Channel="{x:Bind Mode=TwoWay}"
+                                                Server="{Binding Server}" Title="{Binding Name}"
+                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked"
                                                 ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
                                                 ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
                                                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>

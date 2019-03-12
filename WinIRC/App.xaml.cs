@@ -183,7 +183,7 @@ namespace WinIRC
             try
             {
                 var check = await BackgroundExecutionManager.RequestAccessAsync();
-                CanBackground = check == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity || check == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || check == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity || check == BackgroundAccessStatus.AlwaysAllowed;
+                CanBackground = check == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || check == BackgroundAccessStatus.AlwaysAllowed;
             }
             catch
             {

@@ -149,8 +149,10 @@ namespace WinIRC.Net
 
             if (ChannelList.Contains(channel))
             {
+                if (currentChannel != null) ChannelList[currentChannel].CurrentlyViewing = false;
                 currentChannel = channel;
                 ircMessages = ChannelList[channel].Buffers;
+                ChannelList[channel].CurrentlyViewing = true;
             }
         }
 
