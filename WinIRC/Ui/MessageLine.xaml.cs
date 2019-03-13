@@ -65,13 +65,17 @@ namespace WinIRC.Ui
                     return "*";
                 }
 
-                if (MessageItem.Type != MessageType.Normal)
+                if (MessageItem.Type == MessageType.Normal)
                 {
-                    return String.Format("* {0}", MessageItem.User);
+                    return String.Format("<{0}>", MessageItem.User);
+                }
+                else if (MessageItem.Type == MessageType.Notice)
+                {
+                    return String.Format("->{0}<-", MessageItem.User);
                 }
                 else
                 {
-                    return String.Format("<{0}>", MessageItem.User);
+                    return String.Format("* {0}", MessageItem.User);
                 }
             }
         }
