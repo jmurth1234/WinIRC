@@ -1,4 +1,4 @@
-﻿using Microsoft.QueryStringDotNET;
+using Microsoft.QueryStringDotNET;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -356,10 +356,12 @@ namespace WinIRC
                     case SocketActivityTriggerReason.SocketActivity:
                     case SocketActivityTriggerReason.KeepAliveTimerExpired:
                         var socket = socketInformation.StreamSocket;
-                        DataReader reader = new DataReader(socket.InputStream);
-                        DataWriter writer = new DataWriter(socket.OutputStream);
-                        reader.InputStreamOptions = InputStreamOptions.Partial;
-                        await irc.ReadFromServer(reader, writer);
+                        using (DataReader reader = new DataReader(socket.InputStream))
+                        using (DataWriter writer = new DataWriter(socket.OutputStream))
+                        {
+                            reader.InputStreamOptions = InputStreamOptions.Partial;
+                            await irc.ReadFromServer(reader, writer);
+                        }
                         break;
                     case SocketActivityTriggerReason.SocketClosed:
                         // implement reconnecting

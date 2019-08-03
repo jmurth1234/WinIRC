@@ -311,6 +311,7 @@
 
             <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" >
                 <winui:MenuBarItem Title="WinIRC" AccessKey="f">
+                    <MenuFlyoutSubItem Text="Connect to" x:Name="ConnectSubMenu" ToolTipService.ToolTip="This currently won't update dynamically, only on app load"/>
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutItem Text="List Channels" Click="ListChannels_Click"/>

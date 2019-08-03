@@ -37,18 +37,12 @@ namespace WinIRC
     /// </summary>
     public sealed partial class MainPage : INotifyPropertyChanged
     {
-        private ObjectStorageHelper<ObservableCollection<string>> serversOSH;
-        private ObjectStorageHelper<List<WinIrcServer>> serversListOSH;
-
         public string currentChannel { get; set; } = "";
         public string currentServer { get; set; } = "";
 
         public ObservableCollection<String> servers { get; set; }
         public List<WinIrcServer> serversList { get; set; }
         public bool SettingsLoaded = false;
-        private bool loadedSavedServer;
-
-        private ListView usersList;
 
         public string currentTopic { get; set; }
 
@@ -230,7 +224,10 @@ namespace WinIRC
                 await dialog.ShowAsync();
             }
 
-            // Servers.ItemsSource = IrcServers.Instance.Servers;
+            IrcServers.Instance.Servers.CollectionChanged += (sender, ex) => RefreshSubMenu();
+
+            RefreshSubMenu();
+
             var cvs = (CollectionViewSource)Resources["channelsSrc"];
             cvs.Source = IrcHandler.Servers;
 
@@ -246,6 +243,26 @@ namespace WinIRC
             {
                 openWindowButton.Visibility = Visibility.Visible;
                 openWindowButton.Click += OpenWindowButton_Click;
+            }
+        }
+
+        private void RefreshSubMenu()
+        {
+            var items = ConnectSubMenu.Items;
+
+            items.Clear();
+
+            foreach (var server in IrcServers.Instance.Servers)
+            {
+                var item = new MenuFlyoutItem()
+                {
+                    Text = server.Name,
+                    DataContext = server 
+                };
+
+                item.Click += MenuBarItem_Click;
+
+                items.Add(item);
             }
         }
 
@@ -975,7 +992,7 @@ namespace WinIRC
 
         private void ListChannels_Click(object sender, RoutedEventArgs e)
         {
-            GetCurrentServer().CommandManager.HandleCommand(currentChannel, "/list");
+            GetCurrentServer()?.CommandManager.HandleCommand(currentChannel, "/list");
         }
     }
 }
