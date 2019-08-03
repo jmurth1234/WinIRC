@@ -38,6 +38,32 @@ namespace WinIRC.Net
             if (Server == null)
                 return;
 
+            try
+            {
+                foreach (var current in BackgroundTaskRegistration.AllTasks)
+                {
+                    if (current.Value.Name == BackgroundTaskName)
+                    {
+                        task = current.Value;
+                        break;
+                    }
+                }
+
+                if (task == null)
+                {
+                    var socketTaskBuilder = new BackgroundTaskBuilder();
+                    socketTaskBuilder.Name = "WinIRCBackgroundTask." + Server.Name;
+
+                    var trigger = new SocketActivityTrigger();
+                    socketTaskBuilder.SetTrigger(trigger);
+                    task = socketTaskBuilder.Register();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+
             IsAuthed = false;
             ReadOrWriteFailed = false;
 
@@ -68,6 +94,8 @@ namespace WinIRC.Net
                 streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
                 streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
             }
+
+            if (task != null) streamSocket.EnableTransferOwnership(task.TaskId, SocketActivityConnectedStandbyAction.Wake);
 
             dataStreamLineReader = new SafeLineReader();
 
@@ -140,7 +168,7 @@ namespace WinIRC.Net
                 var toast = CreateBasicToast("Error when activating background socket", e.Message);
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
-                //ToastNotificationManager.CreateToastNotifier().Show(toast);
+                ToastNotificationManager.CreateToastNotifier().Show(toast);
             }
         }
 

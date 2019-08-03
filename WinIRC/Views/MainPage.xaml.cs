@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation.Metadata;
@@ -27,6 +27,8 @@ using WinIRC.Net;
 using IrcClientCore;
 using WinIrcServer = WinIRC.Net.WinIrcServer;
 using IrcClientCore.Handlers.BuiltIn;
+using Windows.UI.WindowManagement;
+using Windows.UI.Xaml.Hosting;
 
 namespace WinIRC
 {
@@ -239,6 +241,30 @@ namespace WinIRC
                 var launchEvent = serv.Deserialize<String>(e.Parameter as String);
                 this.ConnectViaName(launchEvent);
             }
+
+            if (ApiInformation.IsTypePresent("Windows.UI.WindowManagement.AppWindow"))
+            {
+                openWindowButton.Visibility = Visibility.Visible;
+                openWindowButton.Click += OpenWindowButton_Click;
+            }
+        }
+
+        private async void OpenWindowButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = await AppWindow.TryCreateAsync();
+            var currentView = GetCurrentChannelView();
+
+            if (currentView != null)
+            {
+                ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, true);
+                ElementCompositionPreview.SetAppWindowContent(window, view);
+                window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
+                window.TitleBar.ExtendsContentIntoTitleBar = true;
+                window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
+                CloseTab_Click(sender, e);
+            }
+
+            await window.TryShowAsync();
         }
 
         public void ConnectViaName(string args)
@@ -262,7 +288,6 @@ namespace WinIRC
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         private void LoadSettings()
         {
@@ -514,8 +539,6 @@ namespace WinIRC
 
             if ((auto || lastAuto || !Config.GetBoolean(Config.UseTabs)) && (GetCurrentItem() != null))
             {
-                if (auto != lastAuto) IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
-
                 var item = GetCurrentItem();
                 lastAuto = auto;
 
@@ -533,12 +556,10 @@ namespace WinIRC
             else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
             {
                 Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item => item.Header as string == channel);
-                IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
             }
             else
             {
                 CreateNewTab(server, channel);
-                IrcHandler.connectedServers[currentServer].ChannelList[channel].Store.SortUsers();
             }
 
             UpdateInfo(server, channel);
@@ -663,6 +684,7 @@ namespace WinIRC
             if (IrcHandler.connectedServersList.Contains(irc.Server.Hostname)) return;
 
             irc.HandleDisconnect += HandleDisconnect;
+            irc.Initialise();
 
             // connect
             if (Tabs.Items.Count != 0)

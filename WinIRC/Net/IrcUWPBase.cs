@@ -1,4 +1,4 @@
-﻿using IrcClientCore;
+using IrcClientCore;
 using IrcClientCore.Handlers.BuiltIn;
 using Microsoft.QueryStringDotNET;
 using NotificationsExtensions;
@@ -50,6 +50,12 @@ namespace WinIRC.Net
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
             );
 
+            DebugMode = false;
+        }
+
+        public new void Initialise()
+        {
+            base.Initialise();
             Mentions.CollectionChanged += Mentions_CollectionChanged;
             HandleDisplayChannelList = ShowChannels;
         }
@@ -107,7 +113,7 @@ namespace WinIRC.Net
             this.CommandManager.HandleCommand(currentChannel, message);
         }
 
-        public override ObservableCollection<Message> CreateChannelBuffer(string channel)
+        public override ICollection<Message> CreateChannelBuffer(string channel)
         {
             Debug.WriteLine("logging " + channel);
             return new MessageCollection(1000, Server.Name, channel);
@@ -151,7 +157,7 @@ namespace WinIRC.Net
             {
                 if (currentChannel != null) ChannelList[currentChannel].CurrentlyViewing = false;
                 currentChannel = channel;
-                ircMessages = ChannelList[channel].Buffers;
+                ircMessages = ChannelList[channel].Buffers as MessageCollection;
                 ChannelList[channel].CurrentlyViewing = true;
             }
         }

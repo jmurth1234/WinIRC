@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="WinIRC.MainPage"
     x:Name="Root"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -415,6 +415,11 @@
                                         </StackPanel>
                                     </DataTemplate>
                                 </Pivot.HeaderTemplate>
+                                <Pivot.RightHeader>
+                                    <Button x:Name="openWindowButton" FontFamily="Segoe MDL2 Assets" ToolTipService.ToolTip="Open tab in new window" Visibility="Collapsed" >
+                                        <FontIcon Glyph="&#xE2B4;" />
+                                    </Button>
+                                </Pivot.RightHeader>
                             </Pivot>
 
                         </Grid>

@@ -33,7 +33,9 @@ namespace WinIRC.Net
                                  NetworkConnectivityLevel.InternetAccess);
 
             if (HasInternetAccess != oldStatus)
+            {
                 ConnectionChanged?.Invoke(HasInternetAccess);
+            }
         }
     }
 }

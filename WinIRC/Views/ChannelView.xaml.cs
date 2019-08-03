@@ -1,4 +1,4 @@
-﻿using IrcClientCore;
+using IrcClientCore;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using System.Collections.Generic;
@@ -56,7 +56,10 @@ namespace WinIRC.Views
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ChannelView(string server, string channel)
+        public ChannelView(string server, string channel) : this(server, channel, false) { 
+        }
+
+        public ChannelView(string server, string channel, bool isWindow)
         {
             this.InitializeComponent();
 
@@ -69,6 +72,9 @@ namespace WinIRC.Views
             };
 
             Unloaded += ChannelView_Unloaded;
+
+            this.titlebar.Visibility = isWindow ? Visibility.Visible : Visibility.Collapsed;
+            this.titlebar.Text = $"{currentChannel} | {currentServer}";
 
             UpdateUi();
         }
@@ -135,7 +141,7 @@ namespace WinIRC.Views
 
             if (channel == null) return;
 
-            CurrentBuffer = channelStore.Buffers;
+            CurrentBuffer = channelStore.Buffers as ObservableCollection<Message>;
 
             store = channelStore.Store;
             store.TopicSetEvent += ChannelView_TopicSetEvent;

@@ -1,4 +1,4 @@
-﻿using OpenGraph_Net;
+using OpenGraph_Net;
 using System;
 using System.Collections.Generic;
 using System.IO;

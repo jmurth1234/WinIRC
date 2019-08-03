@@ -37,6 +37,7 @@ using WinIRC.Utils;
 using System.Threading.Tasks;
 using Template10.Common;
 using WinIRC.Views;
+using Microsoft.ApplicationInsights;
 
 namespace WinIRC
 {
@@ -93,7 +94,7 @@ namespace WinIRC
         /// </summary>
         public App()
         {
-            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(Microsoft.ApplicationInsights.WindowsCollectors.Metadata | Microsoft.ApplicationInsights.WindowsCollectors.Session);
+            WindowsAppInitializer.InitializeAsync(WindowsCollectors.Metadata | WindowsCollectors.Session);
 
             SetTheme();
 
@@ -102,7 +103,6 @@ namespace WinIRC
             {
                 current.Value.Unregister(true);
             }
-
         }
 
         private Boolean CanBackground = false;
@@ -185,8 +185,9 @@ namespace WinIRC
                 var check = await BackgroundExecutionManager.RequestAccessAsync();
                 CanBackground = check == BackgroundAccessStatus.AllowedSubjectToSystemPolicy || check == BackgroundAccessStatus.AlwaysAllowed;
             }
-            catch
+            catch (Exception e)
             {
+                Debug.WriteLine(e);
                 CanBackground = false;
             }
 
@@ -278,6 +279,103 @@ namespace WinIRC
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
+        /// <param name="e">Details about the suspend request.</param>
+        public override Task OnSuspendingAsync(object s, SuspendingEventArgs e, bool prelaunchActivated)
+        {
+            base.OnSuspendingAsync(s, e, prelaunchActivated);
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (CanBackground)
+            {
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                foreach (var server in servers)
+                {
+                    if (server is IrcSocket)
+                    {
+                        server.SocketTransfer();
+                    }
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public override void OnResuming(object s, object e, AppExecutionState previousExecutionState)
+        {
+            base.OnResuming(s, e, previousExecutionState);
+
+            if (CanBackground)
+            {
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                foreach (var server in servers)
+                {
+                    if (server is IrcSocket)
+                    {
+                        server.SocketReturn();
+                    }
+                }
+            }
+        }
+
+        protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            var taskInstance = args.TaskInstance;
+            var deferral = taskInstance.GetDeferral();
+            Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
+            try
+            {
+                var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
+                var socketInformation = details.SocketInformation;
+
+                var servers = IrcUiHandler.Instance.connectedServers.Values;
+
+                IrcSocket irc = null;
+
+                foreach (var server in servers)
+                {
+                    Debug.WriteLine("Irc server name " + server.BackgroundTaskName + " - Task name " + taskInstance.Task.Name);
+
+                    if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName)
+                    {
+                        irc = server as IrcSocket;
+                    }
+                }
+
+                if (irc == null)
+                {
+                    Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
+                    return;
+                }
+
+                Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
+
+                switch (details.Reason)
+                {
+                    case SocketActivityTriggerReason.SocketActivity:
+                    case SocketActivityTriggerReason.KeepAliveTimerExpired:
+                        var socket = socketInformation.StreamSocket;
+                        DataReader reader = new DataReader(socket.InputStream);
+                        DataWriter writer = new DataWriter(socket.OutputStream);
+                        reader.InputStreamOptions = InputStreamOptions.Partial;
+                        await irc.ReadFromServer(reader, writer);
+                        break;
+                    case SocketActivityTriggerReason.SocketClosed:
+                        // implement reconnecting
+                        break;
+                    default:
+                        break;
+                }
+                deferral.Complete();
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                Debug.WriteLine(exception.StackTrace);
+                deferral.Complete();
+            }
+        }
 
         private void ShowToast(string title, string message)
         {

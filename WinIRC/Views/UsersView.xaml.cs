@@ -1,4 +1,5 @@
-﻿using IrcClientCore.Commands;
+using IrcClientCore;
+using IrcClientCore.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,7 +36,7 @@ namespace WinIRC
             this.InitializeComponent();
         }
 
-        public void UpdateUsers(ObservableCollection<string> users)
+        public void UpdateUsers(ObservableCollection<User> users)
         {
             this.usersList.ItemsSource = users;
             commands = MainPage.instance.GetCurrentServer().CommandManager;

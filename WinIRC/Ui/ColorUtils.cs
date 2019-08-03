@@ -44,7 +44,7 @@ namespace WinIRC.Ui
             return Color.FromArgb(color.A, (byte) red, (byte) green, (byte) blue);
         }
 
-        public static Color GenerateColor(string val)
+        public static Color GenerateColor(string val = "")
         {
             var md5 = SHA1.Create();
             var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(val));
