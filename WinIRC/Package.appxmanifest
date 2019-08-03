@@ -1,5 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+    xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
   <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.6.0.0" />
   <mp:PhoneIdentity PhoneProductId="eec02511-138a-4cdb-943d-bb8acf778e32" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
@@ -24,7 +26,7 @@
             <uap:ShowOn Tile="square310x310Logo" />
           </uap:ShowNameOnTiles>
         </uap:DefaultTile>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#171717" />
+        <uap:SplashScreen a:Optional="true" xmlns:a="http://schemas.microsoft.com/appx/manifest/uap/windows10/5" Image="Assets\SplashScreen.png" BackgroundColor="#171717" />
       </uap:VisualElements>
       <Extensions>
         <uap:Extension Category="windows.protocol">

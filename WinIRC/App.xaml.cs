@@ -38,6 +38,7 @@ using System.Threading.Tasks;
 using Template10.Common;
 using WinIRC.Views;
 using Microsoft.ApplicationInsights;
+using Windows.ApplicationModel.ExtendedExecution;
 
 namespace WinIRC
 {
@@ -94,6 +95,8 @@ namespace WinIRC
         /// </summary>
         public App()
         {
+            AutoExtendExecutionSession = false;
+
             WindowsAppInitializer.InitializeAsync(WindowsCollectors.Metadata | WindowsCollectors.Session);
 
             SetTheme();
@@ -106,6 +109,7 @@ namespace WinIRC
         }
 
         private Boolean CanBackground = false;
+        private ExtendedExecutionSession session;
 
         public void SetTheme()
         {
@@ -221,7 +225,9 @@ namespace WinIRC
         private async Task<bool> InitApp(IActivatedEventArgs e)
         {
             var loaded = true;
-            AutoExtendExecutionSession = true;
+
+            ExtendExecution();
+
             IrcServers servers = IrcServers.Instance;
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -280,25 +286,61 @@ namespace WinIRC
         }
 
         /// <param name="e">Details about the suspend request.</param>
-        public override Task OnSuspendingAsync(object s, SuspendingEventArgs e, bool prelaunchActivated)
+        public override async Task OnSuspendingAsync(object s, SuspendingEventArgs e, bool prelaunchActivated)
         {
-            base.OnSuspendingAsync(s, e, prelaunchActivated);
-            Frame rootFrame = Window.Current.Content as Frame;
+            await base.OnSuspendingAsync(s, e, prelaunchActivated);
 
             if (CanBackground)
             {
-                var servers = IrcUiHandler.Instance.connectedServers.Values;
+                ExtendExecution();
+                //var servers = IrcUiHandler.Instance.connectedServers.Values;
 
-                foreach (var server in servers)
+                //foreach (var server in servers)
                 {
-                    if (server is IrcSocket)
+                    //if (server is IrcSocket)
                     {
-                        server.SocketTransfer();
+                        // server.SocketTransfer();
                     }
                 }
             }
+        }
 
-            return Task.CompletedTask;
+        public async void ExtendExecution()
+        {
+            if (session != null)
+            {
+                session.Revoked -= Session_Revoked;
+                session.Dispose();
+                session = null;
+            }
+
+            session = new ExtendedExecutionSession();
+            session.Reason = ExtendedExecutionReason.Unspecified;
+            session.Revoked += Session_Revoked;
+            ExtendedExecutionResult result = await session.RequestExtensionAsync();
+
+            switch (result)
+            {
+                case ExtendedExecutionResult.Allowed:
+                    break;
+
+                default:
+                case ExtendedExecutionResult.Denied:
+                    ShowToast("Could not extend execution session", "To make this more reliable, for the battery settings for this app ensure 'Managed By Windows' is disabled.");
+                    break;
+            }
+        }
+
+        private void Session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
+        {
+            if (args.Reason == ExtendedExecutionRevokedReason.SystemPolicy)
+            {
+                ShowToast("Extended Execution Session Cancelled", "To make this more reliable, in the battery settings for this app ensure 'Managed By Windows' is disabled.");
+            }
+            else
+            {
+                ExtendExecution();
+            }
         }
 
         public override void OnResuming(object s, object e, AppExecutionState previousExecutionState)
@@ -313,7 +355,7 @@ namespace WinIRC
                 {
                     if (server is IrcSocket)
                     {
-                        server.SocketReturn();
+                        // server.SocketReturn();
                     }
                 }
             }
