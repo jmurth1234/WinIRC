@@ -21,9 +21,18 @@
 
         <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
 
-        <ScrollViewer Grid.Row="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
-            <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="{x:Null}" IsReadOnly="True"  />
-        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ToggleButton x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
+                <FontIcon Glyph="&#xE73F;" FocusVisualPrimaryBrush="{x:Null}" />
+            </ToggleButton>
+            <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
+                <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="{x:Null}" IsReadOnly="True"  />
+            </ScrollViewer>
+        </Grid>
 
         <ScrollViewer Grid.RowSpan="3" Canvas.ZIndex="-1" Padding="5">
             <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,15,0" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">

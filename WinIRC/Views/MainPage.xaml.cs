@@ -273,7 +273,7 @@ namespace WinIRC
 
             if (currentView != null)
             {
-                ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, true);
+                ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, window);
                 ElementCompositionPreview.SetAppWindowContent(window, view);
                 window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
                 window.TitleBar.ExtendsContentIntoTitleBar = true;
@@ -515,8 +515,9 @@ namespace WinIRC
             }
         }
 
-        private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ChannelList_ItemClick(object sender, ItemClickEventArgs e)
         {
+            channelList.SelectedItem = e.ClickedItem;
             try
             {
                 if (channelList.SelectedItem == null)

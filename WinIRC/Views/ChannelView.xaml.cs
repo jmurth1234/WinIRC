@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.ViewManagement;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -45,6 +46,8 @@ namespace WinIRC.Views
             }
         }
 
+        public AppWindow Window { get; }
+
         public ChannelView()
         {
             this.InitializeComponent();
@@ -56,10 +59,10 @@ namespace WinIRC.Views
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ChannelView(string server, string channel) : this(server, channel, false) { 
+        public ChannelView(string server, string channel) : this(server, channel, null) { 
         }
 
-        public ChannelView(string server, string channel, bool isWindow)
+        public ChannelView(string server, string channel, AppWindow window)
         {
             this.InitializeComponent();
 
@@ -73,8 +76,11 @@ namespace WinIRC.Views
 
             Unloaded += ChannelView_Unloaded;
 
-            this.titlebar.Visibility = isWindow ? Visibility.Visible : Visibility.Collapsed;
+            var visibility = window != null ? Visibility.Visible : Visibility.Collapsed;
+            this.titlebar.Visibility = visibility;
+            this.CompactToggle.Visibility = visibility;
             this.titlebar.Text = $"{currentChannel} | {currentServer}";
+            this.Window = window;
 
             UpdateUi();
         }
@@ -223,6 +229,18 @@ namespace WinIRC.Views
             else
             {
                 topicScroll.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void CompactToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (CompactToggle.IsChecked.Value)
+            {
+                Window.Presenter.RequestPresentation(AppWindowPresentationKind.CompactOverlay);
+            }
+            else
+            {
+                Window.Presenter.RequestPresentation(AppWindowPresentationKind.Default);
             }
         }
     }

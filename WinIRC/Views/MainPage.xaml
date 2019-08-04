@@ -338,7 +338,10 @@
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" >
             <SplitView.Pane>
                 <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}"
-                          HorizontalAlignment="Left" SelectionChanged="ChannelList_SelectionChanged" Background="{x:Null}"
+                          HorizontalAlignment="Left" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
+                          IsItemClickEnabled="True"
+                          SelectionMode="Single"
+                          SingleSelectionFollowsFocus="False"
                           ItemContainerStyle="{Binding ListBoxItemStyle}" >
                     <ListView.GroupStyle>
                         <GroupStyle>
@@ -355,6 +358,7 @@
                             </GroupStyle.HeaderTemplate>
                         </GroupStyle>
                     </ListView.GroupStyle>
+
 
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="ircclientcore:Channel">
