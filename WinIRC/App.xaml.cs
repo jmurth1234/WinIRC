@@ -239,7 +239,7 @@ namespace WinIRC
                 loaded = false;
                 NumberPings = 0;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
-                applicationView.SetPreferredMinSize(new Windows.Foundation.Size{Width = 360, Height = 240});
+                applicationView.SetPreferredMinSize(new Windows.Foundation.Size { Width = 360, Height = 240 });
             }
 
             if (!(NavigationService.Content is MainPage))
@@ -307,35 +307,46 @@ namespace WinIRC
 
         public async void ExtendExecution()
         {
-            if (session != null)
+            try
             {
-                session.Revoked -= Session_Revoked;
-                session.Dispose();
-                session = null;
-            }
+                if (session != null)
+                {
+                    session.Revoked -= Session_Revoked;
+                    session.Dispose();
+                    session = null;
+                }
 
-            session = new ExtendedExecutionSession();
-            session.Reason = ExtendedExecutionReason.Unspecified;
-            session.Revoked += Session_Revoked;
-            ExtendedExecutionResult result = await session.RequestExtensionAsync();
+                session = new ExtendedExecutionSession();
+                session.Reason = ExtendedExecutionReason.Unspecified;
+                session.Revoked += Session_Revoked;
+                ExtendedExecutionResult result = await session.RequestExtensionAsync();
 
-            switch (result)
-            {
-                case ExtendedExecutionResult.Allowed:
-                    break;
+                switch (result)
+                {
+                    case ExtendedExecutionResult.Allowed:
+                        break;
 
-                default:
-                case ExtendedExecutionResult.Denied:
-                    ShowToast("Could not extend execution session", "To make this more reliable, for the battery settings for this app ensure 'Managed By Windows' is disabled.");
-                    break;
-            }
+                    default:
+                    case ExtendedExecutionResult.Denied:
+                        _ = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                            () =>
+                            {
+                                MainPage.instance.ShowTeachingTip();
+                            });
+                        break;
+                }
+            } catch { }
         }
 
         private void Session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
         {
             if (args.Reason == ExtendedExecutionRevokedReason.SystemPolicy)
             {
-                ShowToast("Extended Execution Session Cancelled", "To make this more reliable, in the battery settings for this app ensure 'Managed By Windows' is disabled.");
+                _ = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>
+                    {
+                        MainPage.instance.ShowTeachingTip();
+                    });
             }
             else
             {
@@ -500,7 +511,8 @@ namespace WinIRC
                     port = uri.Port;
                 }
 
-                WinIrcServer server = new WinIrcServer {
+                WinIrcServer server = new WinIrcServer
+                {
                     Name = uri.Host,
                     Hostname = uri.Host,
                     Port = port,

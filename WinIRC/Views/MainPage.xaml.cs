@@ -994,5 +994,21 @@ namespace WinIRC
         {
             GetCurrentServer()?.CommandManager.HandleCommand(currentChannel, "/list");
         }
+        public void ShowTeachingTip()
+        {
+            if (Config.GetBoolean(Config.HideBackgroundTip))
+            {
+                return;
+            }
+
+            BackgroundTeachingTip.IsOpen = true;
+        }
+
+        private void BackgroundTeachingTip_ActionButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
+        {
+            Config.SetBoolean(Config.HideBackgroundTip, true);
+
+            BackgroundTeachingTip.IsOpen = false;
+        }
     }
 }

@@ -11,6 +11,7 @@
     xmlns:controls="using:Template10.Controls"
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     xmlns:ircclientcore="using:IrcClientCore"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d" 
     NavigationCacheMode="Disabled">
     <Page.Resources>
@@ -436,6 +437,17 @@
                 </Grid>
             </controls:ModalDialog.ModalContent>
         </controls:ModalDialog>
+
+        <winui:TeachingTip x:Name="BackgroundTeachingTip" 
+            Title="Having issues staying connected in the background?"
+            Subtitle="WinIRC will automatically hibernate after 10 minutes of inactivity to save battery life"
+            ActionButtonClick="BackgroundTeachingTip_ActionButtonClick"
+	        ActionButtonContent="Got it"
+            PreferredPlacement="Bottom">
+            <winui:TeachingTip.Content>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To prevent windows from doing this, head to the <Hyperlink NavigateUri="ms-settings:batterysaver-usagedetails">Settings app</Hyperlink>, turn off 'Managed By Windows' for WinIRC and enable 'Allow app to run background tasks.'</TextBlock>
+            </winui:TeachingTip.Content>
+        </winui:TeachingTip>
 
     </Grid>
 

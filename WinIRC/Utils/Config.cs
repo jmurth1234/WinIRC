@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace WinIRC
 {
@@ -34,6 +34,9 @@ namespace WinIRC
         public const string FirstRun = "firstrun";
         public const string EnableLogs = "enablelogs";
         public const string LogsFolder = "logsfolder";
+
+
+        public const string HideBackgroundTip = "hidebackgroundtip";
 
         public static string PerChannelSetting(string server, string channel, string key)
         {
