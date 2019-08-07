@@ -1,4 +1,3 @@
-﻿using Microsoft.Toolkit.Uwp.Services.Twitter;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -55,12 +54,6 @@ namespace WinIRC.Views
         {
             if (new Connection().HasInternetAccess)
             {
-                TwitterService.Instance.Initialize(new TwitterOAuthTokens()
-                {
-                    ConsumerKey = "eK5wblbCAVkxZlMxCmp8Di1uL",
-                    ConsumerSecret = "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7"
-                });
-
                 var uriArray = uri.ToString().Split('/');
                 // Disable the exception swallowing to allow exception to be thrown by Tweetinvi
                 ExceptionHandler.SwallowWebExceptions = false;
@@ -74,7 +67,7 @@ namespace WinIRC.Views
                         credentials = Auth.SetApplicationOnlyCredentials("eK5wblbCAVkxZlMxCmp8Di1uL", "LHccPuEeF2NcaTi53PXceRFVgZ0o5idgkDv62h9mLcdAdfmJp7", true);
                         Auth.InitializeApplicationOnlyCredentials();
 
-                        var id = long.Parse(uriArray[uriArray.Length - 1].Replace("?s=09", ""));
+                        var id = long.Parse(uriArray[uriArray.Length - 1].Split('?')[0]);
 
                         var latestException = ExceptionHandler.GetLastException();
                         if (latestException != null)

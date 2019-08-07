@@ -422,7 +422,7 @@
                                     </DataTemplate>
                                 </Pivot.HeaderTemplate>
                                 <Pivot.RightHeader>
-                                    <Button x:Name="openWindowButton" FontFamily="Segoe MDL2 Assets" ToolTipService.ToolTip="Open tab in new window" Visibility="Collapsed" >
+                                    <Button Style="{ThemeResource IconButtonStyle}" x:Name="openWindowButton" FontFamily="Segoe MDL2 Assets" ToolTipService.ToolTip="Open tab in new window" Visibility="Collapsed" >
                                         <FontIcon Glyph="&#xE2B4;" />
                                     </Button>
                                 </Pivot.RightHeader>

@@ -230,6 +230,9 @@ namespace WinIRC.Views
             {
                 topicScroll.Visibility = Visibility.Collapsed;
             }
+
+            var darktheme = Config.GetBoolean(Config.DarkTheme);
+            this.RequestedTheme = darktheme ? ElementTheme.Dark : ElementTheme.Light;
         }
 
         private void CompactToggle_Click(object sender, RoutedEventArgs e)

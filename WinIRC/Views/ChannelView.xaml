@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Rectangle Grid.RowSpan="2" Fill="{ThemeResource SystemControlAcrylicElementBrush}" />
+        <Rectangle Grid.RowSpan="2" Fill="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush }" />
 
         <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
 
@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ToggleButton x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
+            <ToggleButton Style="{ThemeResource ToggleButtonRevealStyle}" x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
                 <FontIcon Glyph="&#xE73F;" FocusVisualPrimaryBrush="{x:Null}" />
             </ToggleButton>
             <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
@@ -34,8 +34,8 @@
             </ScrollViewer>
         </Grid>
 
-        <ScrollViewer Grid.RowSpan="3" Canvas.ZIndex="-1" Padding="5">
-            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,15,0" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">
+        <ScrollViewer Grid.RowSpan="4" Canvas.ZIndex="-1" Padding="5">
+            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,15,38" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="net:Message">
                         <ui:MessageLine CompactMode="False" MessageItem="{x:Bind Mode=OneWay}" />
@@ -49,14 +49,14 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <Grid Grid.Row="3" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" Padding="5" VerticalAlignment="Bottom" >
+        <Grid Grid.Row="3" Background="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush}" Padding="5,0,5,0" VerticalAlignment="Bottom" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
 
-            <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
+            <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
         </Grid>
     </Grid>
 </Page>

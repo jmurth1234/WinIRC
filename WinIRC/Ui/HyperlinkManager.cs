@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -59,8 +59,7 @@ namespace WinIRC.Ui
                 var symbol = "";
 
                 var url = new Uri(uri);
-                var isFallCreators = ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5);
-                if ((uri.Contains("twitter.com") && uri.Contains("status") && !isFallCreators)
+                if ((uri.Contains("twitter.com") && uri.Contains("status"))
                     || isImage(uri)
                     || uri.Contains("youtube.com/watch")
                     || uri.Contains("youtu.be"))

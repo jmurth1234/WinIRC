@@ -573,7 +573,10 @@ namespace WinIRC
             }
             else if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
             {
-                Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item => item.Header as string == channel);
+                Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item =>
+                    item.Header as string == channel
+                    && (item.Content as ChannelView).currentServer == server
+                );
             }
             else
             {
