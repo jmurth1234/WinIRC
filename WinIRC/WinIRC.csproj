@@ -14,16 +14,15 @@
     <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
-    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
+    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>
-    </PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>WinIRC_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>E0204ECA53E897BDAAD061DC191C857540C33FF7</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>
-    <AppxBundle>Always</AppxBundle>
+    <AppxBundle>Never</AppxBundle>
     <AppxPackageDir>C:\Users\Ryan\Documents\winirc packages\</AppxPackageDir>
     <HockeyAppResourceId>ca57c9d3f4bf4bb082d064cd09de9ac6</HockeyAppResourceId>
     <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot</RuntimeIdentifiers>
