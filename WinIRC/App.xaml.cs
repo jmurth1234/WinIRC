@@ -87,6 +87,8 @@ namespace WinIRC
             }
         }
 
+        public bool SessionRevoked { get; private set; }
+
         public bool IncrementPings = true;
 
         /// <summary>
@@ -328,25 +330,18 @@ namespace WinIRC
 
                     default:
                     case ExtendedExecutionResult.Denied:
-                        _ = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                            () =>
-                            {
-                                MainPage.instance.ShowTeachingTip();
-                            });
+                        SessionRevoked = true;
                         break;
                 }
-            } catch { }
+            }
+            catch { }
         }
 
         private void Session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
         {
             if (args.Reason == ExtendedExecutionRevokedReason.SystemPolicy)
             {
-                _ = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                    () =>
-                    {
-                        MainPage.instance.ShowTeachingTip();
-                    });
+                SessionRevoked = true;
             }
             else
             {
@@ -369,6 +364,15 @@ namespace WinIRC
                         // server.SocketReturn();
                     }
                 }
+            }
+
+            if (SessionRevoked)
+            {
+                CoreApplication.MainView.CoreWindow.Dispatcher.TryRunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    MainPage.instance.ShowTeachingTip();
+                });
+                SessionRevoked = false;
             }
         }
 
