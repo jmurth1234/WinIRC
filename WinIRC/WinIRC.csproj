@@ -171,7 +171,6 @@
     <Content Include="Assets\winirc.png" />
     <Content Include="Assets\winirc.svg" />
     <Content Include="Assets\winircsplash.png" />
-    <Content Include="Square44x44Logo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handlers\IrcUiHandler.cs" />
@@ -259,7 +258,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
+    <AppxManifest Include="Package.debug.appxmanifest" Condition="'$(Configuration)'=='Debug'">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <AppxManifest Include="Package.release.appxmanifest" Condition="'$(Configuration)'=='Release'">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Service References\Application Insights\ConnectedService.json" />

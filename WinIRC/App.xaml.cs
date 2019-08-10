@@ -309,6 +309,7 @@ namespace WinIRC
 
         public async void ExtendExecution()
         {
+            Debug.WriteLine("Attempting extension");
             try
             {
                 if (session != null)
