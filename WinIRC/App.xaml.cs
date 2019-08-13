@@ -39,6 +39,7 @@ using Template10.Common;
 using WinIRC.Views;
 using Microsoft.ApplicationInsights;
 using Windows.ApplicationModel.ExtendedExecution;
+using Windows.UI.Xaml.Markup;
 
 namespace WinIRC
 {

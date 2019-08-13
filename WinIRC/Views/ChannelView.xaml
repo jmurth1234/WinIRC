@@ -30,7 +30,7 @@
                 <FontIcon Glyph="&#xE73F;" FocusVisualPrimaryBrush="{x:Null}" />
             </ToggleButton>
             <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
-                <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" BorderBrush="{x:Null}" Background="{x:Null}" IsReadOnly="True"  />
+                <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" Style="{StaticResource ChannelViewTextBox}" IsReadOnly="True"  />
             </ScrollViewer>
         </Grid>
 
@@ -56,7 +56,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
 
-            <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
+            <TextBox Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
         </Grid>
     </Grid>
 </Page>

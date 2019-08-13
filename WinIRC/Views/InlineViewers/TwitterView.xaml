@@ -1,13 +1,20 @@
-﻿<Page
+<Page
     x:Class="WinIRC.Views.TwitterView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinIRC.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+    MaxWidth="400"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid HorizontalAlignment="Stretch"
+          Background="{ThemeResource SystemControlBackgroundListLowBrush}"
+          CornerRadius="2"
+          Padding="10"
+          BorderThickness="1"
+          BorderBrush="{ThemeResource SystemControlBackgroundListMediumRevealBorderBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
@@ -19,17 +26,17 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Image x:Name="Picture" Grid.Column="0" Grid.RowSpan="3" Width="60" Height="60" Margin="0,0,5,0" VerticalAlignment="Top" Source="ms-appx:///Assets/100x100.png"/>
+        <winui:PersonPicture x:Name="Picture" Grid.Column="0" Width="40" Height="40" Margin="0,0,5,0" VerticalAlignment="Top" ProfilePicture="ms-appx:///Assets/100x100.png"/>
 
-        <TextBlock x:Name="UsernameBox" Grid.Row="0" Grid.Column="1" Padding="0,0,5,0" Text="Loading..." FontWeight="Bold" />
-        
-        <RichTextBlock x:Name="TweetBox" Grid.Row="1" Grid.Column="1"  Padding="0,0,5,0" TextWrapping="WrapWholeWords" >
-                <Paragraph x:Name="TweetParagraph" />
-            </RichTextBlock>
+        <TextBlock x:Name="UsernameBox" Grid.Row="0" Grid.Column="1" Padding="0,0,5,0" Text="Loading..." FontWeight="Bold" VerticalAlignment="Center" FlowDirection="LeftToRight" />
 
-        <StackPanel Grid.Column="1"  Grid.Row="2"  Grid.ColumnSpan="3" Orientation="Horizontal" >
-            <TextBlock x:Name="Timestamp"  />
-            <TextBlock Foreground="{ThemeResource HyperlinkButtonForeground}" Tapped="TextBlock_Tapped" FontWeight="Bold" Margin="5,0,0,0" PointerEntered="TextBlock_PointerEntered" PointerExited="TextBlock_PointerExited" >Open in Browser</TextBlock>
+        <RichTextBlock Margin="0, 10, 0, 0" x:Name="TweetBox" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="0,0,5,0" TextWrapping="WrapWholeWords" >
+            <Paragraph x:Name="TweetParagraph" />
+        </RichTextBlock>
+
+        <StackPanel Grid.Column="0"  Grid.Row="2"  Grid.ColumnSpan="3" Orientation="Horizontal"  >
+            <TextBlock x:Name="Timestamp" VerticalAlignment="Center" />
+            <HyperlinkButton Foreground="{ThemeResource HyperlinkButtonForeground}"  FontWeight="Bold" Margin="5,0,0,0" Click="HyperlinkButton_Click">Open in Browser</HyperlinkButton>
         </StackPanel>
         
     </Grid>

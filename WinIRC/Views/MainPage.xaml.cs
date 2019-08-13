@@ -276,7 +276,7 @@ namespace WinIRC
                 ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, window);
                 ElementCompositionPreview.SetAppWindowContent(window, view);
                 window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
-                window.TitleBar.ExtendsContentIntoTitleBar = true;
+                window.TitleBar.ExtendsContentIntoTitleBar = false;
                 window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
                 CloseTab_Click(sender, e);
             }

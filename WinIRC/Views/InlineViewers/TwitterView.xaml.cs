@@ -104,7 +104,7 @@ namespace WinIRC.Views
                     Timestamp.Text = tweet.CreatedAt.ToLocalTime().ToString();
                     hyperlinkManager.SetText(TweetParagraph, tweet.Text);
                     UsernameBox.Text = tweet.CreatedBy.Name;
-                    Picture.Source = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
+                    Picture.ProfilePicture = new BitmapImage(new Uri(tweet.CreatedBy.ProfileImageUrl400x400));
                 }
                 else
                 {
@@ -112,11 +112,6 @@ namespace WinIRC.Views
                     UsernameBox.Text = "Error loading";
                 }
             }
-        }
-
-        private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            Windows.System.Launcher.LaunchUriAsync(uri);
         }
 
         private void TextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -129,6 +124,11 @@ namespace WinIRC.Views
         {
             Window.Current.CoreWindow.PointerCursor =
                 new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 1);
+        }
+
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            Windows.System.Launcher.LaunchUriAsync(uri);
         }
     }
 }

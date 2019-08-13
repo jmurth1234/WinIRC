@@ -1,4 +1,4 @@
-﻿using IrcClientCore;
+using IrcClientCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -142,12 +142,12 @@ namespace WinIRC.Ui
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Channel.Name, ServerRightClickType.CLOSE));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server, ServerRightClickType.CLOSE));
         }
 
         private void ReconnectItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Channel.Name, ServerRightClickType.RECONNECT));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server, ServerRightClickType.RECONNECT));
         }
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)

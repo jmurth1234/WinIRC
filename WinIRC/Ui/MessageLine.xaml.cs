@@ -1,4 +1,4 @@
-﻿using IrcClientCore;
+using IrcClientCore;
 using OpenGraph_Net;
 using System;
 using System.Collections.Generic;
@@ -48,6 +48,7 @@ namespace WinIRC.Ui
 
         private HyperlinkManager hyperlinkManager;
         private Uri lastUri;
+        private object p;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String propertyName = "")
@@ -106,9 +107,15 @@ namespace WinIRC.Ui
             }
         }
 
-        public MessageLine()
+        public MessageLine() : this(null)
+        {
+        }
+
+        public MessageLine(Message line)
         {
             this.InitializeComponent();
+
+            this.MessageItem = line;
 
             Unloaded += MessageLine_Unloaded;
             Loaded += MessageLine_Loaded;
