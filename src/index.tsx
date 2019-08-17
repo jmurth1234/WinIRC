@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { App } from './App';
 import { mergeStyles } from 'office-ui-fabric-react';
 import { loadTheme } from 'office-ui-fabric-react';
-
+import { PrerenderedControler } from 'react-prerendered-component';
 loadTheme({
   palette: {
     themePrimary: '#5fbaff',
@@ -46,13 +46,13 @@ mergeStyles({
 });
 
 const rootElement = document.getElementById("root");
-if (rootElement && rootElement.hasChildNodes()) {
-  ReactDOM.hydrate(<App />, rootElement);
-} else {
-  ReactDOM.render(<App />, rootElement);
-}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-// serviceWorker.unregister();
+const app = (
+  <App />
+)
+
+if (rootElement && rootElement.hasChildNodes()) {
+  ReactDOM.hydrate(app, rootElement);
+} else {
+  ReactDOM.render(app, rootElement);
+}

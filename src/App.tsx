@@ -1,21 +1,13 @@
-import React, { lazy, Suspense } from 'react';
-import { Stack, Shimmer } from 'office-ui-fabric-react';
+import React from 'react';
+import { Stack } from 'office-ui-fabric-react';
 import { createMarkdownPage } from './components/markdown-loader'
 import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import { NavArea } from './components/Nav';
 import { NotFound } from './components/404'
+import { prerenderedLoader } from './components/prerender-loader'
 
-const Home = lazy(() => createMarkdownPage('README.md'));
-const Changelog = lazy(() => createMarkdownPage('CHANGELOG.md'));
-
-
-const ShimmerArea: React.FunctionComponent = () => (
-  <>
-    <Shimmer />
-    <Shimmer width="75%" />
-    <Shimmer width="50%" />
-  </>
-)
+const Home = prerenderedLoader(() => createMarkdownPage('README.md'));
+const Changelog = prerenderedLoader(() => createMarkdownPage('CHANGELOG.md'));
 
 export const App: React.FunctionComponent = () => {
   return (
@@ -36,13 +28,11 @@ export const App: React.FunctionComponent = () => {
           }}
           gap={15}
         >
-          <Suspense fallback={<ShimmerArea />}>
-            <Switch>
-              <Route path="/" exact component={Home} />
-              <Route path="/changelog" component={Changelog} />
-              <Route component={NotFound} />
-            </Switch>
-          </Suspense>
+          <Switch>
+            <Route path="/" exact component={Home} />
+            <Route path="/changelog" component={Changelog} />
+            <Route component={NotFound} />
+          </Switch>
         </Stack>
 
       </Stack>

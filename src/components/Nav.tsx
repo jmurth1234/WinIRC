@@ -24,7 +24,7 @@ const groups = [
         url: 'https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf',
       },
       {
-        name: 'Install with App Installer',
+        name: 'Install App',
         url: `ms-appinstaller:?source=https://rymate1234.github.io/WinIRC/winirc-${ver}.appxbundle`
       },
       {
