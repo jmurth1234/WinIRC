@@ -7,11 +7,11 @@ const groups = [
     links: [
       {
         name: 'Home',
-        url: '/',
+        url: '/WinIRC/',
       },
       {
         name: 'Changelog',
-        url: '/changelog',
+        url: '/WinIRC/changelog',
       },
       {
         name: 'Github',
@@ -37,7 +37,7 @@ export const NavChild: React.FunctionComponent<RouteComponentProps> = (props) =>
       if (item && item.url.includes('http')) {
         window.location.href = item.url
       } else if (item) {
-        props.history.push(item.url)
+        props.history.push(item.url.replace('/WinIRC', ''))
       }
     }}
     styles={{

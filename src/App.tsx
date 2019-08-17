@@ -19,7 +19,7 @@ const ShimmerArea: React.FunctionComponent = () => (
 
 export const App: React.FunctionComponent = () => {
   return (
-    <BrowserRouter basename="/">
+    <BrowserRouter basename="/WinIRC/">
       <Stack
         horizontal
         verticalFill

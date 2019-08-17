@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://rymate1234.github.io/WinIRC/",
   "dependencies": {
     "@types/jest": "24.0.17",
     "@types/node": "11.13.8",
