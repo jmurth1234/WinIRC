@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/WinIRC/precache-manifest.db7b5113bbaabee6e845c750dbb6bf6c.js"
+  "/WinIRC/precache-manifest.5d9102f08a6b129a83354d5eb09002f9.js"
 );
 
 self.addEventListener('message', (event) => {

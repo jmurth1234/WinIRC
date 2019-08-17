@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "bbe8d8e94c0fc9db4f8593e2213737ac",
+    "revision": "f752bb984c8671e1f2b6e9251f6fbad4",
     "url": "/WinIRC/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/WinIRC/static/js/2.f6fe0ac7.chunk.js"
   },
   {
-    "revision": "cfc04b3212816344b810",
-    "url": "/WinIRC/static/js/main.6e58a869.chunk.js"
+    "revision": "62a4dfb77341422030bf",
+    "url": "/WinIRC/static/js/main.4c3a497d.chunk.js"
   },
   {
     "revision": "d8e658af88bcf2cf2718",
