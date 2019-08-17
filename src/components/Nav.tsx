@@ -2,6 +2,8 @@ import React from 'react';
 import { Nav } from 'office-ui-fabric-react';
 import { withRouter, RouteComponentProps } from "react-router";
 
+const ver = '1.6.0.0'
+
 const groups = [
   {
     links: [
@@ -20,6 +22,14 @@ const groups = [
       {
         name: 'Store',
         url: 'https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf',
+      },
+      {
+        name: 'Install with App Installer',
+        url: `ms-appinstaller:?source=https://rymate1234.github.io/WinIRC/winirc-${ver}.appxbundle`
+      },
+      {
+        name: 'Direct Download',
+        url: `https://rymate1234.github.io/WinIRC/winirc-${ver}.appxbundle`
       }
     ]
   }
