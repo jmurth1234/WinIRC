@@ -1,7 +1,6 @@
 # Changelog
------
 
-# 1.6.0
+## 1.6.0
 
 WinIRC 1.6 updates the SDK used to the fall creators update SDK, meaning you'll see some fluent design within the application! Specifically:
 
@@ -21,6 +20,8 @@ Various other small changes and fixes include:
 
 This is quite possibly the last major release for a while - the next 2.0 release will be a near full recode. However, bugfixes will still be released for the 1.6 update for the foreseeable future.
 
+-----
+
 ## 1.5.0
 
 This release introduces a major overhaul of the UI, making the app more desktop friendly whilst still being touch friendly for mobiles and tablets! The major changes are:
@@ -36,6 +37,8 @@ Other improvements and fixes include:
  - Option to hide messages when a user joins or leaves a channel (conbtributed by owensdj)
  - Some small optimisations to joining ZNCs
  - Fixed out of control memory usage when connected to large amounts of channels
+
+-----
 
 ## 1.4.2
 
@@ -87,8 +90,6 @@ This release of WinIRC features a major recode of the view of messages within a 
 
 This release also fixes a couple issues with the extended execution session on phones.
 
------
-
 ## v1.3
 
 This release adds an initial implementation of an ExtendedExecutionSession - this allows WinIRC to keep connected in the background. This has been tested to both work on a Lumia 435 running build 10586 and a desktop running build 14393. 
@@ -113,7 +114,6 @@ Thanks for using WinIRC!
 
 Small patch to resolve an issue with the clean install experience
 
------
 
 ## v1.2.18
 
@@ -125,8 +125,6 @@ I haven't made any progress on background connections yet, but until then have a
 
  - Application should not crash when IRC disconnects whilst suspended
 
------
-
 ## v1.2.11
 
 Minor release time! Nothing too big, just a couple of added features. The specific changes are as follows:
@@ -137,13 +135,9 @@ Minor release time! Nothing too big, just a couple of added features. The specif
 
 On background irc - this is planned for a future update. There's some promising new APIs coming in the anniversary update, which look like they'll allow me to easily put the app in the background. 
 
------
-
 ## v1.2.7
 
 The 1.2.7 bugfix fixes a number of issues with handing irc:// and ircs:// links when the app is closed. also fixes a crash bug relating to deleting servers.
-
------
 
 ## v1.2.5 - Initial github release
 
