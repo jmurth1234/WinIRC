@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.js": "/WinIRC/static/js/main.0f8d85a7.chunk.js",
-    "main.js.map": "/WinIRC/static/js/main.0f8d85a7.chunk.js.map",
+    "main.css": "/WinIRC/static/css/main.2e270137.chunk.css",
+    "main.js": "/WinIRC/static/js/main.f4d0e3ac.chunk.js",
+    "main.js.map": "/WinIRC/static/js/main.f4d0e3ac.chunk.js.map",
     "runtime~main.js": "/WinIRC/static/js/runtime~main.dddff127.js",
     "runtime~main.js.map": "/WinIRC/static/js/runtime~main.dddff127.js.map",
-    "static/js/2.5cb180db.chunk.js": "/WinIRC/static/js/2.5cb180db.chunk.js",
-    "static/js/2.5cb180db.chunk.js.map": "/WinIRC/static/js/2.5cb180db.chunk.js.map",
+    "static/js/2.a6d249d5.chunk.js": "/WinIRC/static/js/2.a6d249d5.chunk.js",
+    "static/js/2.a6d249d5.chunk.js.map": "/WinIRC/static/js/2.a6d249d5.chunk.js.map",
     "index.html": "/WinIRC/index.html",
-    "precache-manifest.acea79d4b91c03238c30fb2d95823c23.js": "/WinIRC/precache-manifest.acea79d4b91c03238c30fb2d95823c23.js",
-    "service-worker.js": "/WinIRC/service-worker.js"
+    "precache-manifest.82a16f5dfed36f59b85bface6a867127.js": "/WinIRC/precache-manifest.82a16f5dfed36f59b85bface6a867127.js",
+    "service-worker.js": "/WinIRC/service-worker.js",
+    "static/css/main.2e270137.chunk.css.map": "/WinIRC/static/css/main.2e270137.chunk.css.map"
   }
 }
