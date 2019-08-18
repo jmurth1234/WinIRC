@@ -1,9 +1,16 @@
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
 import { mergeStyles } from 'office-ui-fabric-react';
 import { loadTheme } from 'office-ui-fabric-react';
-import { PrerenderedControler } from 'react-prerendered-component';
+import { initializeIcons } from '@uifabric/icons';
+import './style.css'
+
+initializeIcons();
+
 loadTheme({
   palette: {
     themePrimary: '#5fbaff',
@@ -40,6 +47,7 @@ mergeStyles({
       height: '100vh',
       background: '#000000',
       color: '#ffffff',
+      overflow: 'hidden',
       fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`
     }
   }

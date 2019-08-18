@@ -35,11 +35,20 @@ const groups = [
   }
 ]
 
-export const NavChild: React.FunctionComponent<RouteComponentProps> = (props) => (
+interface NavProps extends RouteComponentProps {
+  closeNav?: () => void;
+  className?: string;
+}
+
+export const NavChild: React.FunctionComponent<NavProps> = (props) => (
   <Nav
+    className={props.className}
     expandButtonAriaLabel="Expand or collapse"
     selectedAriaLabel="Selected"
     onLinkClick={(evt, item) => {
+      if (props.closeNav) {
+        props.closeNav()
+      }
       if (evt) {
         evt.preventDefault()
       }
@@ -52,10 +61,8 @@ export const NavChild: React.FunctionComponent<RouteComponentProps> = (props) =>
     }}
     styles={{
       root: {
-        width: 200,
         height: '100%',
         boxSizing: 'border-box',
-        background: '#111111',
         overflowY: 'auto'
       }
     }}

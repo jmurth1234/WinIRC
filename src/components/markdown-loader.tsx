@@ -4,7 +4,7 @@ import { Stack, Text, Link } from 'office-ui-fabric-react';
 import memoize from 'promise-memoize'
 
 const renderers = {
-  heading: (props: { level: Number; children: React.ReactChildren }) => {
+  heading: (props: { level: number; children: any }) => {
     const { level, children } = props
 
     const size = {
@@ -13,7 +13,9 @@ const renderers = {
       3: 'xLarge'
     }
 
-    return <Text as={`h${level}`} variant={size[level]}>{children[0].props.value}</Text>
+    const variant = size[level]
+
+    return <Text as={`h${level}`} variant={variant}>{children[0].props.value}</Text>
   },
   text: Text,
   link: Link
@@ -34,7 +36,8 @@ export const createMarkdownPage = async (filename: String) => {
         verticalFill
         styles={{
           root: {
-            maxWidth: 960
+            maxWidth: 960,
+            height: 'auto'
           }
         }}>
         <ReactMarkdown renderers={renderers} source={markdown} />

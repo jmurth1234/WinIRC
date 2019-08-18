@@ -13,13 +13,12 @@ export const NotFound: React.FunctionComponent = () => {
         root: {
           width: '960px',
           margin: '0 auto',
-          textAlign: 'center',
-          color: '#605e5c'
+          textAlign: 'center'
         }
       }}
       gap={15}
     >
-      <Text variant="xxLarge" styles={boldStyle}>
+      <Text as='h1' variant="xxLarge" styles={boldStyle}>
         404
       </Text>
       <Text variant="large">Page not found.</Text>
