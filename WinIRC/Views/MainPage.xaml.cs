@@ -399,7 +399,6 @@ namespace WinIRC
 
                 style.Setters.Add(new Setter(HeightProperty, height));
 
-                this.ListBoxItemStyle = style;
                 this.channelList.ItemContainerStyle = style;
             }
 
@@ -419,7 +418,7 @@ namespace WinIRC
             Brush brush;
             try
             {
-                if (Config.GetBoolean(Config.Blurred, true))
+                if (Config.GetBoolean(Config.Blurred, true) && ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.AcrylicBrush"))
                 {
                     var hostBackdrop = WindowStates.CurrentState == WideState;
                     var source = hostBackdrop ? Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.HostBackdrop : Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;

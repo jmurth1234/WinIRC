@@ -341,8 +341,7 @@
                           HorizontalAlignment="Left" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
                           IsItemClickEnabled="True"
                           SelectionMode="Single"
-                          SingleSelectionFollowsFocus="False"
-                          ItemContainerStyle="{Binding ListBoxItemStyle}" >
+                          SingleSelectionFollowsFocus="False" >
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>

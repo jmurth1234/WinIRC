@@ -146,11 +146,11 @@ namespace WinIRC.Ui
         {
             InvalidateMeasure();
             UpdateLayout();
+            this.hyperlinkManager = new HyperlinkManager();
 
             if (double.IsNaN(UsernameBox.ActualWidth) || double.IsNaN(TimestampBox.ActualWidth)) return;
             if (MessageItem != null)
             {
-                this.hyperlinkManager = new HyperlinkManager();
                 PreviewFrame.Visibility = Visibility.Collapsed;
 
                 if (hyperlinkManager.LinkClicked != null)
