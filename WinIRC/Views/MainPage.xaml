@@ -452,6 +452,19 @@
                 <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To prevent windows from doing this, head to the <Hyperlink NavigateUri="ms-settings:batterysaver-usagedetails">Settings app</Hyperlink>, turn off 'Managed By Windows' for WinIRC and enable 'Allow app to run background tasks.'</TextBlock>
             </winui:TeachingTip.Content>
         </winui:TeachingTip>
+        
+        <winui:TeachingTip x:Name="AnalyticsPopup"
+            Title="Introducing new, more private analytics"
+            Subtitle="Now powered by AppCenter"
+            ActionButtonClick="AnalyticsPopup_ActionButtonClick"
+	        ActionButtonContent="Disable Analytics"
+            CloseButtonContent="Got it"
+            Closed="AnalyticsPopup_Closed"                           
+            PreferredPlacement="Bottom">
+            <winui:TeachingTip.Content>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">These new analytics don't collect location data unlike the previous analytics, and should hopefully give me more infomation to improve the app. </TextBlock>
+            </winui:TeachingTip.Content>
+        </winui:TeachingTip>
 
     </Grid>
 

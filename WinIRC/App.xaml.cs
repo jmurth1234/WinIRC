@@ -40,6 +40,9 @@ using WinIRC.Views;
 using Microsoft.ApplicationInsights;
 using Windows.ApplicationModel.ExtendedExecution;
 using Windows.UI.Xaml.Markup;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
 
 namespace WinIRC
 {
@@ -99,8 +102,7 @@ namespace WinIRC
         public App()
         {
             AutoExtendExecutionSession = false;
-
-            WindowsAppInitializer.InitializeAsync(WindowsCollectors.Metadata | WindowsCollectors.Session);
+            AppCenter.Start("ca57c9d3-f4bf-4bb0-82d0-64cd09de9ac6", typeof(Analytics), typeof(Crashes));
 
             SetTheme();
 

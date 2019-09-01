@@ -29,6 +29,7 @@ using WinIrcServer = WinIRC.Net.WinIrcServer;
 using IrcClientCore.Handlers.BuiltIn;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml.Hosting;
+using Microsoft.AppCenter.Analytics;
 
 namespace WinIRC
 {
@@ -213,6 +214,10 @@ namespace WinIRC
                     }
                 }
 
+                if (!Config.Contains(Config.AnalyticsAsked))
+                {
+                    AnalyticsPopup.IsOpen = true;
+                }
 
                 UpdateUi();
 
@@ -276,7 +281,7 @@ namespace WinIRC
                 ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, window);
                 ElementCompositionPreview.SetAppWindowContent(window, view);
                 window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
-                window.TitleBar.ExtendsContentIntoTitleBar = false;
+                window.TitleBar.ExtendsContentIntoTitleBar = true;
                 window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
                 CloseTab_Click(sender, e);
             }
@@ -1013,6 +1018,19 @@ namespace WinIRC
             Config.SetBoolean(Config.HideBackgroundTip, true);
 
             BackgroundTeachingTip.IsOpen = false;
+        }
+
+        private void AnalyticsPopup_ActionButtonClick(Microsoft.UI.Xaml.Controls.TeachingTip sender, object args)
+        {
+            Config.SetBoolean(Config.AnalyticsAsked, true);
+
+            Analytics.SetEnabledAsync(false);
+            AnalyticsPopup.IsOpen = false;
+        }
+
+        private void AnalyticsPopup_Closed(Microsoft.UI.Xaml.Controls.TeachingTip sender, Microsoft.UI.Xaml.Controls.TeachingTipClosedEventArgs args)
+        {
+            Config.SetBoolean(Config.AnalyticsAsked, true);
         }
     }
 }

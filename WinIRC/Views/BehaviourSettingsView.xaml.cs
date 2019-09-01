@@ -1,4 +1,5 @@
-﻿using System;
+using Microsoft.AppCenter.Analytics;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace WinIRC
             LoadSettings();
         }
 
-        private void LoadSettings()
+        private async void LoadSettings()
         {
             UserListClick.ItemsSource = UserListClickSettings;
 
@@ -78,6 +79,7 @@ namespace WinIRC
                 this.LogChannels.IsOn = false;
             }
 
+            this.AnalyticsSwitch.IsOn = await Analytics.IsEnabledAsync();
 
             this.SettingsLoaded = true;
         }
@@ -143,6 +145,14 @@ namespace WinIRC
             {
                 ChooseFolder();
             }
+        }
+
+        private void AnalyticsSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Analytics.SetEnabledAsync(AnalyticsSwitch.IsOn);
         }
     }
 

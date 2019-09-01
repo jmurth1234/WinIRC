@@ -11,6 +11,7 @@ namespace WinIRC
         public const string SwitchOnJoin = "switchonjoin";
         public const string UseTabs = "usetabs";
         public const string AlwaysNotify = "alwaysnotify";
+        public const string AnalyticsAsked = "analyticsasked";
 
         // connection settings
         public const string DefaultUsername = "defaultusername";

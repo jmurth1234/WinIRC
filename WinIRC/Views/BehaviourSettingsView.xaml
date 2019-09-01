@@ -1,4 +1,4 @@
-﻿<ui:BaseSettingsPage
+<ui:BaseSettingsPage
     x:Class="WinIRC.BehaviourSettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -24,6 +24,8 @@
                 <TextBlock Text="When clicking on a user" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
                 <ComboBox x:Name="UserListClick" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="UserListClick_SelectionChanged"/>
 
+                <TextBlock Text="Enable Analytics" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+                <ToggleSwitch Margin="5,1" x:Name="AnalyticsSwitch" OffContent="No" OnContent="Yes" Toggled="AnalyticsSwitch_Toggled"/>
             </StackPanel>
 
         </Grid>
