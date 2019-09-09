@@ -6,11 +6,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
@@ -65,6 +67,13 @@ namespace WinIRC.Views
         public ChannelView(string server, string channel, AppWindow window)
         {
             this.InitializeComponent();
+
+            if (ApiInformation.IsTypePresent("Windows.UI.Xaml.Media.ThemeShadow"))
+            {
+                Shadow.Receivers.Add(Scroll);
+
+                TopArea.Translation += new Vector3(0, 0, 12);
+            }
 
             currentServer = server;
             currentChannel = channel;
@@ -230,7 +239,6 @@ namespace WinIRC.Views
             {
                 topicScroll.Visibility = Visibility.Collapsed;
             }
-
             var darktheme = Config.GetBoolean(Config.DarkTheme);
             this.RequestedTheme = darktheme ? ElementTheme.Dark : ElementTheme.Light;
         }

@@ -30,6 +30,7 @@ using IrcClientCore.Handlers.BuiltIn;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml.Hosting;
 using Microsoft.AppCenter.Analytics;
+using System.Numerics;
 
 namespace WinIRC
 {
@@ -246,6 +247,14 @@ namespace WinIRC
 
             if (ApiInformation.IsTypePresent("Windows.UI.WindowManagement.AppWindow"))
             {
+                TitleShadow.Receivers.Add(SplitView);
+                PaneShadow.Receivers.Add(MainGrid);
+
+                TitleContainer.Translation += new Vector3(0, 0, 8);
+                channelList.Translation += new Vector3(0, 0, 16);
+                sidebarGrid.Translation += new Vector3(0, 0, 16);
+                connectDialogRoot.Translation += new Vector3(0, 0, 32);
+
                 openWindowButton.Visibility = Visibility.Visible;
                 openWindowButton.Click += OpenWindowButton_Click;
             }

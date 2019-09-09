@@ -12,9 +12,13 @@
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     xmlns:ircclientcore="using:IrcClientCore"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
     mc:Ignorable="d" 
     NavigationCacheMode="Disabled">
     <Page.Resources>
+        <Windows10version1903:ThemeShadow x:Name="TitleShadow" />
+        <Windows10version1903:ThemeShadow x:Name="PaneShadow" />
+
         <Style x:Key="TabsStyle" TargetType="Pivot">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
@@ -268,7 +272,6 @@
     </Page.Resources>
 
     <Grid x:Name="mainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates" >
                 <VisualState x:Name="WideState">
@@ -301,7 +304,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid Background="{StaticResource SystemControlBackgroundAccentBrush}" RequestedTheme="Dark" >
+        <Grid x:Name="TitleContainer" Background="{StaticResource SystemControlBackgroundAccentBrush}" RequestedTheme="Dark" Windows10version1903:Shadow="{StaticResource TitleShadow}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -335,38 +338,38 @@
             <Grid x:Name="TitleBarPadding" Background="Transparent" Grid.Column="2" />
         </Grid>
         
-        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" >
+        <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" PaneBackground="Transparent">
             <SplitView.Pane>
                 <ListView x:Name="channelList" ItemsSource="{Binding Source={StaticResource channelsSrc}}"
-                          HorizontalAlignment="Left" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
-                          IsItemClickEnabled="True"
-                          SelectionMode="Single"
-                          SingleSelectionFollowsFocus="False" >
+                    HorizontalAlignment="Stretch" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
+                    IsItemClickEnabled="True"
+                    SelectionMode="Single"
+                    SingleSelectionFollowsFocus="False"
+                    Windows10version1903:Shadow="{StaticResource PaneShadow}" >
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate x:DataType="ircclientcore:Channel">
                                     <ui:ChannelListItem Margin="0" FontSize="14" Channel="{x:Bind Mode=TwoWay}"
-                                                        Server="{Binding Server}" IsServer="True" Title="{Binding Server}"
-                                                        ServerClickEvent="ChannelListItem_ServerClickEvent"
-                                                        ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
-                                                        ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
-                                                        ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
+                                                Server="{Binding Server}" IsServer="True" Title="{Binding Server}"
+                                                ServerClickEvent="ChannelListItem_ServerClickEvent"
+                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
+                                                ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
+                                                ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
+                                                VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                         </GroupStyle>
                     </ListView.GroupStyle>
 
-
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="ircclientcore:Channel">
                             <ui:ChannelListItem Margin="0" FontSize="12" Channel="{x:Bind Mode=TwoWay}"
-                                                Server="{Binding Server}" Title="{Binding Name}"
-                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked"
-                                                ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
-                                                ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                                VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
+                                        Server="{Binding Server}" Title="{Binding Name}"
+                                        ChannelJoinClicked="ChannelListItem_ChannelJoinClicked"
+                                        ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
+                                        ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
+                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -374,7 +377,7 @@
             <SplitView.Content>
                 <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed">
                     <SplitView.Pane>
-                        <Grid>
+                        <Grid x:Name="sidebarGrid" Windows10version1903:Shadow="{StaticResource PaneShadow}" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
@@ -433,9 +436,9 @@
             </SplitView.Content>
         </SplitView>
 
-        <controls:ModalDialog Grid.Row="1" x:Name="serverConnect" ModalBackground="#7F808080">
+        <controls:ModalDialog Grid.Row="1" x:Name="serverConnect" ModalBackground="Transparent">
             <controls:ModalDialog.ModalContent>
-                <Grid Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded" VerticalAlignment="Center" HorizontalAlignment="Center" Windows10version1903:Shadow="{StaticResource PaneShadow}" >
                     <Frame x:Name="ConnectFrame" />
                 </Grid>
             </controls:ModalDialog.ModalContent>
