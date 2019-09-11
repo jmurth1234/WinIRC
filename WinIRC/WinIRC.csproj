@@ -190,6 +190,9 @@
       <DependentUpon>PivotPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\PromptDialog.cs" />
+    <Compile Include="Ui\UserRightClickMenu.xaml.cs">
+      <DependentUpon>UserRightClickMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\MessageCollection.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
@@ -283,6 +286,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Ui\PivotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\UserRightClickMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,120 +1,22 @@
-﻿<Page
+<Page
     x:Class="WinIRC.UsersView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinIRC"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:WinIRC.Ui"
     mc:Ignorable="d">
 
     <Page.Resources>
-        <Style x:Key="MenuFlyoutItemIconTemplate" TargetType="MenuFlyoutItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="MenuFlyoutItem">
-                        <Grid x:Name="LayoutRoot" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal" />
-                                    <VisualState x:Name="PointerOver">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LayoutRoot" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightListLowBrush}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextBlock" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightAltBaseHighBrush}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LayoutRoot" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightListMediumBrush}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextBlock" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightAltBaseHighBrush}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <PointerDownThemeAnimation Storyboard.TargetName="TextBlock" />
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Disabled">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextBlock" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseLowBrush}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualStateGroup.Transitions>
-                                        <VisualTransition From="Pressed" To="Normal">
-                                            <Storyboard>
-                                                <PointerUpThemeAnimation Storyboard.TargetName="TextBlock" />
-                                            </Storyboard>
-                                        </VisualTransition>
-                                        <VisualTransition From="Pressed" To="PointerOver">
-                                            <Storyboard>
-                                                <PointerUpThemeAnimation Storyboard.TargetName="TextBlock" />
-                                            </Storyboard>
-                                        </VisualTransition>
-                                    </VisualStateGroup.Transitions>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="CheckPlaceholderStates">
-                                    <VisualState x:Name="NoPlaceholder" />
-                                    <VisualState x:Name="CheckPlaceholder">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TextBlock" Storyboard.TargetProperty="Margin">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource MenuFlyoutItemPlaceholderThemeThickness}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                                <VisualStateGroup x:Name="PaddingSizeStates">
-                                    <VisualState x:Name="DefaultPadding" />
-                                    <VisualState x:Name="NarrowPadding">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LayoutRoot" Storyboard.TargetProperty="Padding">
-                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource MenuFlyoutItemThemePaddingNarrow}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-
-                            <StackPanel Orientation="Horizontal">
-                                <FontIcon  Margin="0,0,12,0" x:Name="TextBlock" Glyph="{TemplateBinding Tag}" Height="16" Width="16" FontSize="16" />
-                                <TextBlock  Text="{TemplateBinding Text}" TextTrimming="CharacterEllipsis" Foreground="{TemplateBinding Foreground}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            </StackPanel>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <MenuFlyout x:Key="UserContextMenu" >
-            <MenuFlyoutItem x:Name="UsernameItem" Tag="&#xE13D;" Style="{StaticResource MenuFlyoutItemIconTemplate}" FontWeight="Bold" Click="UsernameItem_Click"  />
-            <MenuFlyoutSeparator />
-
-            <MenuFlyoutItem x:Name="SendMessageItem" Text="Send Message" Tag="&#xE11F;" Style="{StaticResource MenuFlyoutItemIconTemplate}" Click="SendMessageItem_Click"  />
-            <MenuFlyoutItem x:Name="WhoisItem" Text="Whois user" Tag="&#xE11B;" Style="{StaticResource MenuFlyoutItemIconTemplate}" Click="WhoisItem_Click"  />
-            <!--<MenuFlyoutItem Text="Ignore user" Tag="&#xE8F8;" Style="{StaticResource MenuFlyoutItemIconTemplate}"  />-->
-            <MenuFlyoutSeparator />
-            <MenuFlyoutSubItem Text="Operator actions" >
-                <MenuFlyoutItem x:Name="OpItem" Text="OP user" Click="OpItem_Click" />
-                <MenuFlyoutItem x:Name="DeopItem" Text="Deop user" Click="DeopItem_Click" />
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem x:Name="VoiceItem" Text="Voice user" Click="VoiceItem_Click" />
-                <MenuFlyoutItem x:Name="DevoiceItem" Text="Devoice user" Click="DevoiceItem_Click" />
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem x:Name="MuteItem" Text="Mute user" Click="MuteItem_Click" />
-                <MenuFlyoutItem x:Name="UnmuteItem" Text="Unmute user" Click="UnmuteItem_Click" />
-                <MenuFlyoutItem x:Name="KickItem" Text="Kick user" Click="KickItem_Click" />
-                <MenuFlyoutItem x:Name="BanItem" Text="Ban user" Click="BanItem_Click" />    
-            </MenuFlyoutSubItem>
-        </MenuFlyout>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:UserRightClickMenu x:Name="UserRightClick" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Page.Resources>
 
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView Grid.Row="1" Margin="0,0,0,0" x:Name="usersList" Background="{x:Null}" SelectionMode="None" Tapped="usersList_Tapped" RightTapped="UsersList_RightTapped"/>
+        <ListView Grid.Row="1" Margin="0,0,0,0" x:Name="usersList" Background="{x:Null}" SelectionMode="None" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}"/>
     </Grid>
 </Page>
