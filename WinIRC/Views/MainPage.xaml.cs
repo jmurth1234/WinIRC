@@ -636,6 +636,18 @@ namespace WinIRC
 
         internal ChannelListView ShowChannelsList(List<IrcClientCore.Handlers.BuiltIn.ChannelListItem> obj)
         {
+            if (obj == null)
+            {
+                ContentDialog noChannels = new ContentDialog()
+                {
+                    Title = "Unable to list channels",
+                    Content = "No channels were found or there's no publically viewable channels.",
+                    CloseButtonText = "OK"
+                };
+
+                noChannels.ShowAsync();
+                return null;
+            }
             PivotItem p = new PivotItem();
             p.Header = "Channels";
             ChannelListView view = new ChannelListView(obj);

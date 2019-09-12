@@ -30,14 +30,13 @@
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="TimestampBox" Grid.Column="0" Padding="0,0,5,0" Text="{x:Bind MessageItem.Timestamp, FallbackValue='Timestamp', Mode=OneWay}"/>
-        <RichTextBlock x:Name="MessageBox" Grid.Row="0" Grid.ColumnSpan="3" Padding="0,0,5,0" TextWrapping="WrapWholeWords" >
+        <RichTextBlock x:Name="MessageBox" Grid.Row="0" Grid.ColumnSpan="3" Padding="0,0,5,0" TextWrapping="WrapWholeWords" Foreground="{x:Bind MessageColor, Mode=OneWay}" >
             <Paragraph x:Name="MessageParagraph" /> 
         </RichTextBlock>
-        <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" FontWeight="Bold" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" />
+        <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" FontWeight="Bold" Foreground="{x:Bind UserColor, Mode=OneWay}" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" />
 
         <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" 
                HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0">
-            
         </Frame>
 
     </Grid>

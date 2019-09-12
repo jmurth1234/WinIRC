@@ -50,7 +50,7 @@ namespace WinIRC.Net
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
             );
 
-            DebugMode = false;
+            DebugMode = true;
         }
 
         public new void Initialise()
@@ -63,6 +63,8 @@ namespace WinIRC.Net
         private void ShowChannels(List<ChannelListItem> obj)
         {
             var dialog = MainPage.instance.ShowChannelsList(obj);
+
+            if (dialog == null) return;
             dialog.JoinChannelClick += Dialog_JoinChannelClick; 
         }
 

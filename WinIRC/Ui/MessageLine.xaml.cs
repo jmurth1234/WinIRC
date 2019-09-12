@@ -102,13 +102,65 @@ namespace WinIRC.Ui
                 SetValue(MessageProperty, value);
                 NotifyPropertyChanged("MessageItem");
                 NotifyPropertyChanged("Username");
+                NotifyPropertyChanged("UserColor");
+                NotifyPropertyChanged("MessageColor");
                 NotifyPropertyChanged("TextIndent");
                 UpdateUi();
             }
         }
 
+        public Color MentionRed => ThemeColor(Colors.Red);
+
+        public SolidColorBrush UserColor
+        {
+            get
+            {
+                if (MessageItem == null) return null;
+
+                var color = ThemeColor(ColorUtils.GenerateColor(MessageItem.User));
+
+                if (MessageItem.Mention)
+                {
+                    return new SolidColorBrush(MentionRed);
+                }
+
+                return new SolidColorBrush(color);
+            }
+        }
+
+        public SolidColorBrush MessageColor
+        {
+            get
+            {
+                if (MessageItem == null) return null;
+
+                if (MessageItem.Mention)
+                {
+                    return new SolidColorBrush(MentionRed);
+                }
+
+                Color defaultColor = (Color) Application.Current.Resources["SystemBaseHighColor"];
+
+                return new SolidColorBrush(defaultColor);
+            }
+        }
+
         public MessageLine() : this(null)
         {
+        }
+
+        private Color ThemeColor(Color color)
+        {
+            if (Config.GetBoolean(Config.DarkTheme, true))
+            {
+                color = ColorUtils.ChangeColorBrightness(color, 0.2f);
+            }
+            else
+            {
+                color = ColorUtils.ChangeColorBrightness(color, -0.4f);
+            }
+
+            return color;
         }
 
         public MessageLine(Message line)
@@ -174,21 +226,9 @@ namespace WinIRC.Ui
                     MessageBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
                 }
 
-                var color = ColorUtils.GenerateColor(MessageItem.User);
-                if (Config.GetBoolean(Config.DarkTheme, true))
-                {
-                    color = ColorUtils.ChangeColorBrightness(color, 0.2f);
-                }
-                else
-                {
-                    color = ColorUtils.ChangeColorBrightness(color, -0.4f);
-                }
-                UsernameBox.Foreground = new SolidColorBrush(color);
-
                 if (MessageItem.Mention)
                 {
                     UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
-                    MessageBox.Foreground = new SolidColorBrush(Colors.Red);
                 }
 
                 hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
