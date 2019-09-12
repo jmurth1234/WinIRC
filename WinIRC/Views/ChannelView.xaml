@@ -10,11 +10,12 @@
     xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
+    xmlns:legacy="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d">
 
-    <Page.Resources>
+    <Windows10version1903:Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="Shadow" />
-    </Page.Resources>
+    </Windows10version1903:Page.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -24,7 +25,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Rectangle Grid.RowSpan="2" fcu:Fill="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush }" />
+        <Rectangle Grid.RowSpan="2" legacy:Fill="{ThemeResource SystemControlBackgroundListMediumBrush}" fcu:Fill="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush }" />
 
         <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
 
@@ -33,9 +34,11 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ToggleButton fcu:Style="{ThemeResource ToggleButtonRevealStyle}" x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
+            
+            <Windows10version1903:ToggleButton Style="{ThemeResource ToggleButtonRevealStyle}" x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
                 <FontIcon Glyph="&#xE73F;" FocusVisualPrimaryBrush="{x:Null}" />
-            </ToggleButton>
+            </Windows10version1903:ToggleButton>
+
             <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
                 <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" fcu:Style="{StaticResource ChannelViewTextBox}" IsReadOnly="True"  />
             </ScrollViewer>
@@ -43,16 +46,18 @@
 
         <Border x:Name="RootBorder" Padding="0,12,0,0" Grid.Row="3">
             <Grid>
-                <controls:DropShadowPanel BlurRadius="12"
-                                          Color="Black"
-                                          Opacity="0.3"
-                                          HorizontalContentAlignment="Stretch"
-                                          VerticalContentAlignment="Stretch">
-                    <Rectangle Fill="White" />
-                </controls:DropShadowPanel>
+                <Windows10version1903:Border>
+                    <controls:DropShadowPanel BlurRadius="12"
+                                              Color="Black"
+                                              Opacity="0.3"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch">
+                        <Rectangle Fill="White" />
+                    </controls:DropShadowPanel>
+                </Windows10version1903:Border>
 
                 <!-- SystemControlPageBackgroundChromeLowBrush is the default PaneBackground brush, feel free to change it to whatever you like! -->
-                <Grid x:Name="PaneContentGrid" fcu:Background="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush}">
+                <Grid x:Name="PaneContentGrid" legacy:Background="{ThemeResource SystemControlBackgroundListMediumBrush}" fcu:Background="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />

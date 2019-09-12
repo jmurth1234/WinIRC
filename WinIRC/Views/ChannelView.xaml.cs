@@ -87,7 +87,6 @@ namespace WinIRC.Views
 
             var visibility = window != null ? Visibility.Visible : Visibility.Collapsed;
             this.titlebar.Visibility = visibility;
-            this.CompactToggle.Visibility = visibility;
             this.titlebar.Text = $"{currentChannel} | {currentServer}";
             this.Window = window;
 
