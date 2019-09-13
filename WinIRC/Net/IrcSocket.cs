@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,12 +26,8 @@ namespace WinIRC.Net
         private SafeLineReader dataStreamLineReader;
         private CancellationTokenSource socketCancellation;
 
-        public Connection ConnCheck { get; private set; }
 
-        public IrcSocket(WinIrcServer server) : base(server)
-        {
-            ConnCheck = new Connection();
-        }
+        public IrcSocket(WinIrcServer server) : base(server) {}
 
         public override async void Connect()
         {
@@ -56,7 +52,7 @@ namespace WinIRC.Net
 
                     var trigger = new SocketActivityTrigger();
                     socketTaskBuilder.SetTrigger(trigger);
-                    task = socketTaskBuilder.Register();
+                    //task = socketTaskBuilder.Register();
                 }
             }
             catch (Exception e)
@@ -130,12 +126,6 @@ namespace WinIRC.Net
                 Debug.WriteLine(e.Message);
                 Debug.WriteLine(e.StackTrace);
             }
-        }
-
-        private void session_Revoked(object sender, ExtendedExecutionRevokedEventArgs args)
-        {
-            var toast = CreateBasicToast("Warning", "The extended execution session has been revoked. Connection may be lost when minimized.");
-            ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
 
         private async void ConnectionHandler()

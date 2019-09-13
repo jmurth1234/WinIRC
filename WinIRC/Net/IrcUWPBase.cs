@@ -50,7 +50,7 @@ namespace WinIRC.Net
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
             );
 
-            DebugMode = true;
+            DebugMode = false;
         }
 
         public new void Initialise()

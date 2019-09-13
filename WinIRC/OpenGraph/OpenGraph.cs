@@ -1,4 +1,4 @@
-﻿
+
 namespace OpenGraph_Net
 {
     using System;
@@ -263,15 +263,19 @@ namespace OpenGraph_Net
         private static OpenGraph ParseHtml(OpenGraph result, string content, bool validateSpecification = false)
         {
             string toParse = "";
-            try
+            int indexOfClosingHead = Regex.Match(content, "<body").Index;
+
+            if (content.Length >= 7 && indexOfClosingHead != 0)
             {
-                int indexOfClosingHead = Regex.Match(content, "<body").Index;
-                toParse = content.Substring(0, indexOfClosingHead + 7) + "<body></body></html>\r\n";
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                toParse = content;
+                try
+                {
+                    toParse = content.Substring(0, indexOfClosingHead + 7) + "<body></body></html>\r\n";
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                    toParse = content;
+                }
             }
 
             HtmlDocument document = new HtmlDocument();
@@ -309,6 +313,17 @@ namespace OpenGraph_Net
                 result.openGraphData.Add(property, value);
             }
 
+            if (validateSpecification)
+            {
+                foreach (string required in RequiredMeta)
+                {
+                    if (!result.ContainsKey(required))
+                    {
+                        throw new InvalidSpecificationException("The parsed HTML does not meet the open graph specification");
+                    }
+                }
+            }
+
             string type;
             result.openGraphData.TryGetValue("type", out type);
             result.Type = type ?? string.Empty;
@@ -321,7 +336,9 @@ namespace OpenGraph_Net
             {
                 string image;
                 result.openGraphData.TryGetValue("image", out image);
-                result.Image = new Uri(image ?? string.Empty);
+
+                if (image != null && image != "")
+                result.Image = new Uri(image);
             }
             catch (UriFormatException)
             {
@@ -336,6 +353,8 @@ namespace OpenGraph_Net
             {
                 string url;
                 result.openGraphData.TryGetValue("url", out url);
+
+                if (url != null && url != "")
                 result.Url = new Uri(url ?? string.Empty);
             }
             catch (UriFormatException)
@@ -345,17 +364,6 @@ namespace OpenGraph_Net
             catch (ArgumentException)
             {
                 // do nothing
-            }
-
-            if (validateSpecification)
-            {
-                foreach (string required in RequiredMeta)
-                {
-                    if (!result.ContainsKey(required))
-                    {
-                        throw new InvalidSpecificationException("The parsed HTML does not meet the open graph specification");
-                    }
-                }
             }
 
             return result;

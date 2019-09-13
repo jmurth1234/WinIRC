@@ -129,6 +129,7 @@ namespace WinIRC
         }
 
         private SolidColorBrush _AccentColorAlt;
+        private ICollectionView _contents;
 
         public SolidColorBrush AccentColorAlt
         {
@@ -140,6 +141,22 @@ namespace WinIRC
             {
                 this._AccentColorAlt = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        public ICollectionView ServerContents
+        {
+            get
+            {
+                return _contents;
+            }
+            set
+            {
+                if (_contents != value)
+                {
+                    _contents = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
@@ -234,8 +251,10 @@ namespace WinIRC
 
             RefreshSubMenu();
 
-            var cvs = (CollectionViewSource)Resources["channelsSrc"];
-            cvs.Source = IrcHandler.Servers;
+            CollectionViewSource collectionViewSource = new CollectionViewSource();
+            collectionViewSource.IsSourceGrouped = true;
+            collectionViewSource.Source = IrcHandler.Servers;
+            ServerContents = collectionViewSource.View;
 
             if (e.Parameter != null)
             {
@@ -271,7 +290,7 @@ namespace WinIRC
                 var item = new MenuFlyoutItem()
                 {
                     Text = server.Name,
-                    DataContext = server 
+                    DataContext = server
                 };
 
                 item.Click += MenuBarItem_Click;

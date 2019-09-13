@@ -139,7 +139,7 @@ namespace WinIRC.Ui
                     return new SolidColorBrush(MentionRed);
                 }
 
-                Color defaultColor = (Color) Application.Current.Resources["SystemBaseHighColor"];
+                Color defaultColor = Config.GetBoolean(Config.DarkTheme, true) ? Colors.White : Colors.Black;
 
                 return new SolidColorBrush(defaultColor);
             }
@@ -178,6 +178,9 @@ namespace WinIRC.Ui
         private void Instance_UiUpdated(object sender, EventArgs e)
         {
             UpdateUi();
+
+            NotifyPropertyChanged("UserColor");
+            NotifyPropertyChanged("MessageColor");
         }
 
         private void MessageLine_LayoutUpdated(object sender, object e)

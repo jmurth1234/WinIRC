@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Windows.Foundation.Metadata;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -18,6 +19,8 @@ namespace WinIRC.Ui
         public Action<Uri> LinkClicked { get; internal set; }
         public Uri FirstLink { get; private set; }
         public bool InlineLink { get; private set; }
+
+        private const String linkRegex = @"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?";
 
         public void SetText(Paragraph obj, string text)
         {
@@ -57,8 +60,8 @@ namespace WinIRC.Ui
                 hyper = new Hyperlink();
 
                 var symbol = "";
-
-                var url = new Uri(uri);
+                var matched = Regex.Match(uri, linkRegex);
+                var url = new Uri(matched.Value);
                 if ((uri.Contains("twitter.com") && uri.Contains("status"))
                     || isImage(uri)
                     || uri.Contains("youtube.com/watch")

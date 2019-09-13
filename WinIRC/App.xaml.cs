@@ -102,11 +102,11 @@ namespace WinIRC
         public App()
         {
             AutoExtendExecutionSession = false;
-            AppCenter.Start("ca57c9d3-f4bf-4bb0-82d0-64cd09de9ac6", typeof(Analytics), typeof(Crashes));
 
             SetTheme();
 
             this.InitializeComponent();
+
             foreach (var current in BackgroundTaskRegistration.AllTasks)
             {
                 current.Value.Unregister(true);
@@ -118,25 +118,6 @@ namespace WinIRC
 
         public void SetTheme()
         {
-            try
-            {
-                if (Config.Contains(Config.DarkTheme))
-                {
-                    var darkTheme = Config.GetBoolean(Config.DarkTheme);
-                    this.RequestedTheme = darkTheme ? ApplicationTheme.Dark : ApplicationTheme.Light;
-                }
-                else
-                {
-                    Config.SetBoolean(Config.DarkTheme, true);
-                    this.RequestedTheme = ApplicationTheme.Dark;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
-            }
-
             if (AppLaunched)
             {
                 Frame rootFrame = Window.Current.Content as Frame;
@@ -151,6 +132,28 @@ namespace WinIRC
                 }
 
                 MainPage.instance.ManageTitleBar();
+            }
+            else
+            {
+                try
+                {
+                    if (Config.Contains(Config.DarkTheme))
+                    {
+                        var darkTheme = Config.GetBoolean(Config.DarkTheme);
+                        this.RequestedTheme = darkTheme ? ApplicationTheme.Dark : ApplicationTheme.Light;
+                    }
+                    else
+                    {
+                        Config.SetBoolean(Config.DarkTheme, true);
+                        this.RequestedTheme = ApplicationTheme.Dark;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine(e.StackTrace);
+                }
+
             }
         }
 
@@ -207,6 +210,8 @@ namespace WinIRC
 
             // Ensure the current window is active  
             Window.Current.Activate();
+            AppCenter.Start("ca57c9d3-f4bf-4bb0-82d0-64cd09de9ac6", typeof(Analytics), typeof(Crashes));
+
             Window.Current.Activated += Current_Activated;
 
             AppLaunched = true;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -128,9 +128,9 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
-            base.UpdateUi();
 
             (Application.Current as App).SetTheme();
+            base.UpdateUi();
         }
 
         private void FontCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
