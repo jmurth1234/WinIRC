@@ -329,8 +329,7 @@ namespace WinIRC.Ui
 
         private void PreviewFrame_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            FlyoutShowOptions shareOptions = new FlyoutShowOptions();
-            ShareFlyout.ShowAt(sender as DependencyObject, shareOptions);
+            ShareFlyout.ShowAt(sender as FrameworkElement);
         }
     }
 }

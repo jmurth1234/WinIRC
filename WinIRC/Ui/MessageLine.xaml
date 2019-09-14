@@ -17,7 +17,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <controls:CommandBarFlyout Placement="Right" x:Name="ShareFlyout">
-                <AppBarButton Label="Share Link" Icon="Share" ToolTipService.ToolTip="Share Link" Click="Share_Click" />
+                <AppBarButton Label="Share Link" Icon="ReShare" ToolTipService.ToolTip="Share Link" Click="Share_Click" />
                 <AppBarButton Label="Copy Link to Clipboard" Icon="Copy" ToolTipService.ToolTip="Copy Link to Clipboard" Click="Copy_Click" />
             </controls:CommandBarFlyout>
         </ResourceDictionary>

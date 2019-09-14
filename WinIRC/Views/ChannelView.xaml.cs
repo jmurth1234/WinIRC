@@ -90,7 +90,7 @@ namespace WinIRC.Views
             this.titlebar.Text = $"{currentChannel} | {currentServer}";
             this.Window = window;
 
-            if (window == null)
+            if (window == null && CompactToggle != null)
             {
                 CompactToggle.Visibility = Visibility.Collapsed;   
             }
