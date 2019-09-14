@@ -10,6 +10,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -296,6 +297,40 @@ namespace WinIRC.Ui
             {
                 PreviewFrame.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void Share_Click(object sender, RoutedEventArgs e)
+        {
+            if (hyperlinkManager.FirstLink == null) return;
+
+            DataTransferManager.ShowShareUI();
+            DataTransferManager.GetForCurrentView().DataRequested += MessageLine_DataRequested;
+        }
+
+        private void MessageLine_DataRequested(Windows.ApplicationModel.DataTransfer.DataTransferManager sender, Windows.ApplicationModel.DataTransfer.DataRequestedEventArgs args)
+        {
+            args.Request.Data.SetWebLink(hyperlinkManager.FirstLink);
+            args.Request.Data.Properties.Title = Windows.ApplicationModel.Package.Current.DisplayName;
+
+            DataTransferManager.GetForCurrentView().DataRequested -= MessageLine_DataRequested;
+        }
+
+        private void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            DataPackage dataPackage = new DataPackage
+            {
+                RequestedOperation = DataPackageOperation.Copy
+            };
+
+            dataPackage.SetText(hyperlinkManager.FirstLink.ToString());
+
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void PreviewFrame_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            FlyoutShowOptions shareOptions = new FlyoutShowOptions();
+            ShareFlyout.ShowAt(sender as DependencyObject, shareOptions);
         }
     }
 }

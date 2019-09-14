@@ -5,6 +5,7 @@
     xmlns:local="using:WinIRC.Ui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
@@ -14,6 +15,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <local:UserRightClickMenu x:Name="UserRightClick" />
             </ResourceDictionary.MergedDictionaries>
+
+            <controls:CommandBarFlyout Placement="Right" x:Name="ShareFlyout">
+                <AppBarButton Label="Share Link" Icon="Share" ToolTipService.ToolTip="Share Link" Click="Share_Click" />
+                <AppBarButton Label="Copy Link to Clipboard" Icon="Copy" ToolTipService.ToolTip="Copy Link to Clipboard" Click="Copy_Click" />
+            </controls:CommandBarFlyout>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -35,9 +41,7 @@
         </RichTextBlock>
         <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" FontWeight="Bold" Foreground="{x:Bind UserColor, Mode=OneWay}" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" />
 
-        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" 
-               HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0">
-        </Frame>
+        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0" RightTapped="PreviewFrame_RightTapped" />
 
     </Grid>
 </UserControl>
