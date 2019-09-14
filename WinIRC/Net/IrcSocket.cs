@@ -31,6 +31,8 @@ namespace WinIRC.Net
 
         public override async void Connect()
         {
+            var autoReconnect = Config.GetBoolean(Config.AutoReconnect, true);
+
             if (Server == null)
                 return;
 
@@ -65,7 +67,6 @@ namespace WinIRC.Net
 
             if (!ConnCheck.HasInternetAccess)
             {
-                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
                 var msg = autoReconnect
                     ? "We'll try to connect once a connection is available." 
                     : "Please try again once your connection is restored";
@@ -112,7 +113,6 @@ namespace WinIRC.Net
             }
             catch (Exception e)
             {
-                var autoReconnect = Config.GetBoolean(Config.AutoReconnect, true);
                 var msg = autoReconnect
                     ? "Attempting to reconnect..."
                     : "Please try again later.";
