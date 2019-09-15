@@ -1,3 +1,4 @@
+using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,17 +28,21 @@ namespace WinIRC
         public DisplaySettingsView()
         {
             this.InitializeComponent();
-            Title = "Display";
+            Title = "Appearance";
             LoadSettings();
+        }
+
+        public List<string> Fonts
+        {
+            get
+            {
+                return CanvasTextFormat.GetSystemFontFamilies().OrderBy(f => f).ToList();
+            }
         }
 
         private void LoadSettings()
         {
-            var fontsList = new List<String>();
-            fontsList.Add( "Segoe UI" );
-            fontsList.Add( "Consolas" );
-            fontsList.Add( "Cambria" );
-            FontCombo.ItemsSource = fontsList;
+            FontCombo.ItemsSource = Fonts;
 
             if (Config.Contains(Config.DarkTheme))
             {

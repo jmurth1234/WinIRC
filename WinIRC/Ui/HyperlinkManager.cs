@@ -49,10 +49,18 @@ namespace WinIRC.Ui
             }
         }
 
-        private Hyperlink GetHyperLink(string uri)
+        private string ExtractCleanUrl(string section)
         {
-            if (uri.ToLower().StartsWith("www."))
-                uri = "http://" + uri;
+            var matched = Regex.Match(section, linkRegex);
+            var urlString = matched.Value;
+
+            return urlString;
+        }
+
+        private Hyperlink GetHyperLink(string sectionWithUrl)
+        {
+            if (sectionWithUrl.ToLower().StartsWith("www."))
+                sectionWithUrl = "http://" + sectionWithUrl;
 
             Hyperlink hyper;
             try
@@ -60,12 +68,12 @@ namespace WinIRC.Ui
                 hyper = new Hyperlink();
 
                 var symbol = "";
-                var matched = Regex.Match(uri, linkRegex);
-                var url = new Uri(matched.Value);
-                if ((uri.Contains("twitter.com") && uri.Contains("status"))
-                    || isImage(uri)
-                    || uri.Contains("youtube.com/watch")
-                    || uri.Contains("youtu.be"))
+                var urlString = ExtractCleanUrl(sectionWithUrl);
+                var url = new Uri(urlString);
+                if ((urlString.Contains("twitter.com") && urlString.Contains("status"))
+                    || isImage(urlString)
+                    || urlString.Contains("youtube.com/watch")
+                    || urlString.Contains("youtu.be"))
                 {
                     symbol = "";
                     hyper.Click += Hyper_Click;
@@ -81,11 +89,11 @@ namespace WinIRC.Ui
                     FirstLink = url;
                 }
 
-                hyper.Inlines.Add(GetRunControl(uri));
+                hyper.Inlines.Add(GetRunControl(sectionWithUrl));
 
                 var symbolRun = GetRunControl(symbol);
                 symbolRun.FontFamily = new FontFamily("Segoe MDL2 Assets");
-                symbolRun.FontSize--;
+                symbolRun.FontSize -= 2;
                 hyper.Inlines.Add(symbolRun);
             }
             catch (Exception e)
@@ -111,7 +119,8 @@ namespace WinIRC.Ui
         // custom handling 
         private void Hyper_Click(Hyperlink sender, HyperlinkClickEventArgs args)
         {
-            var uri = new Uri((sender.Inlines[0] as Run).Text);
+            var content = ExtractCleanUrl((sender.Inlines[0] as Run).Text);
+            var uri = new Uri(content);
             if (uri != null)
             {
                 Debug.WriteLine(uri);
