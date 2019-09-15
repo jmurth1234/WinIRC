@@ -245,6 +245,34 @@ namespace WinIRC.Views
             }
             var darktheme = Config.GetBoolean(Config.DarkTheme);
             this.RequestedTheme = darktheme ? ElementTheme.Dark : ElementTheme.Light;
+
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ColorUtils.ParseColor("#FF222222") : ColorUtils.ParseColor("#FFDDDDDD");
+            Brush brush;
+            try
+            {
+                if (Config.GetBoolean(Config.Blurred, true) && ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.AcrylicBrush"))
+                {
+                    var source = Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
+                    brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
+                    {
+                        FallbackColor = sidebarColor,
+                        BackgroundSource = source,
+                        TintColor = sidebarColor,
+                        TintOpacity = 0.55
+                    };
+                }
+                else
+                {
+                    brush = new SolidColorBrush(sidebarColor);
+                }
+            }
+            catch (Exception e)
+            {
+                brush = new SolidColorBrush(sidebarColor);
+            }
+
+            TopFillArea.Fill = brush;
+            PaneContentGrid.Background = brush;
         }
 
         private void CompactToggle_Click(object sender, RoutedEventArgs e)

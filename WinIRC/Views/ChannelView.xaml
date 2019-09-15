@@ -25,7 +25,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Rectangle Grid.RowSpan="2" legacy:Fill="{ThemeResource SystemControlBackgroundListMediumBrush}" fcu:Fill="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush }" />
+        <Rectangle Grid.RowSpan="2" x:Name="TopFillArea" />
 
         <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
 
@@ -57,7 +57,7 @@
                 </Windows10version1903:Border>
 
                 <!-- SystemControlPageBackgroundChromeLowBrush is the default PaneBackground brush, feel free to change it to whatever you like! -->
-                <Grid x:Name="PaneContentGrid" legacy:Background="{ThemeResource SystemControlBackgroundListMediumBrush}" fcu:Background="{ThemeResource SystemControlChromeMediumLowAcrylicElementMediumBrush}">
+                <Grid x:Name="PaneContentGrid" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />

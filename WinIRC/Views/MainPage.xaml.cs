@@ -194,7 +194,7 @@ namespace WinIRC
 
         private void WindowStates_CurrentStateChanging(object sender, VisualStateChangedEventArgs e)
         {
-            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF111111") : ParseColor("#FFEEEEEE");
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ColorUtils.ParseColor("#FF111111") : ColorUtils.ParseColor("#FFEEEEEE");
             SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
         }
 
@@ -378,9 +378,9 @@ namespace WinIRC
 
             var darkTheme = Config.GetBoolean(Config.DarkTheme);
 
-            var background = ParseColor("#FF1F1F1F");
-            var backgroundInactive = ParseColor("#FF2B2B2B");
-            var foreground = ParseColor("#FFFFFFFF");
+            var background = ColorUtils.ParseColor("#FF1F1F1F");
+            var backgroundInactive = ColorUtils.ParseColor("#FF2B2B2B");
+            var foreground = ColorUtils.ParseColor("#FFFFFFFF");
 
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
@@ -390,17 +390,6 @@ namespace WinIRC
             titleBar.ButtonForegroundColor = foreground;
 
             Menu.Background = AccentColor;
-        }
-
-
-        private Color ParseColor(string hexCode)
-        {
-            var color = new Color();
-            color.A = byte.Parse(hexCode.Substring(1, 2), NumberStyles.AllowHexSpecifier);
-            color.R = byte.Parse(hexCode.Substring(3, 2), NumberStyles.AllowHexSpecifier);
-            color.G = byte.Parse(hexCode.Substring(5, 2), NumberStyles.AllowHexSpecifier);
-            color.B = byte.Parse(hexCode.Substring(7, 2), NumberStyles.AllowHexSpecifier);
-            return color;
         }
 
         internal void UpdateUi()
@@ -442,7 +431,7 @@ namespace WinIRC
                 }
             }
 
-            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ParseColor("#FF111111") : ParseColor("#FFEEEEEE");
+            var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ColorUtils.ParseColor("#FF111111") : ColorUtils.ParseColor("#FFEEEEEE");
             Brush brush;
             try
             {
