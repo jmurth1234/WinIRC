@@ -16,8 +16,8 @@
     <Windows10version1903:Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="Shadow" />
     </Windows10version1903:Page.Resources>
-    
-    <Grid>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />

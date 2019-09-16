@@ -312,6 +312,7 @@ namespace WinIRC
                 window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
                 window.TitleBar.ExtendsContentIntoTitleBar = true;
                 window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
+
                 CloseTab_Click(sender, e);
             }
 
@@ -464,16 +465,6 @@ namespace WinIRC
             {
                 TabsVisible = Config.GetBoolean(Config.UseTabs) ? Visibility.Visible : Visibility.Collapsed;
                 HeaderColor.Visibility = (Config.GetBoolean(Config.UseTabs) || ShowTopic) ? Visibility.Visible : Visibility.Collapsed;
-            }
-
-            foreach (PivotItem item in Tabs.Items.Cast<PivotItem>())
-            {
-                if (item.Content is ChannelView)
-                {
-                    var view = item.Content as ChannelView;
-
-                    view.UpdateUi();
-                }
             }
 
             UiUpdated?.Invoke(this, new EventArgs());

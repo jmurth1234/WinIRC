@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.7.0 (unreleased)
+
+Not the promised recode, but it's not 2.0 either so it checks out.
+
+This update does however bring a major change to how the client handles IRC connections, decoupling a lot of the IRC logic into a separate IRCClientCore library.
+
+Some of the major new features in this update include:
+
+ - More fluent design! In 1903 and later, you now get a bunch of shadows in your UI for depth.
+ - More IRC features! NOTICEs are now handled, you can now list server channels where available, and possibly more!
+ - New analytics! Now with the ability to turn them off!
+ - A return to a working Extended Execution Session!
+ - Begins migrating the UI over to WinUI for cross version consistency
+ 
 ## 1.6.0
 
 WinIRC 1.6 updates the SDK used to the fall creators update SDK, meaning you'll see some fluent design within the application! Specifically:

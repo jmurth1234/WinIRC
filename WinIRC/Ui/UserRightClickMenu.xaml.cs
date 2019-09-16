@@ -5,6 +5,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using WinIRC.Handlers;
+using WinIRC.Views;
 
 namespace WinIRC.Ui
 {
@@ -28,9 +30,18 @@ namespace WinIRC.Ui
 
         private void MenuFlyout_Opened(object sender, object e)
         {
-            commands = MainPage.instance.GetCurrentServer().CommandManager;
-            channel = MainPage.instance.currentChannel;
-
+            var flyout = sender as MenuFlyout;
+            if (flyout.Target is ChannelView)
+            {
+                var view = (ChannelView)flyout.Target;
+                commands = IrcUiHandler.Instance.connectedServers[view.currentServer].CommandManager;
+                channel = view.currentChannel;
+            }
+            else
+            {
+                commands = MainPage.instance.GetCurrentServer().CommandManager;
+                channel = MainPage.instance.currentChannel;
+            }
             UsernameItem.Text = UserSelected;
         }
 
@@ -63,7 +74,9 @@ namespace WinIRC.Ui
 
                 if (selectedItem.DataContext is Message)
                 {
-                    user = ((Message)selectedItem.DataContext).User;
+                    var msg = ((Message)selectedItem.DataContext);
+                    user = msg.User;
+                    channel = msg.Channel;
                 }
             }
             else if (e.OriginalSource is ListViewItemPresenter)
@@ -140,6 +153,7 @@ namespace WinIRC.Ui
 
         private void SendPrivateMessage()
         {
+            if (commands == null) return;
             commands.HandleCommand(channel, "/query " + UserSelected);
         }
 

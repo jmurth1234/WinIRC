@@ -49,7 +49,6 @@ namespace WinIRC.Ui
 
         private HyperlinkManager hyperlinkManager;
         private Uri lastUri;
-        private object p;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String propertyName = "")

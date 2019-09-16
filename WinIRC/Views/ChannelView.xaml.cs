@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
@@ -95,6 +96,12 @@ namespace WinIRC.Views
                 CompactToggle.Visibility = Visibility.Collapsed;   
             }
 
+            MainPage.instance.UiUpdated += Instance_UiUpdated;
+            UpdateUi();
+        }
+
+        private void Instance_UiUpdated(object sender, EventArgs e)
+        {
             UpdateUi();
         }
 
@@ -273,6 +280,14 @@ namespace WinIRC.Views
 
             TopFillArea.Fill = brush;
             PaneContentGrid.Background = brush;
+
+            if (this.Window != null)
+            {
+                Window.TitleBar.ButtonBackgroundColor = Window.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+                Window.TitleBar.ButtonForegroundColor = Window.TitleBar.ButtonInactiveForegroundColor = darktheme ? Colors.White : Colors.Black;
+                Window.TitleBar.ForegroundColor = darktheme ? Colors.White : Colors.Black;
+                
+            }
         }
 
         private void CompactToggle_Click(object sender, RoutedEventArgs e)
