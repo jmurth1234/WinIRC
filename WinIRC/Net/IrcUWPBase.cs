@@ -78,12 +78,9 @@ namespace WinIRC.Net
         {
             var message = e.NewItems[0] as Message;
 
-            var key = Config.PerChannelSetting(this.Server.Name, message.Channel, Config.AlwaysNotify);
-            var ping = Config.GetBoolean(key, false);
-
-            if (currentChannel != message.Channel || (App.Current as App).IncrementPings == true || MainPage.instance.currentServer == this.Server.Name || ping)
+            if (currentChannel != message.Channel || (App.Current as App).IncrementPings == true || MainPage.instance.currentServer == this.Server.Name)
             {
-                var toast = CreateMentionToast(message.User, message.Channel, message.Text);
+                var toast = CreateMentionToast(Server.Name, message.User, message.Channel, message.Text);
                 toast.ExpirationTime = DateTime.Now.AddDays(2);
                 ToastNotificationManager.CreateToastNotifier().Show(toast);
                 (App.Current as App).NumberPings++;
@@ -261,7 +258,7 @@ namespace WinIRC.Net
             return null;
         }
 
-        public ToastNotification CreateMentionToast(string username, string channel, string text)
+        public static ToastNotification CreateMentionToast(string server, string username, string channel, string text)
         {
             try
             {
@@ -311,7 +308,7 @@ namespace WinIRC.Net
                         new ToastButton("Reply", new QueryString()
                         {
                             { "action", "reply" },
-                            { "server", Server.Name },
+                            { "server", server },
                             { "channel", channel },
                             { "username", username }
 
@@ -334,7 +331,7 @@ namespace WinIRC.Net
                     Launch = new QueryString()
                     {
                         { "action", "viewConversation" },
-                        { "server", Server.Name },
+                        { "server", server },
                         { "channel",  channel }
 
                     }.ToString()

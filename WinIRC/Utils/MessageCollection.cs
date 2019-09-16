@@ -1,4 +1,4 @@
-﻿using IrcClientCore;
+using IrcClientCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
+using Windows.UI.Notifications;
 using WinIRC.Net;
 
 namespace WinIRC.Utils
@@ -31,6 +32,9 @@ namespace WinIRC.Utils
                 Task.Run(this.LogWriter.Process);
             }
 
+            this.Server = server;
+            this.Channel = channel;
+
             this.CollectionChanged += MessageCollection_CollectionChanged;
         }
 
@@ -41,13 +45,29 @@ namespace WinIRC.Utils
                 Task.Run(() => RemoveAt(0));
             }
 
+            var key = Config.PerChannelSetting(Server, Channel, Config.AlwaysNotify);
+            var ping = Config.GetBoolean(key, false);
 
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
                 var items = e.NewItems;
 
-                if (LogWriter != null && !LogWriter.Error)
-                    foreach (var item in items) LogWriter.Add(item as Message);
+                foreach (var item in items)
+                {
+                    var message = (Message)item;
+
+                    if (LogWriter != null && !LogWriter.Error)
+                    {
+                        LogWriter.Add(message);
+                    }
+
+                    if (ping)
+                    {
+                        var toast = IrcUWPBase.CreateMentionToast(Server, message.User, Channel, message.Text);
+                        toast.ExpirationTime = DateTime.Now.AddDays(2);
+                        ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    }
+                }
             }
         }
 
