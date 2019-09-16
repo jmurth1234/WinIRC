@@ -363,6 +363,10 @@ namespace WinIRC.Net
                 if (writer != null) writer.Dispose();
 
                 if (streamSocket != null) streamSocket.Dispose();
+
+                HandleDisconnect = null;
+                ConnCheck.ConnectionChanged = null;
+                ConnCheck = null;
             }
             catch (NullReferenceException e)
             {

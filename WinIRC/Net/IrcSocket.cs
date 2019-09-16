@@ -107,7 +107,7 @@ namespace WinIRC.Net
                 writer = new DataWriter(streamSocket.OutputStream);
 
                 IsConnected = true;
-                IsReconnecting = false;
+                IsConnecting = false;
 
                 ConnectionHandler();
             }
@@ -235,10 +235,11 @@ namespace WinIRC.Net
         public override async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
+            IsConnected = false;
 
             if (attemptReconnect)
             {
-                IsReconnecting = true;
+                IsConnecting = true;
                 ReconnectionAttempts++;
                 if (ConnCheck != null && Server != null && ConnCheck.HasInternetAccess)
                 {
@@ -255,8 +256,8 @@ namespace WinIRC.Net
             }
             else
             {
-                IsConnected = false;
-                HandleDisconnect(this);
+                IsConnecting = false;
+                HandleDisconnect?.Invoke(this);
             }
         }
     }

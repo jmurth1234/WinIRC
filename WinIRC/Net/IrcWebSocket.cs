@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -50,6 +50,9 @@ namespace WinIRC.Net
                     messageWebSocket = webSocket; // Only store it after successfully connecting.
                 }
 
+                IsConnected = true;
+                IsConnecting = false;
+
                 Debug.WriteLine("Connected!");
 
                 writer = new DataWriter(webSocket.OutputStream);
@@ -87,9 +90,11 @@ namespace WinIRC.Net
         public override async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false)
         {
             WriteLine("QUIT :" + msg);
+            IsConnected = false;
+
             if (attemptReconnect)
             {
-                IsReconnecting = true;
+                IsConnecting = true;
                 if (ConnCheck.HasInternetAccess)
                 {
                     ReconnectionAttempts++;
@@ -107,8 +112,7 @@ namespace WinIRC.Net
             }
             else
             {
-                IsConnected = false;
-                HandleDisconnect(this);
+                HandleDisconnect?.Invoke(this);
                 messageWebSocket.Dispose();
             }
         }

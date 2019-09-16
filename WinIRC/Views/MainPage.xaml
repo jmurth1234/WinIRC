@@ -314,7 +314,7 @@
                     <MenuFlyoutSubItem Text="Connect to" x:Name="ConnectSubMenu" ToolTipService.ToolTip="This currently won't update dynamically, only on app load"/>
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="List Channels" Click="ListChannels_Click"/>
+                    <MenuFlyoutItem Text="Quit" Click="QuitClient_Click"/>
                 </winui:MenuBarItem>
 
                 <winui:MenuBarItem Title="View" AccessKey="v" Foreground="White">
@@ -347,7 +347,7 @@
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate x:DataType="ircclientcore:ChannelsGroup">
                                     <ui:ChannelListItem Margin="0" FontSize="14" Channel="{x:Bind ServerLog, Mode=OneWay}"
-                                                Server="{Binding Server}" IsServer="True" Title="{Binding Server}"
+                                                Server="{Binding Irc}" IsServer="True" Title="{Binding Server}"
                                                 ServerClickEvent="ChannelListItem_ServerClickEvent"
                                                 ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
                                                 ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
@@ -361,7 +361,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="ircclientcore:Channel">
                             <ui:ChannelListItem Margin="0" FontSize="12" Channel="{x:Bind Mode=TwoWay}"
-                                        Server="{Binding Server}" Title="{Binding Name}"
+                                        Server="{Binding Irc}" Title="{Binding Name}"
                                         ChannelJoinClicked="ChannelListItem_ChannelJoinClicked"
                                         ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
                                         ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 

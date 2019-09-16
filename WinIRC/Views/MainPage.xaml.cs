@@ -31,6 +31,7 @@ using Windows.UI.WindowManagement;
 using Windows.UI.Xaml.Hosting;
 using Microsoft.AppCenter.Analytics;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace WinIRC
 {
@@ -737,7 +738,6 @@ namespace WinIRC
             if (IrcHandler.connectedServersList.Contains(irc.Server.Name)) return;
             if (IrcHandler.connectedServersList.Contains(irc.Server.Hostname)) return;
 
-            irc.HandleDisconnect += HandleDisconnect;
             irc.Initialise();
 
             // connect
@@ -757,8 +757,9 @@ namespace WinIRC
             lastAuto = Config.GetBoolean(Config.UseTabs);
         }
 
-        public async void HandleDisconnect(IrcUWPBase irc)
+        public async Task CloseServer(IrcUWPBase irc)
         {
+            irc.DisconnectAsync(attemptReconnect: false);
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (IrcHandler.connectedServersList.Count > 1)
@@ -778,9 +779,6 @@ namespace WinIRC
 
                 IrcHandler.connectedServers.Remove(irc.Server.Name);
                 IrcHandler.connectedServersList.Remove(irc.Server.Name);
-                irc.HandleDisconnect = null;
-                irc.ConnCheck.ConnectionChanged = null;
-                irc.ConnCheck = null;
                 irc.Dispose();
 
                 List<PivotItem> Temp = new List<PivotItem>();
@@ -1001,8 +999,10 @@ namespace WinIRC
 
             if (args.type == ServerRightClickType.RECONNECT)
                 server.DisconnectAsync(attemptReconnect: true);
-            else if (args.type == ServerRightClickType.CLOSE)
+            else if (args.type == ServerRightClickType.DISCONNECT)
                 server.DisconnectAsync(attemptReconnect: false);
+            else if (args.type == ServerRightClickType.CLOSE)
+                CloseServer(server);
         }
 
         private void MenuBarToggleItem_Click(object sender, RoutedEventArgs e)
@@ -1024,13 +1024,32 @@ namespace WinIRC
         {
             var header = sender as Ui.ChannelListItem;
 
-            SwitchChannel(header.Server, "Server", false);
+            SwitchChannel(header.Server.Server.Name, "Server", false);
         }
 
-        private void ListChannels_Click(object sender, RoutedEventArgs e)
+        private async void QuitClient_Click(object sender, RoutedEventArgs e)
         {
-            GetCurrentServer()?.CommandManager.HandleCommand(currentChannel, "/list");
+            ContentDialog confirmExit = new ContentDialog()
+            {
+                Title = "Are you sure?",
+                Content = "This will close WinIRC and end all current connections.",
+                PrimaryButtonText = "Yes",
+                SecondaryButtonText = "No"
+            };
+
+            var result = await confirmExit.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                foreach (var item in IrcHandler.connectedServers.ToList())
+                {
+                    await CloseServer(item.Value);
+                }
+
+                Application.Current.Exit();
+            }
         }
+
         public void ShowTeachingTip()
         {
             if (Config.GetBoolean(Config.HideBackgroundTip))

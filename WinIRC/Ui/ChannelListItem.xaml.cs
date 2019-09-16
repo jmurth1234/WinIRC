@@ -29,7 +29,7 @@ namespace WinIRC.Ui
             DependencyProperty.Register("IsServer", typeof(bool), typeof(ChannelListItem), new PropertyMetadata(null));
 
         internal static readonly DependencyProperty ServerProperty =
-            DependencyProperty.Register("Server", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
+            DependencyProperty.Register("Server", typeof(Irc), typeof(ChannelListItem), new PropertyMetadata(null));
 
         internal static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(string), typeof(ChannelListItem), new PropertyMetadata(null));
@@ -71,9 +71,9 @@ namespace WinIRC.Ui
             }
         }
 
-        public string Server
+        public Irc Server
         {
-            get { return (string)GetValue(ServerProperty); }
+            get { return (Irc)GetValue(ServerProperty); }
             set
             {
                 SetValue(ServerProperty, value);
@@ -104,12 +104,12 @@ namespace WinIRC.Ui
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (!IsServer)
-                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Channel.Name, Server));
+                ChannelCloseClicked?.Invoke(sender, new ChannelEventArgs(Channel.Name, Server.Server.Name));
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text, Server));
+            ChannelJoinClicked?.Invoke(sender, new ChannelEventArgs(channel.Text, Server.Server.Name));
         }
 
         private void Grid_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -134,7 +134,7 @@ namespace WinIRC.Ui
 
             if (!IsServer)
             {
-                var key = Config.PerChannelSetting(Server, Channel.Name, Config.AlwaysNotify);
+                var key = Config.PerChannelSetting(Server.Server.Name, Channel.Name, Config.AlwaysNotify);
                 AlwaysPing.IsChecked = Config.GetBoolean(key, false);
             }
 
@@ -142,12 +142,12 @@ namespace WinIRC.Ui
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server, ServerRightClickType.CLOSE));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server.Server.Name, ServerRightClickType.CLOSE));
         }
 
         private void ReconnectItem_Click(object sender, RoutedEventArgs e)
         {
-            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server, ServerRightClickType.RECONNECT));
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server.Server.Name, ServerRightClickType.RECONNECT));
         }
 
         private void MenuButton_Click(object sender, RoutedEventArgs e)
@@ -161,6 +161,11 @@ namespace WinIRC.Ui
             {
                 ServerClickEvent?.Invoke(this, new EventArgs());
             }
+        }
+
+        private void ListButton_Click(object sender, RoutedEventArgs e)
+        {
+            Server.CommandManager.HandleCommand("", "/list");
         }
 
         protected override void OnPointerPressed(PointerRoutedEventArgs e)
@@ -185,15 +190,20 @@ namespace WinIRC.Ui
         {
             if (!IsServer)
             {
-                var key = Config.PerChannelSetting(Server, Channel.Name, Config.AlwaysNotify);
+                var key = Config.PerChannelSetting(Server.Server.Name, Channel.Name, Config.AlwaysNotify);
                 Config.SetBoolean(key, AlwaysPing.IsChecked);
             }
+        }
+
+        private void DisconnectItem_Click(object sender, RoutedEventArgs e)
+        {
+            ServerRightClickEvent?.Invoke(sender, new ServerRightClickArgs(Server.Server.Name, ServerRightClickType.DISCONNECT));
         }
     }
 
     public enum ServerRightClickType
     {
-        CLOSE, RECONNECT
+        CLOSE, DISCONNECT, RECONNECT
     }
 
     public class ServerRightClickArgs : EventArgs
