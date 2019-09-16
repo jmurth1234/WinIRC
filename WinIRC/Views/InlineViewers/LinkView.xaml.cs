@@ -61,7 +61,8 @@ namespace WinIRC.Views.InlineViewers
 
         private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Windows.System.Launcher.LaunchUriAsync(graph.Url);
+            var url = graph.Url != null ? graph.Url : graph.OriginalUrl;
+            Windows.System.Launcher.LaunchUriAsync(url);
         }
 
         private void TextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)

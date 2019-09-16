@@ -76,8 +76,9 @@ namespace WinIRC.Utils
 
             try
             {
-                await MigrateIfNeeded();
                 serversListOSH = new ObjectStorageHelper<List<WinIrcServer>>(StorageType.Roaming);
+
+                await MigrateIfNeeded();
                 await ConvertIfNeeded();
                 var servers = await serversListOSH.LoadAsync(Config.ServersListStore);
 
@@ -154,11 +155,9 @@ namespace WinIRC.Utils
 
         private async Task MigrateIfNeeded()
         {
-            var serversOSH = new ObjectStorageHelper<List<WinIrcServer>>(StorageType.Roaming);
+            var folder = serversListOSH.GetFolder(StorageType.Roaming);
 
-            var folder = serversOSH.GetFolder(StorageType.Roaming);
-
-            if ((await folder.GetItemsAsync()).Count == 0 && !(await serversOSH.FileExists(folder, "migrated")))
+            if ((await folder.GetItemsAsync()).Count == 0 && !(await serversListOSH.FileExists(folder, "migrated")))
             {
                 await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
                 return;
@@ -169,10 +168,10 @@ namespace WinIRC.Utils
                 return;
             }
 
-            if (!(await serversOSH.FileExists(folder, "migrated")))
+            if (!(await serversListOSH.FileExists(folder, "migrated")))
             {
-                var servers = await serversOSH.LoadAsync();
-                await serversOSH.MigrateAsync(servers, Config.ServersStore);
+                var servers = await serversListOSH.LoadAsync();
+                await serversListOSH.MigrateAsync(servers, Config.ServersStore);
 
                 await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
             }
@@ -239,29 +238,6 @@ namespace WinIRC.Utils
         {
             if (!Servers.Any(server => server.Name == name)) return new WinIrcServer();
             return Servers.First(server => server.Name == name);
-        }
-
-        // this is only used here to convert old servers
-        private class OldIrcServer
-        {
-            public bool invalid { get; set; }
-
-            public string name { get; set; } = "";
-            public string hostname { get; set; } = "";
-            public int port { get; set; } = 6667;
-            public bool ssl { get; set; } = false;
-            public bool webSocket { get; set; } = false;
-            public string username { get; set; } = "";
-            public string password { get; set; } = "";
-            public string nickservPassword { get; set; } = "";
-
-            // channels are a string seperated by commas
-            public string channels { get; set; } = "";
-
-            public override String ToString()
-            {
-                return name;
-            }
         }
     }
 

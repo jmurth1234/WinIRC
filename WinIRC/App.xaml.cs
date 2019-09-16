@@ -37,7 +37,6 @@ using WinIRC.Utils;
 using System.Threading.Tasks;
 using Template10.Common;
 using WinIRC.Views;
-using Microsoft.ApplicationInsights;
 using Windows.ApplicationModel.ExtendedExecution;
 using Windows.UI.Xaml.Markup;
 using Microsoft.AppCenter.Analytics;
@@ -245,7 +244,6 @@ namespace WinIRC
             {
                 await servers.loadServersAsync();
                 await servers.UpdateJumpList();
-
                 loaded = false;
                 NumberPings = 0;
                 var applicationView = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView();
