@@ -832,8 +832,6 @@ namespace WinIRC
             SidebarFrame.BackStack.Clear();
             SidebarHeader.ShowBackButton = false;
 
-            ShowingUsers = false;
-
             if (SidebarFrame.Content == null || !(SidebarFrame.Content.GetType() == type))
             {
                 SidebarFrame.Navigate(type);
@@ -850,8 +848,8 @@ namespace WinIRC
                 }
             }
 
-            NotifyPropertyChanged(nameof(ShowingUsers));
             ToggleSidebar();
+            ShowingUsers = false;
         }
 
         private void BehaviourSettings_Click(object sender, RoutedEventArgs e)
@@ -874,7 +872,7 @@ namespace WinIRC
             ShowingUsers = false;
         }
 
-        private Boolean SidebarPinned()
+        private bool SidebarPinned()
         {
             return SidebarSplitView.DisplayMode == SplitViewDisplayMode.Inline;
         }
