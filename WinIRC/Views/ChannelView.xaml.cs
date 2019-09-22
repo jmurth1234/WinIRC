@@ -79,11 +79,6 @@ namespace WinIRC.Views
             currentServer = server;
             currentChannel = channel;
 
-            Loaded += (s, e) =>
-            {
-                SetChannel(server, channel);
-            };
-
             Unloaded += ChannelView_Unloaded;
 
             var visibility = window != null ? Visibility.Visible : Visibility.Collapsed;
@@ -97,7 +92,7 @@ namespace WinIRC.Views
             }
 
             MainPage.instance.UiUpdated += Instance_UiUpdated;
-            UpdateUi();
+            SetChannel(server, channel);
         }
 
         private void Instance_UiUpdated(object sender, EventArgs e)
@@ -234,12 +229,12 @@ namespace WinIRC.Views
 
             if (Config.Contains(Config.FontFamily))
             {
-                this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
+                // this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
             }
 
             if (Config.Contains(Config.FontSize))
             {
-                this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
+                // this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
             }
 
             if (currentChannel != "Server")

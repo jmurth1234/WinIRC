@@ -199,8 +199,6 @@ namespace WinIRC.Ui
 
         public void UpdateUi()
         {
-            InvalidateMeasure();
-            UpdateLayout();
             this.hyperlinkManager = new HyperlinkManager();
 
             if (double.IsNaN(UsernameBox.ActualWidth) || double.IsNaN(TimestampBox.ActualWidth)) return;
