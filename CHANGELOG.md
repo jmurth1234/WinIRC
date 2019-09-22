@@ -1,19 +1,25 @@
 # Changelog
 
-## 1.7.0 (unreleased)
+## 1.7.0
 
-Not the promised recode, but it's not 2.0 either so it checks out.
+Not the promised recode, but it's not 2.0 either so it checks out. 
 
 This update does however bring a major change to how the client handles IRC connections, decoupling a lot of the IRC logic into a separate IRCClientCore library.
 
 Some of the major new features in this update include:
 
  - More fluent design! In 1903 and later, you now get a bunch of shadows in your UI for depth.
- - More IRC features! NOTICEs are now handled, you can now list server channels where available, and possibly more!
+ - More IRC features! NOTICEs are now handled, you can now list server channels where available, and more!
  - New analytics! Now with the ability to turn them off!
  - A return to a working Extended Execution Session!
- - Begins migrating the UI over to WinUI for cross version consistency
- 
+ - You can now right click a username in the chat view to get the same right click menu as in the sidebar
+ - Redesigned link and Twitter embeds 
+ - Allow opening channels in a new window (1903 or later)
+
+This will likely be the last update to support any Windows Phones -- this update already dropped the Anniversary Update to switch to WinUI, and the next update will probably drop them too as it's the only way to support ARM64 devices.
+
+For the full list of changes, check out https://github.com/rymate1234/WinIRC/compare/v1.6...v1.7
+
 ## 1.6.0
 
 WinIRC 1.6 updates the SDK used to the fall creators update SDK, meaning you'll see some fluent design within the application! Specifically:
@@ -28,6 +34,7 @@ In none fluent design related updates, there's a number of new features, includi
  - You can now right click on a channel, and enable notifications for all messages to that channel.
 
 Various other small changes and fixes include:
+
  - The twitter previewing is disabled on fall creators update devicesdue to a bug in the library used
  - Channels now only render the last 1k messages
  - Notifications are more reliable
