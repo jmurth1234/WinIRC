@@ -1,3 +1,4 @@
+using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -214,7 +215,7 @@ namespace WinIRC.Net
                         if (line == null) break;
                         if (line.Length == 0) continue;
 
-                        await HandleLine(line);
+                        await RecieveLine(line);
                     }
                 }
                 catch (Exception e)

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.1 (WIP)
+
+Patch release of some of the initial bugs captured by the analytics, including:
+
+ - Prevents the app crashing when an unknown command is attempted
+
+This also improves the analytics with additional event tracking of non personal details of IRC usage. Specifically, this will track:
+
+ - Whether a message was sent (not the contents opf the message)
+ - Whether a command was used (not the contents of the command, e.g. if I did /msg nickserv identify **** it would track that /msg was used)
+ - Incoming IRC command lines, and whether it was handled or not
+
 ## 1.7.0
 
 Not the promised recode, but it's not 2.0 either so it checks out. 

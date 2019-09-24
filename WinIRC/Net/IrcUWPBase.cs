@@ -1,5 +1,6 @@
 using IrcClientCore;
 using IrcClientCore.Handlers.BuiltIn;
+using Microsoft.AppCenter.Analytics;
 using Microsoft.QueryStringDotNET;
 using NotificationsExtensions;
 using NotificationsExtensions.Toasts;
@@ -58,6 +59,17 @@ namespace WinIRC.Net
             base.Initialise();
             Mentions.CollectionChanged += Mentions_CollectionChanged;
             HandleDisplayChannelList = ShowChannels;
+        }
+
+        public override async Task ProcessLine(IrcMessage parsedLine)
+        {
+            var hasHandlers = HandlerManager.HasHandler(parsedLine.CommandMessage.Command);
+
+            Analytics.TrackEvent(hasHandlers ? "Processing Irc Line" : "Processing Unhandled IRC line", new Dictionary<string, string> {
+                { "Command", parsedLine.CommandMessage.Command}
+            });
+
+            await base.ProcessLine(parsedLine);
         }
 
         private void ShowChannels(List<ChannelListItem> obj)

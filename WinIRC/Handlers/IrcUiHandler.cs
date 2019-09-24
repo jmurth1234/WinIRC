@@ -1,4 +1,5 @@
-﻿using IrcClientCore;
+using IrcClientCore;
+using Microsoft.AppCenter.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -64,6 +65,16 @@ namespace WinIRC.Handlers
 
             if ((e.Key == Windows.System.VirtualKey.Enter) && (msgBox.Text != ""))
             {
+                if (msgBox.Text.StartsWith("/")) {
+                    Analytics.TrackEvent("Command Used", new Dictionary<string, string> {
+                        { "Command", msgBox.Text.Split(' ').First() }
+                    });
+                }
+                else
+                {
+                    Analytics.TrackEvent("Message Sent");
+                }
+
                 connectedServers[server].CommandManager.HandleCommand(channel, msgBox.Text);
 
                 msgBox.Text = "";
@@ -142,7 +153,6 @@ namespace WinIRC.Handlers
             var users = connectedServers[server].ChannelList[channel].Store.RawUsers;
             return users.Where(cmd => cmd.StartsWith(word)).ToArray();
         }
-
 
         public void UpdateUsers(Frame frame, string server, string channel)
         {

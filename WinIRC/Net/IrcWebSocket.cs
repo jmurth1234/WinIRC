@@ -142,7 +142,7 @@ namespace WinIRC.Net
                         {
                             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                             {
-                                HandleLine(receivedData);
+                                RecieveLine(receivedData);
                             });
                         }
                     }
