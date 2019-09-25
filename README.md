@@ -29,14 +29,13 @@ You'll need the following:
 Once you've downloaded the project (either via a git clone, the "Open in Visual Studio" button in github, or via some other method) and opened in visual studio the compilation steps are as follows:
 
 1. Clean solution
-2. Set the properties of ApplicationInsights.config to "Build Action: None" and "Copy to output Directory: Do not copy"
-3. Ensure you have a certificate for deploying the app - 
+2. Ensure you have a certificate for deploying the app - 
     * Go to `Package.appmanifest -> Packaging -> Choose Certificate`
 	* In the dialog, click `Configure Certificate -> Create Test Certificate`
 	* Keep the default settings, then click ok and ok again
-4. Build solution
-5. Using the top toolbar, select the architecture and the device you want to deploy the app on
-6. And that should be it!
+3. Build solution
+4. Using the top toolbar, select the architecture and the device you want to deploy the app on
+5. And that should be it!
 
 ## Contributing
 
