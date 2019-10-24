@@ -65,8 +65,11 @@ namespace WinIRC.Net
         {
             var hasHandlers = HandlerManager.HasHandler(parsedLine.CommandMessage.Command);
 
-            Analytics.TrackEvent(hasHandlers ? "Processing Irc Line" : "Processing Unhandled IRC line", new Dictionary<string, string> {
-                { "Command", parsedLine.CommandMessage.Command}
+            await Task.Run(() =>
+            {
+                Analytics.TrackEvent(hasHandlers ? "Processing Irc Line" : "Processing Unhandled IRC line", new Dictionary<string, string> {
+                    { "Command", parsedLine.CommandMessage.Command}
+                });
             });
 
             await base.ProcessLine(parsedLine);
