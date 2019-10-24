@@ -1,41 +1,88 @@
-﻿<Page
+<Page
     x:Class="WinIRC.Views.ChannelView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinIRC.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="using:WinIRC.Ui"
+    xmlns:net="using:IrcClientCore"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
+    xmlns:legacy="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d">
+
+    <Windows10version1903:Page.Resources>
+        <Windows10version1903:ThemeShadow x:Name="Shadow" />
+    </Windows10version1903:Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0" Canvas.ZIndex="0" x:Name="messagesScroll" Padding="5" VerticalScrollMode="Enabled" >
-            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,15,0" >
+
+        <Rectangle Grid.RowSpan="2" x:Name="TopFillArea" />
+
+        <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
+
+        <Grid Grid.Row="1" Windows10version1903:Shadow="{StaticResource Shadow}" x:Name="TopArea" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Windows10version1903:ToggleButton Style="{ThemeResource ToggleButtonRevealStyle}" x:Name="CompactToggle" FontFamily="Segoe MDL2 Assets" Background="{x:Null}" Click="CompactToggle_Click">
+                <FontIcon Glyph="&#xE73F;" FocusVisualPrimaryBrush="{x:Null}" />
+            </Windows10version1903:ToggleButton>
+
+            <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
+                <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" fcu:Style="{StaticResource ChannelViewTextBox}" IsReadOnly="True"  />
+            </ScrollViewer>
+        </Grid>
+
+        <Border x:Name="RootBorder" Padding="0,12,0,0" Grid.Row="3">
+            <Grid>
+                <Windows10version1903:Border>
+                    <controls:DropShadowPanel BlurRadius="12"
+                                              Color="Black"
+                                              Opacity="0.3"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch">
+                        <Rectangle Fill="White" />
+                    </controls:DropShadowPanel>
+                </Windows10version1903:Border>
+
+                <!-- SystemControlPageBackgroundChromeLowBrush is the default PaneBackground brush, feel free to change it to whatever you like! -->
+                <Grid x:Name="PaneContentGrid" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
+
+                    <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="ircMsgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.RowSpan="4" Canvas.ZIndex="-1" Padding="5" x:Name="Scroll">
+            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,15,42" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <ui:MessageLine CompactMode="False" MessageItem="{Binding}"/>
+                    <DataTemplate x:DataType="net:Message">
+                        <ui:MessageLine CompactMode="False" MessageItem="{x:Bind Mode=OneWay}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical"/>
+                        <ItemsStackPanel Orientation="Vertical" VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" CacheLength="10" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </ScrollViewer>
-
-        <Grid Grid.Row="1" Background="{ThemeResource SystemChromeMediumColor}" Height="40" VerticalAlignment="Bottom" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="20" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" />
-
-            <TextBox Grid.Column="1" x:Name="ircMsgBox" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0"/>
-        </Grid>
     </Grid>
 </Page>

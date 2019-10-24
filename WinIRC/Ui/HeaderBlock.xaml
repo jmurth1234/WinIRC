@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Margin="0" Height="48" VerticalAlignment="Top">
+    <Grid Margin="0" Height="40" RequestedTheme="Dark" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>

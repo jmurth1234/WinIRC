@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -52,13 +52,13 @@ namespace WinIRC
 
         private void JoinSupport(object sender, RoutedEventArgs e)
         {
-            IrcServer server = new IrcServer
+            WinIrcServer server = new WinIrcServer
             {
-                name = "WinIRC Support (Freenode)",
-                hostname = "chat.freenode.net",
-                port = 6697,
-                ssl = true,
-                channels = "#winirc"
+                Name = "WinIRC Support (Freenode)",
+                Hostname = "chat.freenode.net",
+                Port = 6697,
+                Ssl = true,
+                Channels = "#winirc"
             };
 
             MainPage.instance.IrcPrompt(server);
@@ -66,7 +66,7 @@ namespace WinIRC
 
         private async void VisitGithub(object sender, RoutedEventArgs e)
         {
-            var uri = new Uri("https://github.com/rymate1234/WinIRC");
+            var uri = new Uri("https://github.com/rymate1234/WinIRC/issues/");
             await Windows.System.Launcher.LaunchUriAsync(uri);
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+using Microsoft.Graphics.Canvas.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,22 +25,24 @@ namespace WinIRC
     /// </summary>
     public sealed partial class DisplaySettingsView : BaseSettingsPage
     {
-        private bool SettingsLoaded;
-
         public DisplaySettingsView()
         {
             this.InitializeComponent();
-            Theme.Toggled += theme_Toggled;
+            Title = "Appearance";
             LoadSettings();
+        }
+
+        public List<string> Fonts
+        {
+            get
+            {
+                return CanvasTextFormat.GetSystemFontFamilies().OrderBy(f => f).ToList();
+            }
         }
 
         private void LoadSettings()
         {
-            var fontsList = new List<String>();
-            fontsList.Add( "Segoe UI" );
-            fontsList.Add( "Consolas" );
-            fontsList.Add( "Cambria" );
-            FontCombo.ItemsSource = fontsList;
+            FontCombo.ItemsSource = Fonts;
 
             if (Config.Contains(Config.DarkTheme))
             {
@@ -49,6 +52,16 @@ namespace WinIRC
             {
                 Config.SetBoolean(Config.DarkTheme, true);
                 this.Theme.IsOn = true;
+            }
+
+            if (Config.Contains(Config.Blurred))
+            {
+                this.BlurredBack.IsOn = Config.GetBoolean(Config.Blurred);
+            }
+            else
+            {
+                Config.SetBoolean(Config.Blurred, true);
+                this.BlurredBack.IsOn = true;
             }
 
             if (Config.Contains(Config.FontFamily))
@@ -77,7 +90,7 @@ namespace WinIRC
             }
             else
             {
-                Config.SetBoolean(Config.DarkTheme, false);
+                Config.SetBoolean(Config.ReducedPadding, false);
                 this.Padding.IsOn = false;
             }
 
@@ -91,6 +104,26 @@ namespace WinIRC
                 this.HideStatusBar.IsOn = false;
             }
 
+            if (Config.Contains(Config.IgnoreJoinLeave))
+            {
+                this.IgnoreJoinLeave.IsOn = Config.GetBoolean(Config.IgnoreJoinLeave);
+            }
+            else
+            {
+                Config.SetBoolean(Config.IgnoreJoinLeave, false);
+                this.IgnoreJoinLeave.IsOn = false;
+            }
+
+            if (Config.Contains(Config.ShowMetadata))
+            {
+                this.LinkMetadata.IsOn = Config.GetBoolean(Config.ShowMetadata);
+            }
+            else
+            {
+                Config.SetBoolean(Config.ShowMetadata, true);
+                this.LinkMetadata.IsOn = true;
+            }
+
             this.SettingsLoaded = true;
         }
 
@@ -98,12 +131,10 @@ namespace WinIRC
         {
             if (!SettingsLoaded)
                 return;
-            Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
-            (Application.Current as App).SetTheme();
-            MainPage.instance.RequestedTheme = Theme.IsOn ? ElementTheme.Dark : ElementTheme.Light;
 
-            //var dialog = new MessageDialog("To apply the theme, please restart WinIRC.");
-            //await dialog.ShowAsync();
+            Config.SetBoolean(Config.DarkTheme, Theme.IsOn);
+
+            (Application.Current as App).SetTheme();
             base.UpdateUi();
         }
 
@@ -140,6 +171,36 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.HideStatusBar, HideStatusBar.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void IgnoreJoinLeave_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.IgnoreJoinLeave, IgnoreJoinLeave.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void BlurredBack_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.Blurred, BlurredBack.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void LinkMetadata_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.ShowMetadata, LinkMetadata.IsOn);
 
             base.UpdateUi();
         }

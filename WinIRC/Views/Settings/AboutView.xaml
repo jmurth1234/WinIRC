@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="WinIRC.AboutView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,12 +8,12 @@
     mc:Ignorable="d">
 
     <StackPanel Padding="10" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock x:Name="AppNameBlock" Text="WinIRC" FontSize="24" />
+        <TextBlock x:Name="AppNameBlock" Text="WinIRC" Style="{ThemeResource SubtitleTextBlockStyle}" />
         <TextBlock Text="Made by rymate1234." Margin="0,0,0,20"  />
 
         <Button Content="Visit my Website" Margin="0,0,0,10" Click="VisitWebsite" />
         
-        <Button Content="View the source on GitHub" Margin="0,0,0,10" Click="VisitGithub" />
+        <Button Content="Give feedback on GitHub" Margin="0,0,0,10" Click="VisitGithub" />
 
         <Button Content="Rate this app on the Store" Margin="0,0,0,10" Click="RateApp" />
 

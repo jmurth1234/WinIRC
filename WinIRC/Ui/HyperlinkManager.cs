@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using Windows.Foundation.Metadata;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -13,9 +16,11 @@ namespace WinIRC.Ui
 {
     public class HyperlinkManager
     { 
-        private Dictionary<Hyperlink, Uri> storedUris = new Dictionary<Hyperlink, Uri>();
-
         public Action<Uri> LinkClicked { get; internal set; }
+        public Uri FirstLink { get; private set; }
+        public bool InlineLink { get; private set; }
+
+        private const String linkRegex = @"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?";
 
         public void SetText(Paragraph obj, string text)
         {
@@ -44,10 +49,18 @@ namespace WinIRC.Ui
             }
         }
 
-        private Hyperlink GetHyperLink(string uri)
+        private string ExtractCleanUrl(string section)
         {
-            if (uri.ToLower().StartsWith("www."))
-                uri = "http://" + uri;
+            var matched = Regex.Match(section, linkRegex);
+            var urlString = matched.Value;
+
+            return urlString;
+        }
+
+        private Hyperlink GetHyperLink(string sectionWithUrl)
+        {
+            if (sectionWithUrl.ToLower().StartsWith("www."))
+                sectionWithUrl = "http://" + sectionWithUrl;
 
             Hyperlink hyper;
             try
@@ -55,26 +68,32 @@ namespace WinIRC.Ui
                 hyper = new Hyperlink();
 
                 var symbol = "";
-
-                var url = new Uri(uri);
-
-                if ((uri.Contains("twitter.com") && uri.Contains("status")) 
-                    || isImage(uri)
-                    || uri.Contains("youtube.com/watch")
-                    || uri.Contains("youtu.be"))
+                var urlString = ExtractCleanUrl(sectionWithUrl);
+                var url = new Uri(urlString);
+                if ((urlString.Contains("twitter.com") && urlString.Contains("status"))
+                    || isImage(urlString)
+                    || urlString.Contains("youtube.com/watch")
+                    || urlString.Contains("youtu.be"))
                 {
                     symbol = "";
                     hyper.Click += Hyper_Click;
-                    storedUris.Add(hyper, url);
+                    InlineLink = true;
+                }
+                else
+                {
+                    hyper.NavigateUri = url;
                 }
 
-                else hyper.NavigateUri = url;
+                if (FirstLink == null)
+                {
+                    FirstLink = url;
+                }
 
-                hyper.Inlines.Add(GetRunControl(uri));
+                hyper.Inlines.Add(GetRunControl(sectionWithUrl));
 
                 var symbolRun = GetRunControl(symbol);
                 symbolRun.FontFamily = new FontFamily("Segoe MDL2 Assets");
-                symbolRun.FontSize--;
+                symbolRun.FontSize -= 2;
                 hyper.Inlines.Add(symbolRun);
             }
             catch (Exception e)
@@ -88,18 +107,20 @@ namespace WinIRC.Ui
 
         public static bool isImage(string uri)
         {
+            var split = uri.Split('/');
             return uri.EndsWith(".png")
                 || uri.EndsWith(".jpg")
                 || uri.EndsWith(".jpeg")
-                || uri.EndsWith(".gif");
+                || uri.EndsWith(".gif")
+                || (uri.Contains("imgur") && !uri.Contains("/a/") && !(uri.Contains("/r/") && split.Length == 5));
 
         }
 
         // custom handling 
         private void Hyper_Click(Hyperlink sender, HyperlinkClickEventArgs args)
         {
-            Uri uri;
-            storedUris.TryGetValue(sender, out uri);
+            var content = ExtractCleanUrl((sender.Inlines[0] as Run).Text);
+            var uri = new Uri(content);
             if (uri != null)
             {
                 Debug.WriteLine(uri);

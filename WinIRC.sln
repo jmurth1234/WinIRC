@@ -1,23 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27019.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinIRC", "WinIRC\WinIRC.csproj", "{014C237E-8D09-4459-BBCF-EF5663A6A355}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|ARM.ActiveCfg = Debug|ARM
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|ARM.Build.0 = Debug|ARM
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -27,7 +24,6 @@ Global
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|x86.ActiveCfg = Debug|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|x86.Build.0 = Debug|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Debug|x86.Deploy.0 = Debug|x86
-		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|Any CPU.ActiveCfg = Release|x86
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|ARM.ActiveCfg = Release|ARM
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|ARM.Build.0 = Release|ARM
 		{014C237E-8D09-4459-BBCF-EF5663A6A355}.Release|ARM.Deploy.0 = Release|ARM
@@ -40,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3E86097-ED0B-4390-9469-9C9900737F09}
 	EndGlobalSection
 EndGlobal

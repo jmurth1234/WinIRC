@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace WinIRC
 {
@@ -10,8 +10,13 @@ namespace WinIRC
         public const string UserListClick = "userlistclick";
         public const string SwitchOnJoin = "switchonjoin";
         public const string UseTabs = "usetabs";
+        public const string AlwaysNotify = "alwaysnotify";
+        public const string AnalyticsAsked = "analyticsasked";
+
+        // connection settings
+        public const string DefaultUsername = "defaultusername";
         public const string AutoReconnect = "autoreconnect";
-        public static string IgnoreSSL = "ignoressl";
+        public const string IgnoreSSL = "ignoressl";
 
         // display settings
         public const string DarkTheme = "darktheme";
@@ -19,10 +24,25 @@ namespace WinIRC
         public const string FontSize = "fontsize";
         public const string ReducedPadding = "reducedpadding";
         public const string HideStatusBar = "hidestatusbar";
+        public const string IgnoreJoinLeave = "ignorejoinleave";
+        public const string Blurred = "blurredback";
+        public const string ShowMetadata = "showmetadata";
 
         // handles for server storage
         public static string ServersStore = "serversstore";
         public static string ServersListStore = "serversliststore";
+
+        public const string FirstRun = "firstrun";
+        public const string EnableLogs = "enablelogs";
+        public const string LogsFolder = "logsfolder";
+
+
+        public const string HideBackgroundTip = "hidebackgroundtip";
+
+        public static string PerChannelSetting(string server, string channel, string key)
+        {
+            return server + "." + channel + "." + key;
+        }
 
         public static bool Contains(string key)
         {
@@ -44,42 +64,45 @@ namespace WinIRC
             roamingSettings.Values[key] = value;
         }
 
-        public static bool GetBoolean(string key)
+        public static bool GetBoolean(string key, bool def = false)
         {
-            if (roamingSettings.Values[key] is bool)
+            if (Contains(key) && roamingSettings.Values[key] is bool)
             {
                 return (bool) roamingSettings.Values[key];
             }
             else
             {
-                return false;
+                return def;
             }
         }
 
-        public static string GetString(string key)
+        public static string GetString(string key, string def = "")
         {
-            var s = roamingSettings.Values[key] as string;
-            if (s != null)
+            if (Contains(key) && roamingSettings.Values[key] is string)
             {
-                return s;
+                return roamingSettings.Values[key] as string; 
             }
             else
             {
-                return "";
+                return def;
             }
         }
 
-        public static int GetInt(string key)
+        public static int GetInt(string key, int def = 0)
         {
-            if (roamingSettings.Values[key] is int)
+            if (Contains(key) && roamingSettings.Values[key] is int)
             {
                 return (int) roamingSettings.Values[key];
             }
             else
             {
-                return 0;
+                return def;
             }
         }
 
+        public static void RemoveKey(string key)
+        {
+            roamingSettings.Values.Remove(key);
+        }
     }
 }

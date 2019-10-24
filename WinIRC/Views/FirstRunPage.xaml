@@ -1,0 +1,79 @@
+﻿<Page
+    x:Class="WinIRC.Views.FirstRunPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="TextBoxRegexStyle"
+               TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates" >
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MiddleStack.Orientation" Value="Horizontal" />
+                        <Setter Target="Title.Text" Value="Welcome to WinIRC" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MiddleStack.Orientation" Value="Vertical" />
+                        <Setter Target="Title.Text" Value="Welcome" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Rectangle x:Name="TitleRect" Fill="{ThemeResource SystemAccentColor}" />
+        <TextBlock Padding="8,0,8,8"  x:Name="Title" FontSize="48" FontWeight="Medium" >
+            Welcome to WinIRC
+        </TextBlock>
+
+        <ScrollViewer Padding="8,0,8,8"  Grid.Row="1">
+            <StackPanel x:Name="MiddleStack" Orientation="Horizontal">
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Margin="0,8,8,8" Style="{StaticResource SubheaderTextBlockStyle}">
+                        Set a username
+                    </TextBlock>
+
+                    <TextBox Name="Username" />
+
+                    <TextBlock x:Name="Error" Text="Invalid Username" Foreground="#FFFF6468" FontSize="18" Visibility="Collapsed" />
+                </StackPanel>
+
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock Margin="0,8,8,8" Style="{StaticResource SubheaderTextBlockStyle}">
+                        Add some servers
+                    </TextBlock>
+
+                    <ListBox x:Name="ServListBox" ItemsSource="{x:Bind Servers}" DisplayMemberPath="Name" VerticalContentAlignment="Stretch" SelectionMode="Multiple" Background="{x:Null}" />
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+        <Button Margin="8,0,8,8" x:Name="ConfirmButton" Grid.Row="2" Content="Start using WinIRC" HorizontalAlignment="Right" Background="{ThemeResource SystemAccentColor}" Click="ConfirmButton_Click"/>
+
+    </Grid>
+</Page>

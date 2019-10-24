@@ -1,12 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.StartScreen;
+using Windows.UI.Xaml.Controls;
 using WinIRC.Net;
+using WinIRC.Ui;
+using System.IO;
 
 namespace WinIRC.Utils
 {
@@ -14,25 +19,10 @@ namespace WinIRC.Utils
     {
         private static IrcServers instance;
 
-        private ObjectStorageHelper<List<IrcServer>> serversListOSH;
+        private ObjectStorageHelper<List<WinIrcServer>> serversListOSH;
+        private bool loaded = false;
 
-        public ObservableCollection<String> servers {
-            get
-            {
-                if (serversList == null)
-                {
-                    loadServersAsync();
-                }
-
-                var list = new ObservableCollection<string>();
-
-                serversList.ForEach(server => list.Add(server.name));
-
-                return list;
-            }
-        }
-
-        public List<IrcServer> serversList { get; set; }
+        public ObservableCollection<WinIrcServer> Servers { get; set; } = new ObservableCollection<WinIrcServer>();
 
         public static IrcServers Instance
         {
@@ -46,13 +36,18 @@ namespace WinIRC.Utils
             }
         }
 
+        public int Count
+        {
+            get => Servers.Count;
+        }
+
         private IrcServers()
         {
         }
 
         public async Task UpdateJumpList()
         {
-            if (serversList == null)
+            if (Servers == null)
             {
                 await loadServersAsync();
             }
@@ -61,9 +56,9 @@ namespace WinIRC.Utils
             jumpList.SystemGroupKind = JumpListSystemGroupKind.None;
             jumpList.Items.Clear();
 
-            foreach (String server in servers)
+            foreach (WinIrcServer server in Servers)
             {
-                JumpListItem item = JumpListItem.CreateWithArguments(server, server);
+                JumpListItem item = JumpListItem.CreateWithArguments(server.ToString(), server.ToString());
                 item.GroupName = "Servers";
                 item.Logo = new Uri("ms-appx:///Assets/winirc-jumplist.png");
                 jumpList.Items.Add(item);
@@ -74,85 +69,176 @@ namespace WinIRC.Utils
 
         public async Task loadServersAsync()
         {
+            if (loaded)
+            {
+                return;
+            }
+
             try
             {
-                serversListOSH = new ObjectStorageHelper<List<Net.IrcServer>>(StorageType.Roaming);
-                serversList = await serversListOSH.LoadAsync(Config.ServersListStore);
+                serversListOSH = new ObjectStorageHelper<List<WinIrcServer>>(StorageType.Roaming);
+
+                await MigrateIfNeeded();
+                await ConvertIfNeeded();
+                var servers = await serversListOSH.LoadAsync(Config.ServersListStore);
+
+                if (servers != null && servers.Count > 0)
+                {
+                    servers.ForEach(Servers.Add);
+                }
+                else
+                {
+                    Servers = new ObservableCollection<WinIrcServer>();
+                    await SaveServers();
+                }
             }
             catch (Exception e)
             {
                 var dialog = new MessageDialog("Your saved servers have been corrupted for some reason. Clearing them. \n\nError: " + e.Message);
                 await dialog.ShowAsync();
 
-                serversList = new List<IrcServer>();
-                await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+                Servers = new ObservableCollection<WinIrcServer>();
+                await SaveServers();
             }
 
-            if (serversList == null)
+            if (Servers == null)
             {
-                serversList = new List<IrcServer>();
+                Servers = new ObservableCollection<WinIrcServer>();
             }
+            loaded = true;
 
-            servers.CollectionChanged += async (e, i) => await UpdateJumpList();
+            Servers.CollectionChanged += Servers_CollectionChanged;
         }
 
-        internal Irc CreateConnection(IrcServer ircServer)
+        private async Task ConvertIfNeeded()
         {
-            Net.Irc irc;
-            if (ircServer.webSocket)
-                irc = new Net.IrcWebSocket();
-            else
-                irc = new Net.IrcSocket();
+            var folder = serversListOSH.GetFolder(StorageType.Roaming);
+            var file = await serversListOSH.GetFileIfExistsAsync(folder, Config.ServersListStore);
+            if (file == null)
+            {
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+                return;
+            }
+            var stream = await file.OpenReadAsync();
+            XDocument loadedData = XDocument.Load(stream.AsStream());
 
-            irc.server = ircServer;
+            if ((await folder.GetItemsAsync()).Count == 0 && !(await serversListOSH.FileExists(folder, "converted")))
+            {
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+                return;
+            }
+
+            if (!(await serversListOSH.FileExists(folder, "converted")))
+            {
+                var data = from query in loadedData.Descendants("IrcServer")
+                           select new WinIrcServer
+                           {
+                               Name = (string)query.Element("name"),
+                               Hostname = (string)query.Element("hostname"),
+                               Port = (int)query.Element("port"),
+                               Ssl = (bool)query.Element("ssl"),
+                               webSocket = (bool)query.Element("webSocket"),
+                               Username = (string)query.Element("username"),
+                               Password = (string)query.Element("password"),
+                               NickservPassword = (string)query.Element("nickservPassword"),
+                               Channels = (string)query.Element("channels")
+                           };
+                foreach (var server in data.ToArray())
+                {
+                    Servers.Add(server);
+                }
+                await folder.CreateFileAsync("converted", CreationCollisionOption.FailIfExists);
+
+                await SaveServers();
+            }
+        }
+
+        private async Task MigrateIfNeeded()
+        {
+            var folder = serversListOSH.GetFolder(StorageType.Roaming);
+
+            if ((await folder.GetItemsAsync()).Count == 0 && !(await serversListOSH.FileExists(folder, "migrated")))
+            {
+                await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+                return;
+            }
+
+            if ((await folder.GetItemsAsync()).Count == 1)
+            {
+                return;
+            }
+
+            if (!(await serversListOSH.FileExists(folder, "migrated")))
+            {
+                var servers = await serversListOSH.LoadAsync();
+                await serversListOSH.MigrateAsync(servers, Config.ServersStore);
+
+                await folder.CreateFileAsync("migrated", CreationCollisionOption.FailIfExists);
+            }
+
+        }
+
+        private async void Servers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            await UpdateJumpList();
+        }
+
+        internal IrcUWPBase CreateConnection(WinIrcServer ircServer)
+        {
+            Net.IrcUWPBase irc;
+            if (ircServer.webSocket)
+                irc = new Net.IrcWebSocket(ircServer);
+            else
+                irc = new Net.IrcSocket(ircServer);
 
             return irc;
         }
 
-        public async Task AddServer(IrcServer server)
+        public async Task AddServer(WinIrcServer server)
         {
-            if (servers == null)
+            if (Servers == null)
             {
-                serversList = new List<IrcServer>();
+                Servers = new ObservableCollection<WinIrcServer>();
             }
 
-            foreach (var serverCheck in serversList)
+            foreach (var serverCheck in Servers)
             {
-                if (serverCheck.name == server.name)
+                if (serverCheck.Name == server.Name)
                 {
-                    var name = serverCheck.name;
-                    serversList.Remove(serverCheck);
-                    servers.Remove(name);
-
-                    await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+                    var name = serverCheck.Name;
+                    Servers.Remove(serverCheck);
                     break;
                 }
             }
 
-            serversList.Add(server);
-
-            serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+            Servers.Add(server);
+            await SaveServers();
         }
 
         public async void DeleteServer(String name)
         {
-            foreach (var ircServer in serversList)
+            foreach (var ircServer in Servers)
             {
-                if (ircServer.name == name)
+                if (ircServer.Name == name)
                 {
-                    serversList.Remove(ircServer);
-                    servers.Remove(name);
-
-                    await serversListOSH.SaveAsync(serversList, Config.ServersListStore);
+                    Servers.Remove(ircServer);
                     break;
                 }
             }
+            await SaveServers();
         }
 
-        public IrcServer Get(String name)
+        public async Task SaveServers()
         {
-            if (!serversList.Any(server => server.name == name)) return new IrcServer();
-            return serversList.First(server => server.name == name);
+            var servers = new List<WinIrcServer>(Servers);
+            await serversListOSH.SaveAsync(servers, Config.ServersListStore);
+        }
+
+        public WinIrcServer Get(String name)
+        {
+            if (!Servers.Any(server => server.Name == name)) return new WinIrcServer();
+            return Servers.First(server => server.Name == name);
         }
     }
+
 }

@@ -1,0 +1,36 @@
+<Page
+    x:Class="WinIRC.Views.InlineViewers.LinkView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC.Views.InlineViewers"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    PointerEntered="TextBlock_PointerEntered"
+    PointerExited="TextBlock_PointerExited"
+    Tapped="TextBlock_Tapped"
+    MaxWidth="400"
+    mc:Ignorable="d">
+
+    <Grid HorizontalAlignment="Stretch"
+          Background="{ThemeResource SystemControlBackgroundListLowBrush}"
+          CornerRadius="2"
+          Padding="10"
+          BorderThickness="1"
+          BorderBrush="{ThemeResource SystemControlBackgroundListMediumRevealBorderBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Image x:Name="ArticleImage" Stretch="UniformToFill" Height="40" Width="100" Margin="0,0,5,0" />
+
+        <TextBlock x:Name="Title" Grid.Row="0" Grid.Column="1" MaxLines="2" Text="Title Test" FontWeight="Bold" VerticalAlignment="Center" FlowDirection="LeftToRight" TextTrimming="WordEllipsis" TextWrapping="Wrap" />
+        <TextBlock Margin="0, 10, 0, 0" x:Name="Body" Grid.Row="1" MaxLines="3" Grid.ColumnSpan="2" Style="{ThemeResource BodyTextBlockStyle}" Text="Body Text Test" />
+    </Grid>
+</Page>

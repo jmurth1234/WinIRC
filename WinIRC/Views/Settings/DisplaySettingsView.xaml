@@ -1,4 +1,4 @@
-﻿<ui:BaseSettingsPage
+<ui:BaseSettingsPage
     x:Class="WinIRC.DisplaySettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,28 +7,43 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    
+    <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
+            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Application</TextBlock>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid>
-            <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
-                <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" />
+            <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
 
-                <TextBlock Text="Reduced List Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
+            <TextBlock Text="Acrylic Blurs" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Disabled" OnContent="Enabled" Toggled="BlurredBack_Toggled" />
 
-                <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
+            <TextBlock Text="Reduce Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
 
+            <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
 
-                <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged"/>
+            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Chat Area</TextBlock>
 
-                <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
+            <TextBlock Text="Display inline link metadata" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="LinkMetadata" OffContent="No" OnContent="Yes" Toggled="LinkMetadata_Toggled" />
 
-            </StackPanel>
+            <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
 
-        </Grid>
-    </Grid>
+            <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <TextBlock FontFamily="{x:Bind}" Text="{x:Bind}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+            <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
+
+        </StackPanel>
+    </ScrollViewer>
 </ui:BaseSettingsPage>

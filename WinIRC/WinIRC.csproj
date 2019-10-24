@@ -11,20 +11,29 @@
     <AssemblyName>WinIRC</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.15063.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
-    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
+    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>WinIRC_StoreKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>BC62619FE59A690D9F48E8B95704C07B49A31663</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>
+    </PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>E0204ECA53E897BDAAD061DC191C857540C33FF7</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>
     <AppxBundle>Always</AppxBundle>
-    <AppxPackageDir>C:\Users\Ryan\Documents\Visual Studio 2015\Projects\WinIRC\WinIRC\AppPackages\</AppxPackageDir>
+    <AppxPackageDir>C:\Users\Ryan\Documents\winirc packages\</AppxPackageDir>
     <HockeyAppResourceId>ca57c9d3f4bf4bb082d064cd09de9ac6</HockeyAppResourceId>
+    <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot</RuntimeIdentifiers>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <GenerateTestArtifacts>False</GenerateTestArtifacts>
+    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <AppInstallerUpdateFrequency>0</AppInstallerUpdateFrequency>
+    <AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -36,8 +45,9 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
-    <EnableGatekeeperAnalysis>true</EnableGatekeeperAnalysis>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
+    <EnableGatekeeperAnalysis>false</EnableGatekeeperAnalysis>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
     <OutputPath>bin\ARM\Release\</OutputPath>
@@ -50,7 +60,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
-    <EnableGatekeeperAnalysis>true</EnableGatekeeperAnalysis>
+    <EnableGatekeeperAnalysis>false</EnableGatekeeperAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -62,8 +72,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
-    <EnableGatekeeperAnalysis>true</EnableGatekeeperAnalysis>
+    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
+    <EnableGatekeeperAnalysis>false</EnableGatekeeperAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -107,10 +117,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Content Include="ApplicationInsights.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Assets\100x100.png" />
     <Content Include="Assets\NewStoreLogo.scale-100.png" />
@@ -166,28 +172,36 @@
     <Content Include="Assets\winirc.svg" />
     <Content Include="Assets\winircsplash.png" />
     <Content Include="Libs\MoonSharp.Interpreter.dll" />
-    <Content Include="Square44x44Logo.scale-100.png" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\IrcUiHandler.cs" />
     <Compile Include="Handlers\LuaHandler.cs" />
-    <Compile Include="Net\ChannelStore.cs" />
     <Compile Include="Net\Connection.cs" />
-    <Compile Include="Net\Irc.cs" />
-    <Compile Include="Net\IrcMessage.cs" />
+    <Compile Include="Net\IrcUWPBase.cs" />
     <Compile Include="Net\IrcServer.cs" />
     <Compile Include="Net\IrcSocket.cs" />
     <Compile Include="Net\IrcWebSocket.cs" />
-    <Compile Include="Net\Message.cs" />
-    <Compile Include="Net\MessageEventArgs.cs" />
-    <Compile Include="Net\ReplyConstants.cs" />
+    <Compile Include="OpenGraph\HttpDownloader.cs" />
+    <Compile Include="OpenGraph\InvalidSpecificationException.cs" />
+    <Compile Include="OpenGraph\OpenGraph.cs" />
+    <Compile Include="OpenGraph\ReadOnlyDictionaryException.cs" />
+    <Compile Include="Ui\BoolToGray.cs" />
+    <Compile Include="Ui\BoolToRedOrGrey.cs" />
     <Compile Include="Ui\ChannelListItem.xaml.cs">
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Ui\ColorUtils.cs" />
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Ui\PivotPage.xaml.cs">
+      <DependentUpon>PivotPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\PromptDialog.cs" />
+    <Compile Include="Ui\UserRightClickMenu.xaml.cs">
+      <DependentUpon>UserRightClickMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\IrcServers.cs" />
+    <Compile Include="Utils\MessageCollection.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
     <Compile Include="Views\ScriptsView.xaml.cs">
       <DependentUpon>ScriptsView.xaml</DependentUpon>
@@ -203,14 +217,26 @@
     <Compile Include="Views\Settings\BehaviourSettingsView.xaml.cs">
       <DependentUpon>BehaviourSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ChannelListView.xaml.cs">
+      <DependentUpon>ChannelListView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ChannelView.xaml.cs">
       <DependentUpon>ChannelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConnectionSettingsView.xaml.cs">
+      <DependentUpon>ConnectionSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ConnectView.xaml.cs">
       <DependentUpon>ConnectView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InlineMedia\ImageView.xaml.cs">
+    <Compile Include="Views\FirstRunPage.xaml.cs">
+      <DependentUpon>FirstRunPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InlineViewers\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InlineViewers\LinkView.xaml.cs">
+      <DependentUpon>LinkView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -228,7 +254,7 @@
     <Compile Include="Ui\HeaderBlock.xaml.cs">
       <DependentUpon>HeaderBlock.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InlineMedia\TwitterView.xaml.cs">
+    <Compile Include="Views\InlineViewers\TwitterView.xaml.cs">
       <DependentUpon>TwitterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UsersView.xaml.cs">
@@ -237,12 +263,15 @@
     <Compile Include="Views\Settings\DisplaySettingsView.xaml.cs">
       <DependentUpon>DisplaySettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InlineMedia\YoutubeView.xaml.cs">
+    <Compile Include="Views\InlineViewers\YoutubeView.xaml.cs">
       <DependentUpon>YoutubeView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
+    <AppxManifest Include="Package.debug.appxmanifest" Condition="'$(Configuration)'=='Debug'">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <AppxManifest Include="Package.release.appxmanifest" Condition="'$(Configuration)'=='Release'">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="Service References\Application Insights\ConnectedService.json" />
@@ -270,6 +299,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Ui\PivotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\UserRightClickMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Settings\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -278,7 +315,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\ChannelListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ChannelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ConnectionSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -286,7 +331,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InlineMedia\ImageView.xaml">
+    <Page Include="Views\FirstRunPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InlineViewers\ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InlineViewers\LinkView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,7 +363,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InlineMedia\TwitterView.xaml">
+    <Page Include="Views\InlineViewers\TwitterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -322,16 +375,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InlineMedia\YoutubeView.xaml">
+    <Page Include="Views\InlineViewers\YoutubeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="WindowsDesktop, Version=10.0.15063.0">
+    <SDKReference Include="WindowsDesktop, Version=10.0.18362.0">
       <Name>Windows Desktop Extensions for the UWP</Name>
     </SDKReference>
-    <SDKReference Include="WindowsMobile, Version=10.0.15063.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.18362.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
@@ -343,6 +396,39 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\MoonSharp.Interpreter.dll</HintPath>
     </Reference>
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.6.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AppCenter.Analytics">
+      <Version>2.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AppCenter.Crashes">
+      <Version>2.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>6.2.9</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
+      <Version>3.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.UI.Xaml">
+      <Version>2.2.190830001</Version>
+    </PackageReference>
+    <PackageReference Include="NotificationsExtensions.Win10">
+      <Version>14332.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="QueryString.NET">
+      <Version>1.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Rymate.IrcClientCore">
+      <Version>1.0.52-20190924.1-dev-master</Version>
+    </PackageReference>
+    <PackageReference Include="Template10">
+      <Version>1.1.13-preview-20161207</Version>
+    </PackageReference>
+    <PackageReference Include="TweetinviAPI">
+      <Version>4.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

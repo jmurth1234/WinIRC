@@ -1,10 +1,12 @@
-﻿using System;
+using Microsoft.AppCenter.Analytics;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.AccessCache;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,18 +26,16 @@ namespace WinIRC
     /// </summary>
     public sealed partial class BehaviourSettingsView : BaseSettingsPage
     {
-        private bool SettingsLoaded;
-
         List<String> UserListClickSettings = new List<string> { "Mention user in channel", "PM the user", "Show the context menu" };
-
 
         public BehaviourSettingsView()
         {
             this.InitializeComponent();
+            Title = "Behaviour";
             LoadSettings();
         }
 
-        private void LoadSettings()
+        private async void LoadSettings()
         {
             UserListClick.ItemsSource = UserListClickSettings;
 
@@ -48,27 +48,6 @@ namespace WinIRC
                 Config.SetInt(Config.UserListClick, 0);
                 this.UserListClick.SelectedIndex = 0;
             }
-
-            if (Config.Contains(Config.IgnoreSSL))
-            {
-                this.IgnoreSSLErrors.IsOn = Config.GetBoolean(Config.IgnoreSSL);
-            }
-            else
-            {
-                Config.SetBoolean(Config.IgnoreSSL, false);
-                this.IgnoreSSLErrors.IsOn = false;
-            }
-
-            if (Config.Contains(Config.AutoReconnect))
-            {
-                this.ReconnectSwitch.IsOn = Config.GetBoolean(Config.AutoReconnect);
-            }
-            else
-            {
-                Config.SetBoolean(Config.AutoReconnect, true);
-                this.ReconnectSwitch.IsOn = true;
-            }
-
 
             if (Config.Contains(Config.SwitchOnJoin))
             {
@@ -90,6 +69,17 @@ namespace WinIRC
                 this.TabsSwitch.IsOn = true;
             }
 
+            if (Config.Contains(Config.EnableLogs))
+            {
+                this.LogChannels.IsOn = Config.GetBoolean(Config.EnableLogs);
+            }
+            else
+            {
+                Config.SetBoolean(Config.EnableLogs, false);
+                this.LogChannels.IsOn = false;
+            }
+
+            this.AnalyticsSwitch.IsOn = await Analytics.IsEnabledAsync();
 
             this.SettingsLoaded = true;
         }
@@ -117,23 +107,52 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.UseTabs, TabsSwitch.IsOn);
-
+            base.UpdateUi();
         }
 
-        private void ReconnectSwitch_Toggled(object sender, RoutedEventArgs e)
+        private void LogFolder_Click(object sender, RoutedEventArgs e)
+        {
+            ChooseFolder();
+        }
+
+        private async void ChooseFolder()
+        {
+            var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+            folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder;
+            folderPicker.FileTypeFilter.Add("*");
+
+            Windows.Storage.StorageFolder folder = await folderPicker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                // Application now has read/write access to all contents in the picked folder
+                // (including other sub-folder contents)
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace(Config.LogsFolder, folder);
+            }
+            else
+            {
+                LogChannels.IsOn = false;
+            }
+        }
+
+        private void LogChannels_Toggled(object sender, RoutedEventArgs e)
         {
             if (!SettingsLoaded)
                 return;
 
-            Config.SetBoolean(Config.AutoReconnect, ReconnectSwitch.IsOn);
+            Config.SetBoolean(Config.EnableLogs, LogChannels.IsOn);
+
+            if (LogChannels.IsOn)
+            {
+                ChooseFolder();
+            }
         }
 
-        private void IgnoreSSLErrors_Toggled(object sender, RoutedEventArgs e)
+        private void AnalyticsSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             if (!SettingsLoaded)
                 return;
 
-            Config.SetBoolean(Config.IgnoreSSL, IgnoreSSLErrors.IsOn);
+            Analytics.SetEnabledAsync(AnalyticsSwitch.IsOn);
         }
     }
 
