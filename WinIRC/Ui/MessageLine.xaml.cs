@@ -232,6 +232,11 @@ namespace WinIRC.Ui
                     UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
                 }
 
+                if (MessageItem.Type == MessageType.MOTD)
+                {
+                    this.FontFamily = new FontFamily("Consolas");
+                }
+
                 hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
                 hyperlinkManager.LinkClicked += MediaPreview_Clicked;
             }

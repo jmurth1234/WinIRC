@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.2
+
+A couple changes in this release:
+
+ - Fixes font size and font family in the channel view (thanks mlarouche!)
+ - Adds handling for server MOTDs (they'll always display in Consolas)
+ - Updates dependencies:
+    - WinUI updated to 2.3, changing the font size entry to a NumberBox
+    - AppCenter SDK update for better error tracking
+
 ## 1.7.1
 
 Patch release of one of the initial bugs captured by the analytics, fixing:
