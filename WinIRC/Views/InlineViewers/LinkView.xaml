@@ -30,7 +30,7 @@
 
         <Image x:Name="ArticleImage" Stretch="UniformToFill" Height="40" Width="100" Margin="0,0,5,0" />
 
-        <TextBlock x:Name="Title" Grid.Row="0" Grid.Column="1" MaxLines="2" Text="Title Test" FontWeight="Bold" VerticalAlignment="Center" FlowDirection="LeftToRight" TextTrimming="WordEllipsis" TextWrapping="Wrap" />
-        <TextBlock Margin="0, 10, 0, 0" x:Name="Body" Grid.Row="1" MaxLines="3" Grid.ColumnSpan="2" Style="{ThemeResource BodyTextBlockStyle}" Text="Body Text Test" />
+        <TextBlock FontSize="13" FontFamily="Segoe UI" x:Name="Title" Grid.Row="0" Grid.Column="1" MaxLines="2" Text="Title Test" FontWeight="Bold" VerticalAlignment="Center" FlowDirection="LeftToRight" TextTrimming="WordEllipsis" TextWrapping="Wrap" />
+        <TextBlock FontSize="12" Margin="0, 10, 0, 0" x:Name="Body" Grid.Row="1" MaxLines="3" Grid.ColumnSpan="2" Style="{ThemeResource BodyTextBlockStyle}" Text="Body Text Test" />
     </Grid>
 </Page>

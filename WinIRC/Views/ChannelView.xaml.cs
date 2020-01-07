@@ -234,7 +234,7 @@ namespace WinIRC.Views
 
             if (Config.Contains(Config.FontSize))
             {
-                this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
+                this.messagesView.FontSize = Convert.ToDouble(Config.GetInt(Config.FontSize));
             }
 
             if (currentChannel != "Server")

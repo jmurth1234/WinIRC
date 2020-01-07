@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinIRC"
     xmlns:ui="using:WinIRC.Ui"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -42,7 +43,7 @@
             </ComboBox>
 
             <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <TextBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" InputScope="Number" LostFocus="FontSize_LostFocus"/>
+            <winui:NumberBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5"  Minimum="6" SpinButtonPlacementMode="Compact" LosingFocus="FontSize_LosingFocus" />
 
         </StackPanel>
     </ScrollViewer>

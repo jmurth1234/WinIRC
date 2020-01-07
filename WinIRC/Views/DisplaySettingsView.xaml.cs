@@ -76,12 +76,12 @@ namespace WinIRC
 
             if (Config.Contains(Config.FontSize))
             {
-                this.FontSize.Text = Config.GetString(Config.FontSize);
+                this.FontSize.Value = Config.GetInt(Config.FontSize);
             }
             else
             {
-                Config.SetString(Config.FontSize, "14");
-                this.FontSize.Text = "14";
+                Config.SetInt(Config.FontSize, 14);
+                this.FontSize.Value = 14;
             }
 
             if (Config.Contains(Config.ReducedPadding))
@@ -147,15 +147,6 @@ namespace WinIRC
             base.UpdateUi();
         }
 
-        private void FontSize_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (!SettingsLoaded)
-                return;
-            Config.SetString(Config.FontSize, FontSize.Text);
-
-            base.UpdateUi();
-        }
-
         private void Padding_Toggled(object sender, RoutedEventArgs e)
         {
             if (!SettingsLoaded)
@@ -201,6 +192,15 @@ namespace WinIRC
                 return;
 
             Config.SetBoolean(Config.ShowMetadata, LinkMetadata.IsOn);
+
+            base.UpdateUi();
+        }
+
+        private void FontSize_LosingFocus(UIElement sender, LosingFocusEventArgs args)
+        {
+            if (!SettingsLoaded)
+                return;
+            Config.SetInt(Config.FontSize, (int)FontSize.Value);
 
             base.UpdateUi();
         }
