@@ -314,6 +314,8 @@
                     <MenuFlyoutSubItem Text="Connect to" x:Name="ConnectSubMenu" ToolTipService.ToolTip="This currently won't update dynamically, only on app load"/>
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
                     <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="Manage Scripts" Click="ScriptsSettings_ClickAsync"/>
+                    <MenuFlyoutSeparator />
                     <MenuFlyoutItem Text="Quit" Click="QuitClient_Click"/>
                 </winui:MenuBarItem>
 
@@ -386,7 +388,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Grid Grid.Column="0" >
-                                    <ui:HeaderBlock x:Name="SidebarHeader" ShowBackButton="False" BackButtonClicked="HeaderBlock_BackButtonClicked"/>
+                                    <ui:HeaderBlock x:Name="SidebarHeader" ShowBackButton="False" />
                                 </Grid>
 
                                 <Button RequestedTheme="Dark" Background="{x:Bind AccentColorAlt}" Grid.Column="1" 

@@ -171,9 +171,12 @@
     <Content Include="Assets\winirc.png" />
     <Content Include="Assets\winirc.svg" />
     <Content Include="Assets\winircsplash.png" />
+    <Content Include="Libs\MoonSharp.Interpreter.dll" />
+    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handlers\IrcUiHandler.cs" />
+    <Compile Include="Handlers\LuaHandler.cs" />
     <Compile Include="Net\Connection.cs" />
     <Compile Include="Net\IrcUWPBase.cs" />
     <Compile Include="Net\IrcServer.cs" />
@@ -200,7 +203,10 @@
     <Compile Include="Utils\IrcServers.cs" />
     <Compile Include="Utils\MessageCollection.cs" />
     <Compile Include="Utils\ObjectStorageHelper.cs" />
-    <Compile Include="Views\AboutView.xaml.cs">
+    <Compile Include="Views\ScriptsView.xaml.cs">
+      <DependentUpon>ScriptsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Settings\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
@@ -208,7 +214,7 @@
     </Compile>
     <Compile Include="Utils\Config.cs" />
     <Compile Include="Ui\BaseSettingsPage.cs" />
-    <Compile Include="Views\BehaviourSettingsView.xaml.cs">
+    <Compile Include="Views\Settings\BehaviourSettingsView.xaml.cs">
       <DependentUpon>BehaviourSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ChannelListView.xaml.cs">
@@ -242,9 +248,6 @@
     <Compile Include="Views\PlaceholderView.xaml.cs">
       <DependentUpon>PlaceholderView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Ui\HeaderBlock.xaml.cs">
       <DependentUpon>HeaderBlock.xaml</DependentUpon>
     </Compile>
@@ -254,7 +257,7 @@
     <Compile Include="Views\UsersView.xaml.cs">
       <DependentUpon>UsersView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DisplaySettingsView.xaml.cs">
+    <Compile Include="Views\Settings\DisplaySettingsView.xaml.cs">
       <DependentUpon>DisplaySettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InlineViewers\YoutubeView.xaml.cs">
@@ -289,6 +292,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ScriptsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Ui\PivotPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -297,11 +304,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AboutView.xaml">
+    <Page Include="Views\Settings\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\BehaviourSettingsView.xaml">
+    <Page Include="Views\Settings\BehaviourSettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -345,10 +352,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Ui\HeaderBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -361,7 +364,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\DisplaySettingsView.xaml">
+    <Page Include="Views\Settings\DisplaySettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -382,6 +385,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="MoonSharp.Interpreter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.6.0</Version>
     </PackageReference>

@@ -813,6 +813,25 @@ namespace WinIRC
             ShowSettings(typeof(DisplaySettingsView));
         }
 
+        private async void ScriptsSettings_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(ScriptsView), null);
+                Window.Current.Content = frame;
+                // You have to activate the window in order to show it later.
+                Window.Current.Activate();
+
+                var view = ApplicationView.GetForCurrentView();
+                newViewId = view.Id;
+                view.Title = "Manage Scripts";
+            });
+            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+        }
+
         private void AboutPage_Click(object sender, RoutedEventArgs e)
         {
             ShowSettings(typeof(AboutView));
@@ -888,27 +907,6 @@ namespace WinIRC
             {
                 SidebarSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
             }
-        }
-
-
-        private void HeaderBlock_BackButtonClicked(object sender, EventArgs e)
-        {
-            if (SidebarFrame.CanGoBack)
-                SidebarFrame.GoBack();
-
-            if (SidebarFrame.Content is SettingsView)
-            {
-                var settingsView = (SettingsView)SidebarFrame.Content;
-
-                if (settingsView != null)
-                {
-                    SidebarHeader.Title = "Settings";
-                    settingsView.Header = SidebarHeader;
-                }
-            }
-
-            SidebarHeader.ShowBackButton = false;
-
         }
 
         private void SidebarFrame_Navigated(object sender, NavigationEventArgs e)
