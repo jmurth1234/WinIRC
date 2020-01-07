@@ -229,12 +229,12 @@ namespace WinIRC.Views
 
             if (Config.Contains(Config.FontFamily))
             {
-                // this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
+                this.messagesView.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
             }
 
             if (Config.Contains(Config.FontSize))
             {
-                // this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
+                this.messagesView.FontSize = Convert.ToDouble(Config.GetString(Config.FontSize));
             }
 
             if (currentChannel != "Server")
