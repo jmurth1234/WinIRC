@@ -248,9 +248,6 @@
     <Compile Include="Views\PlaceholderView.xaml.cs">
       <DependentUpon>PlaceholderView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Settings\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Ui\HeaderBlock.xaml.cs">
       <DependentUpon>HeaderBlock.xaml</DependentUpon>
     </Compile>
@@ -352,10 +349,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlaceholderView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Settings\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
