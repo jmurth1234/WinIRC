@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -17,9 +17,8 @@
     <FileAlignment>512</FileAlignment>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>
-    </PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>E0204ECA53E897BDAAD061DC191C857540C33FF7</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>WinIRC_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>519FA76D02DF7887D3FC60421A6A55E4A5BA1CA3</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <ApplicationInsightsResourceId>/subscriptions/e80b34cd-28a7-489e-b3d7-2b104351a8d0/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/WinIRC</ApplicationInsightsResourceId>

@@ -76,7 +76,7 @@ namespace WinIRC
 
             if (Config.Contains(Config.FontSize))
             {
-                this.FontSize.Value = Config.GetInt(Config.FontSize);
+                this.FontSize.Value = Config.GetInt(Config.FontSize, 14);
             }
             else
             {
