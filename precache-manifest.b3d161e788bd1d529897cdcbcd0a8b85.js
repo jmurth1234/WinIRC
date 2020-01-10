@@ -1,19 +1,19 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "6892ef10d95805e5abdebeaccbf4bc19",
+    "revision": "3840fe6bd5db95f00cb98b792950bf63",
     "url": "/WinIRC/index.html"
   },
   {
-    "revision": "b90641817c3a72c327df",
+    "revision": "256298f44dfef7aa7073",
     "url": "/WinIRC/static/css/main.2e270137.chunk.css"
   },
   {
-    "revision": "57daae42f36de581f685",
-    "url": "/WinIRC/static/js/2.a6d249d5.chunk.js"
+    "revision": "5377c432af90fcffbcc8",
+    "url": "/WinIRC/static/js/2.bc9ae5bd.chunk.js"
   },
   {
-    "revision": "b90641817c3a72c327df",
-    "url": "/WinIRC/static/js/main.f4d0e3ac.chunk.js"
+    "revision": "256298f44dfef7aa7073",
+    "url": "/WinIRC/static/js/main.35463277.chunk.js"
   },
   {
     "revision": "d8e658af88bcf2cf2718",
