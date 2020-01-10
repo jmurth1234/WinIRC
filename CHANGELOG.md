@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.3
+
+Migrating from a TextBox to the NumberBox was broken -- this update fixes it
+
 ## 1.7.2
 
 A couple changes in this release:
