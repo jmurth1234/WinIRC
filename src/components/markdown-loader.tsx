@@ -7,15 +7,16 @@ const renderers = {
   heading: (props: { level: number; children: any }) => {
     const { level, children } = props
 
-    const size = {
+    const size: any = {
       1: 'mega',
       2: 'xxLarge',
       3: 'xLarge'
     }
 
     const variant = size[level]
+    const title: any = `h${level}`
 
-    return <Text as={`h${level}`} variant={variant}>{children[0].props.value}</Text>
+    return <Text as={title} variant={variant}>{children[0].props.value}</Text>
   },
   text: Text,
   link: Link
