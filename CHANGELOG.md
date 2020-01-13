@@ -2,7 +2,9 @@
 
 ## 1.7.3
 
-Migrating from a TextBox to the NumberBox was broken -- this update fixes it
+Migrating from a TextBox to the NumberBox was broken -- this update fixes it.
+
+This also adds a privacy policy link in the app.
 
 ## 1.7.2
 

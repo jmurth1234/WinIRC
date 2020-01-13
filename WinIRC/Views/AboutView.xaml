@@ -17,7 +17,9 @@
 
         <Button Content="Rate this app on the Store" Margin="0,0,0,10" Click="RateApp" />
 
-        <Button Content="Join our support channel" Click="JoinSupport" />
+        <Button Content="Join our support channel" Click="JoinSupport" Margin="0,0,0,10" />
+
+        <HyperlinkButton Content="Privacy Policy" NavigateUri="http://rymate.co.uk/privacy-policy-windows-edition/" />
 
     </StackPanel>
 </Page>
