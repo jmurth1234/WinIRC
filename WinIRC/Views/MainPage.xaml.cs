@@ -271,7 +271,7 @@ namespace WinIRC
                 PaneShadow.Receivers.Add(MainGrid);
 
                 TitleContainer.Translation += new Vector3(0, 0, 8);
-                channelList.Translation += new Vector3(0, 0, 16);
+                channelContainer.Translation += new Vector3(0, 0, 16);
                 sidebarGrid.Translation += new Vector3(0, 0, 16);
                 connectDialogRoot.Translation += new Vector3(0, 0, 32);
 
@@ -396,30 +396,7 @@ namespace WinIRC
 
         internal void UpdateUi()
         {
-            if (Config.Contains(Config.ReducedPadding))
-            {
-                int height;
-
-                if (Config.GetBoolean(Config.ReducedPadding))
-                {
-                    height = 28;
-                }
-                else
-                {
-                    height = 42;
-                }
-
-                var res = new ResourceDictionary { Source = new Uri("ms-appx:///Styles/Styles.xaml", UriKind.Absolute) };
-
-                var style = res["ListBoxItemStyle"] as Style;
-
-                foreach (var item in style.Setters.Cast<Setter>().Where(item => item.Property == HeightProperty))
-                    style.Setters.Remove(item);
-
-                style.Setters.Add(new Setter(HeightProperty, height));
-
-                this.channelList.ItemContainerStyle = style;
-            }
+            this.channelList.UpdateUi();
 
             if (Config.Contains(Config.HideStatusBar))
             {
@@ -490,11 +467,6 @@ namespace WinIRC
             else return null;
         }
 
-        public ListView GetChannelList()
-        {
-            return channelList;
-        }
-
         private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
         {
             var bounds = Window.Current.Bounds;
@@ -528,26 +500,11 @@ namespace WinIRC
             }
         }
 
-        private void ChannelList_ItemClick(object sender, ItemClickEventArgs e)
+        public void SwitchChannel(Channel channel)
         {
-            channelList.SelectedItem = e.ClickedItem;
-            try
-            {
-                if (channelList.SelectedItem == null)
-                    return;
-
-                var channel = channelList.SelectedItem.ToString();
-                currentServer = ((Channel)channelList.SelectedItem).Server;
-                SwitchChannel(currentServer, channel, false);
-                IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel);
-            }
-            catch (Exception ex)
-            {
-                var toast = IrcUWPBase.CreateBasicToast(ex.Message, ex.StackTrace);
-                toast.ExpirationTime = DateTime.Now.AddDays(2);
-                ToastNotificationManager.CreateToastNotifier().Show(toast);
-                Debug.WriteLine(ex);
-            }
+            currentServer = channel.Server;
+            SwitchChannel(currentServer, channel.Name, false);
+            IrcHandler.UpdateUsers(SidebarFrame, currentServer, channel.Name);
         }
 
         public void SwitchChannel(string server, string channel, bool auto)
@@ -919,22 +876,6 @@ namespace WinIRC
             }
         }
 
-        private void ChannelListItem_ChannelCloseClicked(object sender, EventArgs e)
-        {
-            var channelArgs = e as ChannelEventArgs;
-            var channel = channelArgs.Channel;
-
-            GetServer(channelArgs.Server).PartChannel(channel);
-        }
-
-        private void ChannelListItem_ChannelJoinClicked(object sender, EventArgs e)
-        {
-            var channelArgs = e as ChannelEventArgs;
-            var channel = channelArgs.Channel;
-
-            GetServer(channelArgs.Server).JoinChannel(channel);
-        }
-
         internal void CloseConnectView()
         {
             serverConnect.IsModal = !serverConnect.IsModal;
@@ -981,19 +922,6 @@ namespace WinIRC
                 UpdateInfo(GetCurrentChannelView().currentServer, GetCurrentChannelView().currentChannel);
         }
 
-        private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)
-        {
-            var args = e as ServerRightClickArgs;
-            var server = IrcHandler.connectedServers[args.server];
-
-            if (args.type == ServerRightClickType.RECONNECT)
-                server.DisconnectAsync(attemptReconnect: true);
-            else if (args.type == ServerRightClickType.DISCONNECT)
-                server.DisconnectAsync(attemptReconnect: false);
-            else if (args.type == ServerRightClickType.CLOSE)
-                CloseServer(server);
-        }
-
         private void MenuBarToggleItem_Click(object sender, RoutedEventArgs e)
         {
             UpdateUi();
@@ -1007,13 +935,6 @@ namespace WinIRC
         private void ConnectionSettings_Click(object sender, RoutedEventArgs e)
         {
             ShowSettings(typeof(ConnectionSettingsView));
-        }
-
-        private void ChannelListItem_ServerClickEvent(object sender, EventArgs e)
-        {
-            var header = sender as Ui.ChannelListItem;
-
-            SwitchChannel(header.Server.Server.Name, "Server", false);
         }
 
         private async void QuitClient_Click(object sender, RoutedEventArgs e)

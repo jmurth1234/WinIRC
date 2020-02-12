@@ -349,39 +349,9 @@
         
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" PaneBackground="Transparent">
             <SplitView.Pane>
-                <ListView x:Name="channelList" ItemsSource="{x:Bind ServerContents, Mode=OneWay}"
-                    HorizontalAlignment="Stretch" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
-                    IsItemClickEnabled="True"
-                    SelectionMode="Single"
-                    SingleSelectionFollowsFocus="False"
-                    Windows10version1903:Shadow="{StaticResource PaneShadow}" >
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate x:DataType="ircclientcore:ChannelsGroup">
-                                    <ui:ChannelListItem Margin="0" FontSize="14" Channel="{x:Bind ServerLog, Mode=OneWay}"
-                                                Server="{Binding Irc}" IsServer="True" Title="{Binding Server}"
-                                                ServerClickEvent="ChannelListItem_ServerClickEvent"
-                                                ChannelJoinClicked="ChannelListItem_ChannelJoinClicked" 
-                                                ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
-                                                ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                                VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
-
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="ircclientcore:Channel">
-                            <ui:ChannelListItem Margin="0" FontSize="12" Channel="{x:Bind Mode=TwoWay}"
-                                        Server="{Binding Irc}" Title="{Binding Name}"
-                                        ChannelJoinClicked="ChannelListItem_ChannelJoinClicked"
-                                        ChannelCloseClicked="ChannelListItem_ChannelCloseClicked" 
-                                        ServerRightClickEvent="ChannelListItem_ServerRightClickEvent" 
-                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                <Grid x:Name="channelContainer" Windows10version1903:Shadow="{StaticResource PaneShadow}">
+                    <ui:ServersSidebar x:Name="channelList" ServerContents="{x:Bind ServerContents, Mode=OneWay}" />
+                </Grid>
             </SplitView.Pane>
             <SplitView.Content>
                 <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed">
