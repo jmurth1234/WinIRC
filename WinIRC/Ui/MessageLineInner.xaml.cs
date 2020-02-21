@@ -170,6 +170,7 @@ namespace WinIRC.Ui
 
             Unloaded += MessageLine_Unloaded;
             Loaded += MessageLine_Loaded;
+            LayoutUpdated += MessageLine_LayoutUpdated;
             MainPage.instance.UiUpdated += Instance_UiUpdated;
         }
 
@@ -179,6 +180,15 @@ namespace WinIRC.Ui
 
             NotifyPropertyChanged("UserColor");
             NotifyPropertyChanged("MessageColor");
+        }
+
+        private void MessageLine_LayoutUpdated(object sender, object e)
+        {
+            var wantedPadding = UsernameBox.ActualWidth + TimestampBox.ActualWidth;
+            if (MessageParagraph.TextIndent != wantedPadding)
+            {
+                MessageParagraph.TextIndent = wantedPadding;
+            }
         }
 
         private void MessageLine_Loaded(object sender, RoutedEventArgs e)
