@@ -83,14 +83,23 @@ namespace WinIRC.Ui
                 SetValue(MessageProperty, value);
                 NotifyPropertyChanged("MessageItem");
                 NotifyPropertyChanged("Username");
-                NotifyPropertyChanged("UserColor");
+                NotifyPropertyChanged("UserColorBrush");
                 NotifyPropertyChanged("MessageColor");
                 NotifyPropertyChanged("TextIndent");
+                NotifyPropertyChanged("JoinPart");
                 UpdateUi();
             }
         }
 
         public Color MentionRed => ThemeColor(Colors.Red);
+
+        public bool JoinPart
+        {
+            get
+            {
+                return MessageItem.Type == MessageType.JoinPart;
+            }
+        }
 
         public SolidColorBrush UserColorBrush
         {
@@ -98,14 +107,7 @@ namespace WinIRC.Ui
             {
                 if (MessageItem == null) return null;
 
-                var color = ThemeColor(ColorUtils.GenerateColor(MessageItem.User));
-
-                if (MessageItem.Mention)
-                {
-                    return new SolidColorBrush(MentionRed);
-                }
-
-                return new SolidColorBrush(color);
+                return new SolidColorBrush(UserColor);
             }
         }
         public Color UserColor

@@ -25,7 +25,10 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <controls:PersonPicture DisplayName="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Height="40" Margin="0,0,8,0" VerticalAlignment="Top" >
+        <controls:PersonPicture
+            Visibility="{x:Bind NormalMessage, Mode=OneWay}"
+            DisplayName="{x:Bind Username, FallbackValue='Username', Mode=OneWay}"
+            Height="40" Margin="0,0,8,0" VerticalAlignment="Top">
             <controls:PersonPicture.Resources>
                 <SolidColorBrush x:Key="PersonPictureEllipseFillThemeBrush" Color="{x:Bind UserColor, Mode=OneWay}" />
             </controls:PersonPicture.Resources>
@@ -41,9 +44,18 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock x:Name="UsernameBox" Grid.Column="0" Padding="0,0,5,0" FontWeight="Bold" Foreground="{x:Bind UserColorBrush, Mode=OneWay}" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" VerticalAlignment="Top" />
+            <TextBlock x:Name="UsernameBox" Grid.Column="0" Padding="0,0,5,0"
+                       Visibility="{x:Bind NormalMessage, Mode=OneWay}"
+                       FontWeight="Bold" Foreground="{x:Bind UserColorBrush, Mode=OneWay}"
+                       Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}"
+                       Tapped="{x:Bind UserRightClick.User_Tapped}"
+                       RightTapped="{x:Bind UserRightClick.User_RightTapped}"
+                       VerticalAlignment="Top" />
 
-            <TextBlock x:Name="TimestampBox" Grid.Column="1" Padding="0,0,5,0" Text="{x:Bind MessageItem.Parent.Timestamp, FallbackValue='Timestamp', Mode=OneWay}" VerticalAlignment="Top"/>
+            <TextBlock x:Name="TimestampBox" Grid.Column="1" Padding="0,0,5,0"
+                       Visibility="{x:Bind NormalMessage, Mode=OneWay}"
+                       Text="{x:Bind MessageItem.Parent.Timestamp, FallbackValue='Timestamp', Mode=OneWay}"
+                       VerticalAlignment="Top"/>
 
             <ItemsControl x:Name="messagesView" Grid.Row="2" Grid.ColumnSpan="2" FontSize="14" FontFamily="Segoe UI" ItemsSource="{x:Bind MessageItem.Children, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>

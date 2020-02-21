@@ -40,8 +40,6 @@ namespace WinIRC.Ui
                 typeof(MessageLine),
                 new PropertyMetadata(null));
 
-        private Uri lastUri;
-
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String propertyName = "")
         {
@@ -89,11 +87,20 @@ namespace WinIRC.Ui
                 NotifyPropertyChanged("UserColorBrush");
                 NotifyPropertyChanged("MessageColor");
                 NotifyPropertyChanged("TextIndent");
+                NotifyPropertyChanged("NormalMessage");
                 UpdateUi();
             }
         }
 
         public Color MentionRed => ThemeColor(Colors.Red);
+
+        public bool NormalMessage
+        {
+            get
+            {
+                return MessageItem.Parent.Type != MessageType.JoinPart;
+            }
+        }
 
         public SolidColorBrush UserColorBrush
         {
