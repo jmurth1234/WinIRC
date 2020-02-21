@@ -39,12 +39,22 @@ namespace WinIRC.Views
         public string currentChannel { get; set; }
         public string currentServer { get; set; }
 
-        private ObservableCollection<Message> currentBuffer;
-        public ObservableCollection<Message> CurrentBuffer
+        private ObservableCollection<MessageGroup> currentBuffer;
+        public ObservableCollection<MessageGroup> CurrentBuffer
         {
             get => currentBuffer; set
             {
                 currentBuffer = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        private DataTemplate template;
+        public DataTemplate CurrentTemplate
+        {
+            get => template; set
+            {
+                template = value;
                 this.NotifyPropertyChanged();
             }
         }
@@ -114,8 +124,6 @@ namespace WinIRC.Views
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            var args = ((string[])e.Parameter);
-
             Unload();
         }
 
@@ -130,14 +138,31 @@ namespace WinIRC.Views
             }
         }
 
+        private Channel GetChannel()
+        {
+            var servers = IrcHandler.connectedServers;
+
+            Channel channelStore = null;
+
+            if (servers[currentServer].ChannelList.Contains(currentChannel))
+            {
+                channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+            }
+            else if (currentChannel == "Server" || currentChannel == "")
+            {
+                channelStore = IrcHandler.connectedServers[currentServer].ChannelList.ServerLog;
+            }
+
+            return channelStore;
+        }
+
         internal void SetChannel(string server, string channel)
         {
-            if (currentChannel != null && currentServer != null && CurrentBuffer != null && ChannelLoaded)
+            if (currentChannel != null && currentServer != null && ChannelLoaded)
             {
                 var chan = currentChannel == "Server"
                     ? IrcHandler.connectedServers[currentServer].ChannelList.ServerLog
                     : IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
-                CurrentBuffer.CollectionChanged -= ChannelView_CollectionChanged;
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
@@ -149,38 +174,31 @@ namespace WinIRC.Views
             }
             currentServer = server;
             currentChannel = channel;
-            Channel channelStore = null;
 
-            if (servers[server].ChannelList.Contains(channel))
-            {
-                channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
-            }
-            else if (channel == "Server" || channel == "")
-            {
-                channelStore = IrcHandler.connectedServers[currentServer].ChannelList.ServerLog;
-            }
-
-            if (channel == null) return;
-
-            CurrentBuffer = channelStore.Buffers as ObservableCollection<Message>;
+            var channelStore = GetChannel();
+            if (channelStore == null) return;
 
             store = channelStore.Store;
             store.TopicSetEvent += ChannelView_TopicSetEvent;
 
             topicText.Text = store.Topic;
 
-            CurrentBuffer.CollectionChanged += ChannelView_CollectionChanged;
-
-            // ScrollToBottom();
             UpdateUi();
 
             ChannelLoaded = true;
         }
 
-        private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SetupBuffer()
         {
-            // ScrollToBottom();
+            var channelStore = GetChannel();
+            if (channelStore == null) return;
+
+            var grouped = new MessageGrouper(channelStore.Buffers as ObservableCollection<Message>);
+
+            this.CurrentTemplate = this.Resources[Config.GetBoolean(Config.ModernChat) ? "ModernTemplate" : "ClassicTemplate"] as DataTemplate;
+            this.CurrentBuffer = grouped.Grouped;
         }
+
 
         private void ChannelView_TopicSetEvent(string topic)
         {
@@ -202,7 +220,6 @@ namespace WinIRC.Views
             IrcHandler.IrcTextBoxHandler(ircMsgBox, e, currentServer, currentChannel);
         }
 
-
         private void TabButton_Clicked(object sender, RoutedEventArgs e)
         {
             if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
@@ -213,10 +230,11 @@ namespace WinIRC.Views
             IrcHandler.TabComplete(ircMsgBox, currentServer, currentChannel);
         }
 
-
         public void UpdateUi()
         {
             var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
+
+            SetupBuffer();
 
             if (uiMode == Windows.UI.ViewManagement.UserInteractionMode.Touch)
             {
@@ -281,7 +299,6 @@ namespace WinIRC.Views
                 Window.TitleBar.ButtonBackgroundColor = Window.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 Window.TitleBar.ButtonForegroundColor = Window.TitleBar.ButtonInactiveForegroundColor = darktheme ? Colors.White : Colors.Black;
                 Window.TitleBar.ForegroundColor = darktheme ? Colors.White : Colors.Black;
-                
             }
         }
 

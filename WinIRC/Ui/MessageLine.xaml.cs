@@ -36,18 +36,10 @@ namespace WinIRC.Ui
         public static readonly DependencyProperty MessageProperty =
             DependencyProperty.Register(
                 "MessageItem",
-                typeof(Message),
+                typeof(MessageGroup),
                 typeof(MessageLine),
                 new PropertyMetadata(null));
 
-        public static readonly DependencyProperty CompactModeProperty =
-            DependencyProperty.Register(
-                "CompactMode",
-                typeof(bool),
-                typeof(MessageLine),
-                new PropertyMetadata(null));
-
-        private HyperlinkManager hyperlinkManager;
         private Uri lastUri;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -61,48 +53,40 @@ namespace WinIRC.Ui
             get
             {
                 if (MessageItem == null) return "";
-                if (MessageItem.User.Contains("*"))
+
+                var user = MessageItem.Parent.User;
+
+                if (user.Contains("*"))
                 {
                     return "*";
                 }
 
-                if (MessageItem.Type == MessageType.Normal)
+                if (MessageItem.Parent.Type == MessageType.Normal)
                 {
-                    return String.Format("<{0}>", MessageItem.User);
+                    return String.Format("{0}", user);
                 }
-                else if (MessageItem.Type == MessageType.Notice)
+                else if (MessageItem.Parent.Type == MessageType.Notice)
                 {
-                    return String.Format("->{0}<-", MessageItem.User);
+                    return String.Format("->{0}<-", user);
                 }
                 else
                 {
-                    return String.Format("* {0}", MessageItem.User);
+                    return String.Format("* {0}", user);
                 }
-            }
-        }
-
-        public bool CompactMode
-        {
-            get
-            {
-                return (bool)GetValue(CompactModeProperty);
-            }
-            set
-            {
-                SetValue(CompactModeProperty, value);
             }
         }
 
         public bool HasLoaded { get; private set; }
-        public Message MessageItem
+        public MessageGroup MessageItem
         {
-            get { return (Message)GetValue(MessageProperty); }
+            get { return (MessageGroup)GetValue(MessageProperty); }
             set
             {
                 SetValue(MessageProperty, value);
                 NotifyPropertyChanged("MessageItem");
                 NotifyPropertyChanged("Username");
                 NotifyPropertyChanged("UserColor");
+                NotifyPropertyChanged("UserColorBrush");
                 NotifyPropertyChanged("MessageColor");
                 NotifyPropertyChanged("TextIndent");
                 UpdateUi();
@@ -111,20 +95,29 @@ namespace WinIRC.Ui
 
         public Color MentionRed => ThemeColor(Colors.Red);
 
-        public SolidColorBrush UserColor
+        public SolidColorBrush UserColorBrush
         {
             get
             {
                 if (MessageItem == null) return null;
 
-                var color = ThemeColor(ColorUtils.GenerateColor(MessageItem.User));
+                return new SolidColorBrush(UserColor);
+            }
+        }
+        public Color UserColor
+        {
+            get
+            {
+                if (MessageItem == null) return Colors.White;
 
-                if (MessageItem.Mention)
+                var color = ThemeColor(ColorUtils.GenerateColor(MessageItem.Parent.User));
+
+                if (MessageItem.Parent.Mention)
                 {
-                    return new SolidColorBrush(MentionRed);
+                    return MentionRed;
                 }
 
-                return new SolidColorBrush(color);
+                return color;
             }
         }
 
@@ -134,7 +127,7 @@ namespace WinIRC.Ui
             {
                 if (MessageItem == null) return null;
 
-                if (MessageItem.Mention)
+                if (MessageItem.Parent.Mention)
                 {
                     return new SolidColorBrush(MentionRed);
                 }
@@ -163,7 +156,7 @@ namespace WinIRC.Ui
             return color;
         }
 
-        public MessageLine(Message line)
+        public MessageLine(MessageGroup line)
         {
             this.InitializeComponent();
 
@@ -171,7 +164,6 @@ namespace WinIRC.Ui
 
             Unloaded += MessageLine_Unloaded;
             Loaded += MessageLine_Loaded;
-            LayoutUpdated += MessageLine_LayoutUpdated;
             MainPage.instance.UiUpdated += Instance_UiUpdated;
         }
 
@@ -183,15 +175,6 @@ namespace WinIRC.Ui
             NotifyPropertyChanged("MessageColor");
         }
 
-        private void MessageLine_LayoutUpdated(object sender, object e)
-        {
-            var wantedPadding = UsernameBox.ActualWidth + TimestampBox.ActualWidth;
-            if (MessageParagraph.TextIndent != wantedPadding)
-            {
-                MessageParagraph.TextIndent = wantedPadding;
-            }
-        }
-
         private void MessageLine_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateUi();
@@ -199,68 +182,28 @@ namespace WinIRC.Ui
 
         public void UpdateUi()
         {
-            this.hyperlinkManager = new HyperlinkManager();
-
             if (double.IsNaN(UsernameBox.ActualWidth) || double.IsNaN(TimestampBox.ActualWidth)) return;
             if (MessageItem != null)
             {
-                PreviewFrame.Visibility = Visibility.Collapsed;
-
-                if (hyperlinkManager.LinkClicked != null)
-                {
-                    hyperlinkManager.LinkClicked -= MediaPreview_Clicked;
-                }
-                if (MessageBox.ActualHeight > UsernameBox.ActualHeight)
-                {
-                    Thickness margin = new Thickness(0, -1, 0, 0);
-                    MessageBox.Margin = margin;
-                }
-
-                if (MessageItem.Type == MessageType.Info || MessageItem.Type == MessageType.JoinPart)
+                if (MessageItem.Parent.Type == MessageType.Info || MessageItem.Parent.Type == MessageType.JoinPart)
                 {
                     UsernameBox.Style = (Style)Application.Current.Resources["InfoTextBlockStyle"];
-                    MessageBox.Style = (Style)Application.Current.Resources["InfoTextRichStyle"];
                 }
-                else if (MessageItem.Type == MessageType.Action)
+                else if (MessageItem.Parent.Type == MessageType.Action)
                 {
                     UsernameBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
-                    MessageBox.FontStyle = Windows.UI.Text.FontStyle.Italic;
                 }
 
-                if (MessageItem.Mention)
+                if (MessageItem.Parent.Mention)
                 {
                     UsernameBox.Foreground = new SolidColorBrush(Colors.Red);
                 }
 
-                if (MessageItem.Type == MessageType.MOTD)
+                if (MessageItem.Parent.Type == MessageType.MOTD)
                 {
                     this.FontFamily = new FontFamily("Consolas");
                 }
-
-                hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
-                hyperlinkManager.LinkClicked += MediaPreview_Clicked;
             }
-
-            try
-            {
-                if (!hyperlinkManager.InlineLink && hyperlinkManager.FirstLink != null && Config.GetBoolean(Config.ShowMetadata, true))
-                {
-                    Task.Run(async () =>
-                    {
-                        var graph = await OpenGraph.ParseUrlAsync(hyperlinkManager.FirstLink);
-
-                        if (graph.Values.Count > 0 && graph.Title != "" && graph["description"] != "")
-                        {
-                            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                            {
-                                PreviewFrame.Visibility = Visibility.Visible;
-                                PreviewFrame.Navigate(typeof(LinkView), graph, new SuppressNavigationTransitionInfo());
-                            });
-                        }
-                    });
-                }
-            }
-            catch { } // swallow exceptions
 
             this.HasLoaded = true;
             UpdateLayout();
@@ -268,70 +211,8 @@ namespace WinIRC.Ui
 
         private void MessageLine_Unloaded(object sender, RoutedEventArgs e)
         {
-            PreviewFrame.Navigate(typeof(Page));
-
-            hyperlinkManager.SetText(MessageParagraph, "");
-            hyperlinkManager.LinkClicked -= MediaPreview_Clicked;
-            hyperlinkManager = null;
             MainPage.instance.UiUpdated -= Instance_UiUpdated;
             UpdateLayout();
-        }
-
-        private void MediaPreview_Clicked(Uri uri)
-        {
-            if (PreviewFrame.Visibility == Visibility.Collapsed)
-            {
-                PreviewFrame.Visibility = Visibility.Visible;
-
-                if (uri != lastUri)
-                {
-                    if (uri.Host.Contains("twitter.com"))
-                        PreviewFrame.Navigate(typeof(TwitterView), uri, new SuppressNavigationTransitionInfo());
-                    else if (uri.Host.Contains("youtube.com") || uri.Host.Contains("youtu.be"))
-                        PreviewFrame.Navigate(typeof(YoutubeView), uri, new SuppressNavigationTransitionInfo());
-                    else if (HyperlinkManager.isImage(uri.ToString()))
-                        PreviewFrame.Navigate(typeof(ImageView), uri, new SuppressNavigationTransitionInfo());
-                }
-
-                lastUri = uri;
-            }
-            else
-            {
-                PreviewFrame.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void Share_Click(object sender, RoutedEventArgs e)
-        {
-            if (hyperlinkManager.FirstLink == null) return;
-
-            DataTransferManager.ShowShareUI();
-            DataTransferManager.GetForCurrentView().DataRequested += MessageLine_DataRequested;
-        }
-
-        private void MessageLine_DataRequested(Windows.ApplicationModel.DataTransfer.DataTransferManager sender, Windows.ApplicationModel.DataTransfer.DataRequestedEventArgs args)
-        {
-            args.Request.Data.SetWebLink(hyperlinkManager.FirstLink);
-            args.Request.Data.Properties.Title = Windows.ApplicationModel.Package.Current.DisplayName;
-
-            DataTransferManager.GetForCurrentView().DataRequested -= MessageLine_DataRequested;
-        }
-
-        private void Copy_Click(object sender, RoutedEventArgs e)
-        {
-            DataPackage dataPackage = new DataPackage
-            {
-                RequestedOperation = DataPackageOperation.Copy
-            };
-
-            dataPackage.SetText(hyperlinkManager.FirstLink.ToString());
-
-            Clipboard.SetContent(dataPackage);
-        }
-
-        private void PreviewFrame_RightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            ShareFlyout.ShowAt(sender as FrameworkElement);
         }
     }
 }

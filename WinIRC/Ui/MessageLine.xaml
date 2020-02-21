@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:ircclientcore="using:IrcClientCore"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
@@ -15,33 +16,48 @@
             <ResourceDictionary.MergedDictionaries>
                 <local:UserRightClickMenu x:Name="UserRightClick" />
             </ResourceDictionary.MergedDictionaries>
-
-            <controls:CommandBarFlyout Placement="Right" x:Name="ShareFlyout">
-                <AppBarButton Label="Share Link" Icon="ReShare" ToolTipService.ToolTip="Share Link" Click="Share_Click" />
-                <AppBarButton Label="Copy Link to Clipboard" Icon="Copy" ToolTipService.ToolTip="Copy Link to Clipboard" Click="Copy_Click" />
-            </controls:CommandBarFlyout>
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Margin="0,4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <controls:PersonPicture DisplayName="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Height="40" Margin="0,0,8,0" VerticalAlignment="Top" >
+            <controls:PersonPicture.Resources>
+                <SolidColorBrush x:Key="PersonPictureEllipseFillThemeBrush" Color="{x:Bind UserColor, Mode=OneWay}" />
+            </controls:PersonPicture.Resources>
+        </controls:PersonPicture>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-        <TextBlock x:Name="TimestampBox" Grid.Column="0" Padding="0,0,5,0" Text="{x:Bind MessageItem.Timestamp, FallbackValue='Timestamp', Mode=OneWay}"/>
-        <RichTextBlock x:Name="MessageBox" Grid.Row="0" Grid.ColumnSpan="3" Padding="0,0,5,0" TextWrapping="WrapWholeWords" Foreground="{x:Bind MessageColor, Mode=OneWay}" >
-            <Paragraph x:Name="MessageParagraph" /> 
-        </RichTextBlock>
-        <TextBlock x:Name="UsernameBox" Grid.Column="1" Padding="0,0,5,0" FontWeight="Bold" Foreground="{x:Bind UserColor, Mode=OneWay}" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0" RightTapped="PreviewFrame_RightTapped" />
+            <TextBlock x:Name="UsernameBox" Grid.Column="0" Padding="0,0,5,0" FontWeight="Bold" Foreground="{x:Bind UserColorBrush, Mode=OneWay}" Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}" VerticalAlignment="Top" />
+
+            <TextBlock x:Name="TimestampBox" Grid.Column="1" Padding="0,0,5,0" Text="{x:Bind MessageItem.Parent.Timestamp, FallbackValue='Timestamp', Mode=OneWay}" VerticalAlignment="Top"/>
+
+            <ItemsControl x:Name="messagesView" Grid.Row="2" Grid.ColumnSpan="2" FontSize="14" FontFamily="Segoe UI" ItemsSource="{x:Bind MessageItem.Children, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="ircclientcore:Message">
+                        <local:MessageLineInner MessageItem="{x:Bind Mode=OneWay}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel  />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
 
     </Grid>
 </UserControl>

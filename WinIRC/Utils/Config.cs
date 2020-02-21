@@ -27,6 +27,7 @@ namespace WinIRC
         public const string IgnoreJoinLeave = "ignorejoinleave";
         public const string Blurred = "blurredback";
         public const string ShowMetadata = "showmetadata";
+        public const string ModernChat = "modernchatstyle";
 
         // handles for server storage
         public static string ServersStore = "serversstore";

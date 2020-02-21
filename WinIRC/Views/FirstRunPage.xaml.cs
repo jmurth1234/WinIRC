@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -134,6 +134,7 @@ namespace WinIRC.Views
             }
 
             Config.SetBoolean(Config.FirstRun, true);
+            Config.SetBoolean(Config.ModernChat, true);
             await App.Current.NavigationService.NavigateAsync(typeof(MainPage));
             App.Current.NavigationService.ClearHistory();
         }

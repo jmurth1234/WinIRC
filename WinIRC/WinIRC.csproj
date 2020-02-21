@@ -189,6 +189,13 @@
     </Compile>
     <Compile Include="Ui\ColorUtils.cs" />
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Ui\MessageGrouper.cs" />
+    <Compile Include="Ui\MessageLineInner.xaml.cs">
+      <DependentUpon>MessageLineInner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\MessageLineClassic.xaml.cs">
+      <DependentUpon>MessageLineClassic.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Ui\PivotPage.xaml.cs">
       <DependentUpon>PivotPage.xaml</DependentUpon>
     </Compile>
@@ -287,6 +294,14 @@
     <Page Include="Ui\ChannelListItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\MessageLineInner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Ui\MessageLineClassic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Ui\PivotPage.xaml">
       <SubType>Designer</SubType>

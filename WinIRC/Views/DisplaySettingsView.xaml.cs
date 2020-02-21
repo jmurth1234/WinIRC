@@ -124,6 +124,16 @@ namespace WinIRC
                 this.LinkMetadata.IsOn = true;
             }
 
+            if (Config.Contains(Config.ModernChat))
+            {
+                this.ModernChatStyle.IsOn = Config.GetBoolean(Config.ModernChat);
+            }
+            else
+            {
+                Config.SetBoolean(Config.ModernChat, false);
+                this.ModernChatStyle.IsOn = false;
+            }
+
             this.SettingsLoaded = true;
         }
 
@@ -201,6 +211,16 @@ namespace WinIRC
             if (!SettingsLoaded)
                 return;
             Config.SetInt(Config.FontSize, (int)FontSize.Value);
+
+            base.UpdateUi();
+        }
+
+        private void ModernChatStyle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetBoolean(Config.ModernChat, ModernChatStyle.IsOn);
 
             base.UpdateUi();
         }

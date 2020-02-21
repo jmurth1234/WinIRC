@@ -15,6 +15,14 @@
 
     <Windows10version1903:Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="Shadow" />
+
+        <DataTemplate x:Key="ModernTemplate" x:DataType="ui:MessageGroup">
+            <ui:MessageLine MessageItem="{x:Bind Mode=OneWay}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ClassicTemplate" x:DataType="ui:MessageGroup">
+            <ui:MessageLineClassic CompactMode="False" MessageItem="{x:Bind Parent, Mode=OneWay}" />
+        </DataTemplate>
     </Windows10version1903:Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -71,12 +79,7 @@
         </Border>
 
         <ScrollViewer Grid.RowSpan="4" Canvas.ZIndex="-1" Padding="5" x:Name="Scroll">
-            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,15,42" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="net:Message">
-                        <ui:MessageLine CompactMode="False" MessageItem="{x:Bind Mode=OneWay}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
+            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,10,42" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}" ItemTemplate="{x:Bind CurrentTemplate, Mode=OneWay}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsStackPanel Orientation="Vertical" VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" CacheLength="10" />
