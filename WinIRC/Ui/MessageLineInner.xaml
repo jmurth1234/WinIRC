@@ -20,31 +20,6 @@
     </UserControl.Resources>
 
     <Grid>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="WindowStates" >
-                <VisualState x:Name="WideState">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="720" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="MessageBox.(Grid.Row)" Value="0" />
-                        <Setter Target="MessageBox.(Grid.Column)" Value="2" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="NarrowState">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="MessageBox.(Grid.Row)" Value="1" />
-                        <Setter Target="PreviewFrame.(Grid.Row)" Value="2" />
-                        <Setter Target="MessageBox.(Grid.Column)" Value="0" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -70,13 +45,17 @@
                        Text="{x:Bind Username, FallbackValue='Username', Mode=OneWay}"
                        VerticalAlignment="Top" />
 
-
-        <RichTextBlock x:Name="MessageBox" Padding="0,0,5,0" Grid.Column="2" Grid.ColumnSpan="3" TextWrapping="WrapWholeWords" Foreground="{x:Bind MessageColor, Mode=OneWay}" >
+        <RichTextBlock x:Name="MessageBox" Padding="0,0,5,0" Grid.Column="0" Grid.ColumnSpan="3" TextWrapping="WrapWholeWords" Foreground="{x:Bind MessageColor, Mode=OneWay}" >
             <Paragraph x:Name="MessageParagraph" />
         </RichTextBlock>
 
-        <Frame x:Name="PreviewFrame" Visibility="Collapsed"  Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0" RightTapped="PreviewFrame_RightTapped" />
+        <Frame x:Name="PreviewFrame" Visibility="Collapsed" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,5,0,0" HorizontalAlignment="Left" HorizontalContentAlignment="Left" CacheSize="0" RightTapped="PreviewFrame_RightTapped" />
 
-        <Button Padding="4,0" Grid.ColumnSpan="3" Margin="0,5,0,0" Grid.Row="2" Visibility="Collapsed" >2 Replies</Button>
+        <Button Padding="4,0" Grid.ColumnSpan="3" Margin="0,5,0,0" Grid.Row="2" Visibility="{x:Bind MessageItem.HasReplies, Mode=OneWay}">
+            <TextBlock>
+                <Run Text="{x:Bind MessageItem.Replies, Mode=OneWay}" />
+                <Run Text="Replies" />
+            </TextBlock>
+        </Button>
     </Grid>
 </UserControl>
