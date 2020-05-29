@@ -189,6 +189,9 @@
     </Compile>
     <Compile Include="Ui\ColorUtils.cs" />
     <Compile Include="Ui\HyperlinkManager.cs" />
+    <Compile Include="Ui\MessageBox.xaml.cs">
+      <DependentUpon>MessageBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Ui\MessageGrouper.cs" />
     <Compile Include="Ui\MessageLineInner.xaml.cs">
       <DependentUpon>MessageLineInner.xaml</DependentUpon>
@@ -292,6 +295,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Ui\ChannelListItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Ui\MessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -79,49 +79,6 @@ namespace WinIRC.Handlers
 
                 msgBox.Text = "";
             }
-            else if ((e.Key == Windows.System.VirtualKey.Tab) && (msgBox.Text != ""))
-            {
-                e.Handled = true;
-
-                TabComplete(msgBox, server, channel);
-            }
-        }
-
-        public void TabComplete(TextBox msgBox, string server, string channel)
-        {
-            if (server == null || channel == null || server == "" || channel == "")
-            {
-                return;
-            }
-
-            var position = msgBox.SelectionStart;
-            var words = msgBox.Text.Split(' ');
-            var word = words[words.Length - 1];
-            var isFirst = (words.Length == 1);
-            var completions = GetTabCompletions(server, channel, msgBox.Text, word, words.Length - 1);
-
-            if (word.Length == 0)
-                return;
-
-            foreach (var item in completions)
-            {
-                if (item.ToLower().StartsWith(word.ToLower()))
-                {
-                    if (isFirst && !word.StartsWith("/"))
-                    {
-                        msgBox.Text = item + ": ";
-                    }
-                    else
-                    {
-                        words[words.Length - 1] = words[words.Length - 1].Replace(word, item);
-                        msgBox.Text = String.Join(" ", words) + " ";
-                    }
-                    msgBox.SelectionStart = msgBox.Text.Length;
-                    msgBox.SelectionLength = 0;
-                    msgBox.Focus(FocusState.Keyboard);
-                    break;
-                }
-            }
         }
 
         public string[] GetTabCompletions(string server, string channel, string message, string current, int position)
@@ -151,7 +108,7 @@ namespace WinIRC.Handlers
         private string[] GetUserCompletions(string server, string channel, string word)
         {
             var users = connectedServers[server].ChannelList[channel].Store.RawUsers;
-            return users.Where(cmd => cmd.StartsWith(word)).ToArray();
+            return users.OrderBy(o => o.ToLower()).Where(cmd => cmd.ToLower().StartsWith(word.ToLower())).ToArray();
         }
 
         public void UpdateUsers(Frame frame, string server, string channel)

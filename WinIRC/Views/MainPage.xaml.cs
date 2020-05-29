@@ -307,9 +307,9 @@ namespace WinIRC
 
             if (currentView != null)
             {
-                ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, window);
+                ChannelView view = new ChannelView(currentView.Server, currentView.Channel, window);
                 ElementCompositionPreview.SetAppWindowContent(window, view);
-                window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
+                window.Title = $"{currentView.Channel} | {currentView.Server}";
                 window.TitleBar.ExtendsContentIntoTitleBar = true;
                 window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
 
@@ -588,7 +588,7 @@ namespace WinIRC
             {
                 Tabs.SelectedItem = Tabs.Items.Cast<PivotItem>().First(item =>
                     item.Header as string == channel
-                    && (item.Content as ChannelView).currentServer == server
+                    && (item.Content as ChannelView).Server == server
                 );
             }
             else
@@ -782,7 +782,7 @@ namespace WinIRC
                     Debug.WriteLine("Tabs seen: " + i);
                     var item = Tabs.Items[0] as PivotItem;
                     var content = item.Content;
-                    if (content is ChannelView && (content as ChannelView).currentServer == name)
+                    if (content is ChannelView && (content as ChannelView).Server == name)
                     {
                         item.Content = null;
                         Tabs.Items.Remove(item);
@@ -978,7 +978,7 @@ namespace WinIRC
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (GetCurrentChannelView() != null)
-                UpdateInfo(GetCurrentChannelView().currentServer, GetCurrentChannelView().currentChannel);
+                UpdateInfo(GetCurrentChannelView().Server, GetCurrentChannelView().Channel);
         }
 
         private void ChannelListItem_ServerRightClickEvent(object sender, EventArgs e)

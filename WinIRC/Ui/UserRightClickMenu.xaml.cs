@@ -34,8 +34,8 @@ namespace WinIRC.Ui
             if (flyout.Target is ChannelView)
             {
                 var view = (ChannelView)flyout.Target;
-                commands = IrcUiHandler.Instance.connectedServers[view.currentServer].CommandManager;
-                channel = view.currentChannel;
+                commands = IrcUiHandler.Instance.connectedServers[view.Server].CommandManager;
+                channel = view.Channel;
             }
             else
             {

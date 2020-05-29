@@ -64,17 +64,10 @@
                     </controls:DropShadowPanel>
                 </Windows10version1903:Border>
 
+                <Rectangle Grid.RowSpan="2" x:Name="BottomFillArea" />
+
                 <!-- SystemControlPageBackgroundChromeLowBrush is the default PaneBackground brush, feel free to change it to whatever you like! -->
-                <Grid x:Name="PaneContentGrid" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
-
-                    <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="ircMsgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch"/>
-                </Grid>
+                <ui:MessageBox x:Name="ircTextBox" Server="{x:Bind Server, Mode=TwoWay}" Channel="{x:Bind Channel, Mode=TwoWay}" />
             </Grid>
         </Border>
 

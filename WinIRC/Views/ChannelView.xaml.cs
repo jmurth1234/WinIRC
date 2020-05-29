@@ -36,8 +36,28 @@ namespace WinIRC.Views
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string currentChannel { get; set; }
-        public string currentServer { get; set; }
+        private string _channel;
+        private string _server;
+
+        public string Channel
+        {
+            get => _channel;
+            set
+            {
+                _channel = value;
+                this.NotifyPropertyChanged();
+            }
+        }
+
+        public string Server
+        {
+            get => _server;
+            set
+            {
+                _server = value;
+                this.NotifyPropertyChanged();
+            }
+        }
 
         private ObservableCollection<MessageGroup> currentBuffer;
         public ObservableCollection<MessageGroup> CurrentBuffer
@@ -86,14 +106,14 @@ namespace WinIRC.Views
                 TopArea.Translation += new Vector3(0, 0, 12);
             }
 
-            currentServer = server;
-            currentChannel = channel;
+            Server = server;
+            Channel = channel;
 
             Unloaded += ChannelView_Unloaded;
 
             var visibility = window != null ? Visibility.Visible : Visibility.Collapsed;
             this.titlebar.Visibility = visibility;
-            this.titlebar.Text = $"{currentChannel} | {currentServer}";
+            this.titlebar.Text = $"{Channel} | {Server}";
             this.Window = window;
 
             if (window == null && CompactToggle != null)
@@ -144,13 +164,13 @@ namespace WinIRC.Views
 
             Channel channelStore = null;
 
-            if (servers[currentServer].ChannelList.Contains(currentChannel))
+            if (servers[Server].ChannelList.Contains(Channel))
             {
-                channelStore = IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+                channelStore = IrcHandler.connectedServers[Server].ChannelList[Channel];
             }
-            else if (currentChannel == "Server" || currentChannel == "")
+            else if (Channel == "Server" || Channel == "")
             {
-                channelStore = IrcHandler.connectedServers[currentServer].ChannelList.ServerLog;
+                channelStore = IrcHandler.connectedServers[Server].ChannelList.ServerLog;
             }
 
             return channelStore;
@@ -158,11 +178,11 @@ namespace WinIRC.Views
 
         internal void SetChannel(string server, string channel)
         {
-            if (currentChannel != null && currentServer != null && ChannelLoaded)
+            if (Channel != null && Server != null && ChannelLoaded)
             {
-                var chan = currentChannel == "Server"
-                    ? IrcHandler.connectedServers[currentServer].ChannelList.ServerLog
-                    : IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
+                var chan = Channel == "Server"
+                    ? IrcHandler.connectedServers[Server].ChannelList.ServerLog
+                    : IrcHandler.connectedServers[Server].ChannelList[Channel];
                 store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
@@ -172,8 +192,8 @@ namespace WinIRC.Views
             {
                 return;
             }
-            currentServer = server;
-            currentChannel = channel;
+            Server = server;
+            Channel = channel;
 
             var channelStore = GetChannel();
             if (channelStore == null) return;
@@ -207,43 +227,12 @@ namespace WinIRC.Views
 
         public TextBox GetInputBox()
         {
-            return ircMsgBox;
-        }
-
-        public void ircMsgBox_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
-            {
-                return;
-            }
-
-            IrcHandler.IrcTextBoxHandler(ircMsgBox, e, currentServer, currentChannel);
-        }
-
-        private void TabButton_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (currentChannel == null || currentServer == null || currentServer == "" || currentChannel == "")
-            {
-                return;
-            }
-
-            IrcHandler.TabComplete(ircMsgBox, currentServer, currentChannel);
+            return ircTextBox.Inner;
         }
 
         public void UpdateUi()
         {
-            var uiMode = UIViewSettings.GetForCurrentView().UserInteractionMode;
-
             SetupBuffer();
-
-            if (uiMode == Windows.UI.ViewManagement.UserInteractionMode.Touch)
-            {
-                TabButton.Width = 48;
-            }
-            else
-            {
-                TabButton.Width = 0;
-            }
 
             if (Config.Contains(Config.FontFamily))
             {
@@ -255,7 +244,7 @@ namespace WinIRC.Views
                 this.messagesView.FontSize = Convert.ToDouble(Config.GetInt(Config.FontSize, 14));
             }
 
-            if (currentChannel != "Server")
+            if (Channel != "Server")
             {
                 topicScroll.Visibility = MainPage.instance.ShowTopic ? Visibility.Visible : Visibility.Collapsed;
             }
@@ -292,7 +281,7 @@ namespace WinIRC.Views
             }
 
             TopFillArea.Fill = brush;
-            PaneContentGrid.Background = brush;
+            BottomFillArea.Fill = brush;
 
             if (this.Window != null)
             {
