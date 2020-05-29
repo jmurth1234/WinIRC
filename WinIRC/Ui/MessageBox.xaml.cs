@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -13,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Web.Http;
 using WinIRC.Handlers;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -132,7 +137,9 @@ namespace WinIRC.Ui
 
                 this.saved = true;
                 this.possible = IrcHandler.GetTabCompletions(Server, Channel, msgBox.Text, this.word, position);
-            } else {
+            }
+            else
+            {
                 this.index++;
             }
 
@@ -179,6 +186,95 @@ namespace WinIRC.Ui
                 prev = prev.Replace(":", ",");
             }
             return (word, prev);
+        }
+
+        public async void UploadFile(IInputStream str)
+        {
+            HttpStreamContent streamfile = new HttpStreamContent(str);
+            HttpMultipartFormDataContent httpContents = new HttpMultipartFormDataContent();
+
+            httpContents.Headers.ContentType.MediaType = "multipart/form-data";
+            httpContents.Add(streamfile, "file", "upload");
+
+            var client = new HttpClient();
+            HttpResponseMessage result = await client.PostAsync(new Uri("https://0x0.st"), httpContents);
+            string stringReadResult = await result.Content.ReadAsStringAsync();
+            msgBox.Text += stringReadResult;
+            msgBox.SelectionStart += stringReadResult.Length;
+        }
+
+        private async void msgBox_Paste(object sender, TextControlPasteEventArgs e)
+        {
+            // Mark the event as handled first. Otherwise, the
+            // default paste action will happen, then the custom paste
+            // action, and the user will see the text box content change.
+            e.Handled = true;
+
+            // Get content from the clipboard.
+            var dataPackageView = Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
+            if (dataPackageView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.Text))
+            {
+                var text = await dataPackageView.GetTextAsync();
+
+                if (text.Contains('\n'))
+                {
+                    var messageDialog = new Windows.UI.Popups.MessageDialog(
+                        "Looks like you're attempting to post multiline text. Do you want to pastebin it?"
+                    );
+
+                    // Add commands to the message dialog.
+                    messageDialog.Commands.Add(new UICommand("Pastebin", (command) =>
+                    {
+                        byte[] byteArray = Encoding.UTF8.GetBytes(text);
+                        //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
+                        MemoryStream stream = new MemoryStream(byteArray);
+                        this.UploadFile(stream.AsInputStream());
+                    }));
+                    messageDialog.Commands.Add(new UICommand("Cancel", (command) =>
+                    {
+                        // Cancelled. Do nothing.
+                    }));
+
+                    // Set the command that will be invoked by default.
+                    messageDialog.DefaultCommandIndex = 0;
+
+                    // Set the command to be invoked when escape is pressed.
+                    messageDialog.CancelCommandIndex = 1;
+
+                    // Show the message dialog.
+                    await messageDialog.ShowAsync();
+                }
+                else
+                {
+                    msgBox.Text += text;
+                    msgBox.SelectionStart += text.Length;
+                }
+            }
+
+            if (dataPackageView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.Bitmap))
+            {
+                var image = await dataPackageView.GetBitmapAsync();
+
+                IRandomAccessStreamWithContentType stream = await image.OpenReadAsync();
+                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+                var pixels = await decoder.GetPixelDataAsync();
+                var outStream = new InMemoryRandomAccessStream();
+
+                // Create encoder for PNG
+                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
+
+                // Get pixel data from decoder and set them for encoder
+                encoder.SetPixelData(decoder.BitmapPixelFormat,
+                                     BitmapAlphaMode.Ignore, // Alpha is not used
+                                     decoder.OrientedPixelWidth,
+                                     decoder.OrientedPixelHeight,
+                                     decoder.DpiX, decoder.DpiY,
+                                     pixels.DetachPixelData());
+
+                await encoder.FlushAsync(); // Write data to the stream
+
+                this.UploadFile(outStream);
+            }
         }
     }
 }

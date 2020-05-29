@@ -16,6 +16,6 @@
         </Grid.ColumnDefinitions>
 
         <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
-        <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch"/>
+        <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch" Paste="msgBox_Paste"/>
     </Grid>
 </UserControl>
