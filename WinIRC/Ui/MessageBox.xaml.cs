@@ -16,9 +16,11 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using WinIRC.Handlers;
+using WinIRC.Ui.Dialogs;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -220,35 +222,21 @@ namespace WinIRC.Ui
 
                 if (text.Contains('\n'))
                 {
-                    var messageDialog = new Windows.UI.Popups.MessageDialog(
-                        "Looks like you're attempting to post multiline text. Do you want to pastebin it?"
-                    );
+                    var messageDialog = new PasteTextDialog(text);
 
                     // Add commands to the message dialog.
-                    messageDialog.Commands.Add(new UICommand("Pastebin", (command) =>
+                    messageDialog.PrimaryButtonClick += (ev, i) =>
                     {
                         var url = Config.GetString(Config.PasteText, "https://0x0.st");
 
                         StatusText.Text = "Pasting text...";
                         StatusArea.Visibility = Visibility.Visible;
-                        byte[] byteArray = Encoding.UTF8.GetBytes(text);
+                        byte[] byteArray = Encoding.UTF8.GetBytes(messageDialog.PasteText);
                         //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
                         MemoryStream stream = new MemoryStream(byteArray);
                         this.UploadFile(url, stream.AsInputStream());
-                    }));
+                    };
 
-                    messageDialog.Commands.Add(new UICommand("Cancel", (command) =>
-                    {
-                        // Cancelled. Do nothing.
-                    }));
-
-                    // Set the command that will be invoked by default.
-                    messageDialog.DefaultCommandIndex = 0;
-
-                    // Set the command to be invoked when escape is pressed.
-                    messageDialog.CancelCommandIndex = 1;
-
-                    // Show the message dialog.
                     await messageDialog.ShowAsync();
                 }
                 else
@@ -265,27 +253,41 @@ namespace WinIRC.Ui
 
                 var image = await dataPackageView.GetBitmapAsync();
 
-                IRandomAccessStreamWithContentType stream = await image.OpenReadAsync();
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-                var pixels = await decoder.GetPixelDataAsync();
-                var outStream = new InMemoryRandomAccessStream();
+                using (var stream = await image.OpenReadAsync())
+                {
+                    // Set the image source to the selected bitmap 
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(stream);
 
-                // Create encoder for PNG
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
+                    var messageDialog = new PasteImageDialog(bitmapImage);
 
-                // Get pixel data from decoder and set them for encoder
-                encoder.SetPixelData(decoder.BitmapPixelFormat,
-                                     BitmapAlphaMode.Ignore, // Alpha is not used
-                                     decoder.OrientedPixelWidth,
-                                     decoder.OrientedPixelHeight,
-                                     decoder.DpiX, decoder.DpiY,
-                                     pixels.DetachPixelData());
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+                    var pixels = await decoder.GetPixelDataAsync();
+                    var outStream = new InMemoryRandomAccessStream();
 
-                await encoder.FlushAsync(); // Write data to the stream
+                    // Add commands to the message dialog.
+                    messageDialog.PrimaryButtonClick += async (ev, i) =>
+                    {
+                        // Create encoder for PNG
+                        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
 
-                var url = Config.GetString(Config.PasteImage, "https://0x0.st");
+                        // Get pixel data from decoder and set them for encoder
+                        encoder.SetPixelData(decoder.BitmapPixelFormat,
+                                             BitmapAlphaMode.Ignore, // Alpha is not used
+                                             decoder.OrientedPixelWidth,
+                                             decoder.OrientedPixelHeight,
+                                             decoder.DpiX, decoder.DpiY,
+                                             pixels.DetachPixelData());
 
-                this.UploadFile(url, outStream);
+                        await encoder.FlushAsync(); // Write data to the stream
+
+                        var url = Config.GetString(Config.PasteImage, "https://0x0.st");
+
+                        this.UploadFile(url, outStream);
+                    };
+
+                    await messageDialog.ShowAsync();
+                }
             }
         }
     }

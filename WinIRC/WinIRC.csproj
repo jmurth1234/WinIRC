@@ -188,6 +188,12 @@
       <DependentUpon>ChannelListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Ui\ColorUtils.cs" />
+    <Compile Include="Ui\Dialogs\PasteImageDialog.xaml.cs">
+      <DependentUpon>PasteImageDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\Dialogs\PasteTextDialog.xaml.cs">
+      <DependentUpon>PasteTextDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Ui\HyperlinkManager.cs" />
     <Compile Include="Ui\MessageBox.xaml.cs">
       <DependentUpon>MessageBox.xaml</DependentUpon>
@@ -202,7 +208,7 @@
     <Compile Include="Ui\PivotPage.xaml.cs">
       <DependentUpon>PivotPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ui\PromptDialog.cs" />
+    <Compile Include="Ui\Dialogs\PromptDialog.cs" />
     <Compile Include="Ui\UserRightClickMenu.xaml.cs">
       <DependentUpon>UserRightClickMenu.xaml</DependentUpon>
     </Compile>
@@ -226,7 +232,7 @@
     <Compile Include="Views\ChannelView.xaml.cs">
       <DependentUpon>ChannelView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ConnectDialog.xaml.cs">
+    <Compile Include="Ui\Dialogs\ConnectDialog.xaml.cs">
       <DependentUpon>ConnectDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ConnectionSettingsView.xaml.cs">
@@ -298,6 +304,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Ui\Dialogs\PasteImageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Ui\Dialogs\PasteTextDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Ui\MessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -334,7 +348,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ConnectDialog.xaml">
+    <Page Include="Ui\Dialogs\ConnectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -420,6 +434,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.4.2</Version>
+    </PackageReference>
+    <PackageReference Include="Monaco.Editor">
+      <Version>0.8.1-alpha</Version>
     </PackageReference>
     <PackageReference Include="NotificationsExtensions.Win10">
       <Version>14332.0.2</Version>
