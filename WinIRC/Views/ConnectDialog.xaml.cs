@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -18,29 +18,26 @@ using WinIRC.Handlers;
 using WinIRC.Net;
 using WinIRC.Utils;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace WinIRC.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class ConnectView : Page
+    public sealed partial class ConnectDialog : ContentDialog
     {
+
         private IrcServers ircServers = IrcServers.Instance;
 
         public IrcUiHandler IrcHandler = IrcUiHandler.Instance;
         private bool loadedSavedServer;
 
-        private Action CloseView { get; set; }
-
-        public ConnectView()
+        public ConnectDialog()
         {
             this.InitializeComponent();
 
-            Loaded += ConnectView_LoadedAsync; 
-
-            CloseView = MainPage.instance.CloseConnectView;
+            this.Loaded += ConnectView_LoadedAsync;
         }
 
         private async void ConnectView_LoadedAsync(object sender, RoutedEventArgs e)
@@ -51,11 +48,11 @@ namespace WinIRC.Views
             username.Text = Config.GetString(Config.DefaultUsername);
         }
 
-        private void ConnectButtonClick(object sender, RoutedEventArgs e)
+        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             if (IrcHandler.connectedServersList.Contains(server.Text) || IrcHandler.connectedServersList.Contains(hostname.Text))
             {
-                CloseView();
+                this.Hide();
                 return;
             }
 
@@ -69,7 +66,7 @@ namespace WinIRC.Views
 
             var irc = ircServers.CreateConnection(ircServer);
 
-            CloseView();
+            this.Hide();
             MainPage.instance.Connect(irc);
 
             // close the dialog
@@ -145,7 +142,7 @@ namespace WinIRC.Views
 
         private void CloseDialogClick(object sender, RoutedEventArgs e)
         {
-            CloseView();
+            this.Hide();
         }
 
         // kek
@@ -240,6 +237,5 @@ namespace WinIRC.Views
                 await messageDialog.ShowAsync();
             }
         }
-
     }
 }

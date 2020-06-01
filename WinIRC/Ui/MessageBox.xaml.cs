@@ -188,7 +188,7 @@ namespace WinIRC.Ui
             return (word, prev);
         }
 
-        public async void UploadFile(IInputStream str)
+        public async void UploadFile(string url, IInputStream str)
         {
             HttpStreamContent streamfile = new HttpStreamContent(str);
             HttpMultipartFormDataContent httpContents = new HttpMultipartFormDataContent();
@@ -197,10 +197,12 @@ namespace WinIRC.Ui
             httpContents.Add(streamfile, "file", "upload");
 
             var client = new HttpClient();
-            HttpResponseMessage result = await client.PostAsync(new Uri("https://0x0.st"), httpContents);
+            HttpResponseMessage result = await client.PostAsync(new Uri(url), httpContents);
             string stringReadResult = await result.Content.ReadAsStringAsync();
             msgBox.Text += stringReadResult;
             msgBox.SelectionStart += stringReadResult.Length;
+            StatusText.Text = "";
+            StatusArea.Visibility = Visibility.Collapsed;
         }
 
         private async void msgBox_Paste(object sender, TextControlPasteEventArgs e)
@@ -225,11 +227,16 @@ namespace WinIRC.Ui
                     // Add commands to the message dialog.
                     messageDialog.Commands.Add(new UICommand("Pastebin", (command) =>
                     {
+                        var url = Config.GetString(Config.PasteText, "https://0x0.st");
+
+                        StatusText.Text = "Pasting text...";
+                        StatusArea.Visibility = Visibility.Visible;
                         byte[] byteArray = Encoding.UTF8.GetBytes(text);
                         //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
                         MemoryStream stream = new MemoryStream(byteArray);
-                        this.UploadFile(stream.AsInputStream());
+                        this.UploadFile(url, stream.AsInputStream());
                     }));
+
                     messageDialog.Commands.Add(new UICommand("Cancel", (command) =>
                     {
                         // Cancelled. Do nothing.
@@ -253,6 +260,9 @@ namespace WinIRC.Ui
 
             if (dataPackageView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.Bitmap))
             {
+                StatusText.Text = "Uploading image...";
+                StatusArea.Visibility = Visibility.Visible;
+
                 var image = await dataPackageView.GetBitmapAsync();
 
                 IRandomAccessStreamWithContentType stream = await image.OpenReadAsync();
@@ -273,7 +283,9 @@ namespace WinIRC.Ui
 
                 await encoder.FlushAsync(); // Write data to the stream
 
-                this.UploadFile(outStream);
+                var url = Config.GetString(Config.PasteImage, "https://0x0.st");
+
+                this.UploadFile(url, outStream);
             }
         }
     }

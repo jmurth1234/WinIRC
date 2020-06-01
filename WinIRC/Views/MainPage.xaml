@@ -333,7 +333,7 @@
 
             <Grid x:Name="TitleBarPadding" Background="Transparent" Grid.Column="2" />
         </Grid>
-        
+
         <SplitView x:Name="SplitView" Grid.Row="1" OpenPaneLength="240" PaneBackground="Transparent">
             <SplitView.Pane>
                 <ListView x:Name="channelList" ItemsSource="{x:Bind ServerContents, Mode=OneWay}"
@@ -431,14 +431,6 @@
                 </SplitView>
             </SplitView.Content>
         </SplitView>
-
-        <controls:ModalDialog Grid.Row="1" x:Name="serverConnect" ModalBackground="Transparent">
-            <controls:ModalDialog.ModalContent>
-                <Grid Width="320" BorderThickness="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" BorderBrush="{ThemeResource SystemChromeMediumColor}" x:Name="connectDialogRoot" Loaded="ConnectDialog_Loaded" VerticalAlignment="Center" HorizontalAlignment="Center" Windows10version1903:Shadow="{StaticResource PaneShadow}" >
-                    <Frame x:Name="ConnectFrame" />
-                </Grid>
-            </controls:ModalDialog.ModalContent>
-        </controls:ModalDialog>
 
         <winui:TeachingTip x:Name="BackgroundTeachingTip" 
             Title="Having issues staying connected in the background?"

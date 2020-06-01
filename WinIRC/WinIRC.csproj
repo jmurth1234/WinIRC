@@ -226,11 +226,11 @@
     <Compile Include="Views\ChannelView.xaml.cs">
       <DependentUpon>ChannelView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ConnectDialog.xaml.cs">
+      <DependentUpon>ConnectDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ConnectionSettingsView.xaml.cs">
       <DependentUpon>ConnectionSettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ConnectView.xaml.cs">
-      <DependentUpon>ConnectView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FirstRunPage.xaml.cs">
       <DependentUpon>FirstRunPage.xaml</DependentUpon>
@@ -334,11 +334,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ConnectionSettingsView.xaml">
+    <Page Include="Views\ConnectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ConnectView.xaml">
+    <Page Include="Views\ConnectionSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

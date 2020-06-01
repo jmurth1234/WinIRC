@@ -273,7 +273,6 @@ namespace WinIRC
                 TitleContainer.Translation += new Vector3(0, 0, 8);
                 channelList.Translation += new Vector3(0, 0, 16);
                 sidebarGrid.Translation += new Vector3(0, 0, 16);
-                connectDialogRoot.Translation += new Vector3(0, 0, 32);
 
                 openWindowButton.Visibility = Visibility.Visible;
                 openWindowButton.Click += OpenWindowButton_Click;
@@ -499,17 +498,6 @@ namespace WinIRC
         {
             var bounds = Window.Current.Bounds;
             double height = bounds.Height;
-            connectDialogRoot.MaxHeight = height;
-        }
-
-        private void ConnectDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!(ConnectFrame.Content is ConnectView))
-                ConnectFrame.Navigate(typeof(ConnectView));
-
-            var bounds = Window.Current.Bounds;
-            double height = bounds.Height;
-            connectDialogRoot.MaxHeight = height;
         }
 
         private void InputPaneHiding(InputPane sender, InputPaneVisibilityEventArgs args)
@@ -721,7 +709,7 @@ namespace WinIRC
 
         private void ShowConnectPopup(object sender, RoutedEventArgs e)
         {
-            serverConnect.IsModal = !serverConnect.IsModal;
+            new ConnectDialog().ShowAsync();
         }
 
         public async void Connect(IrcUWPBase irc)
@@ -937,7 +925,7 @@ namespace WinIRC
 
         internal void CloseConnectView()
         {
-            serverConnect.IsModal = !serverConnect.IsModal;
+            //serverConnect.IsModal = !serverConnect.IsModal;
         }
 
         public async void IrcPrompt(WinIrcServer server)

@@ -7,15 +7,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignHeight="50"
+    d:DesignWidth="400"
+    MinHeight="50">
     <Grid x:Name="PaneContentGrid" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
 
         <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
-        <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch" Paste="msgBox_Paste"/>
+        <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" VerticalContentAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch" Paste="msgBox_Paste"/>
+
+        <StackPanel Background="{ThemeResource SystemControlAcrylicElementBrush}" Grid.Row="1" Grid.ColumnSpan="2" x:Name="StatusArea" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0" Visibility="Collapsed" Opacity="0.8">
+            <TextBlock Margin="5,0,5,5" x:Name="StatusText" FontSize="12" VerticalAlignment="Center" />
+        </StackPanel>
     </Grid>
 </UserControl>

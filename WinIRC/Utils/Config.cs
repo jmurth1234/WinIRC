@@ -12,6 +12,8 @@ namespace WinIRC
         public const string UseTabs = "usetabs";
         public const string AlwaysNotify = "alwaysnotify";
         public const string AnalyticsAsked = "analyticsasked";
+        public const string PasteImage = "pasteimage";
+        public const string PasteText = "pastetext";
 
         // connection settings
         public const string DefaultUsername = "defaultusername";
