@@ -37,7 +37,7 @@
 
 
             <Grid Grid.Column="0" >
-                <TextBlock Text="Manage Servers" Style="{StaticResource AppTitleTextBlockStyle}" VerticalAlignment="Center" Padding="0" Margin="9" FontSize="18" />
+                <TextBlock Text="Manage Servers" Style="{StaticResource NavigationViewItemHeaderTextStyle}" VerticalAlignment="Center" Padding="0" Margin="9" FontSize="18" />
             </Grid>
             <Button Grid.Column="1" x:Name="SaveButton"  Content="&#xE105;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Save Server" Click="SaveButtonClick" />
             <Button Grid.Column="2" x:Name="DeleteButton"  Content="&#xE107;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Remove Server" Click="DeleteButtonClick" />
@@ -50,7 +50,7 @@
             <StackPanel Orientation="Vertical" x:Name="pop" BorderThickness="0" >
                 <TextBlock Margin="5,1" x:Name="formError" Height="0" Foreground="#FFA80000" />
 
-                <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">Connection Details</TextBlock>
+                <TextBlock Style="{StaticResource NavigationViewItemHeaderTextStyle}" Padding="5,10">Connection Details</TextBlock>
 
                 <TextBox  x:Name="server"  Margin="5,6" PlaceholderText="Server Name"  />
 
@@ -75,7 +75,7 @@
                     <ToggleSwitch Grid.Column="1" x:Name="webSocket" OffContent="Standard" OnContent="Websocket" Toggled="webSocket_Toggled" Header="Connection Type" HorizontalAlignment="Right" Width="126" MinWidth="0" />
                 </Grid>
 
-                <TextBlock Style="{StaticResource AppTitleTextBlockStyle}" Margin="5,1">User Info</TextBlock>
+                <TextBlock Style="{StaticResource NavigationViewItemHeaderTextStyle}" Padding="5,10">User Info</TextBlock>
                 <TextBox  x:Name="username"  Margin="5,10" PlaceholderText="Username"  />
 
                 <PasswordBox  x:Name="nickservPassword"  IsPasswordRevealButtonEnabled="True"  Margin="5,6" PlaceholderText="Nickserv Password" />

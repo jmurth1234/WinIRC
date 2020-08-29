@@ -221,6 +221,10 @@ namespace WinIRC.Ui
                 if (MessageItem.Type == MessageType.MOTD)
                 {
                     this.FontFamily = new FontFamily("Consolas");
+                } else
+                {
+                    this.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
+                    this.FontSize = Config.GetInt(Config.FontSize);
                 }
 
                 hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);
