@@ -27,6 +27,12 @@ namespace WinIRC.Ui
 
         private void Original_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                Grouped.Clear();
+                return;
+            }
+
             foreach (var message in e.NewItems)
             {
                 AddMessage(message as Message);

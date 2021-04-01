@@ -44,7 +44,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
     <EnableGatekeeperAnalysis>false</EnableGatekeeperAnalysis>
     <Optimize>false</Optimize>
   </PropertyGroup>
@@ -178,6 +178,8 @@
     <Compile Include="Net\IrcServer.cs" />
     <Compile Include="Net\IrcSocket.cs" />
     <Compile Include="Net\IrcWebSocket.cs" />
+    <Compile Include="Net\UWPBuffer.cs" />
+    <Compile Include="Net\UWPSocketBase.cs" />
     <Compile Include="OpenGraph\HttpDownloader.cs" />
     <Compile Include="OpenGraph\InvalidSpecificationException.cs" />
     <Compile Include="OpenGraph\OpenGraph.cs" />
@@ -445,7 +447,7 @@
       <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="Rymate.IrcClientCore">
-      <Version>1.0.118-20201021.1-dev-master</Version>
+      <Version>1.0.147-20210314.1-dev-master</Version>
     </PackageReference>
     <PackageReference Include="Template10">
       <Version>1.1.13-preview-20161207</Version>

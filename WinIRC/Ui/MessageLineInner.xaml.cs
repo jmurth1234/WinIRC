@@ -54,22 +54,24 @@ namespace WinIRC.Ui
             get
             {
                 if (MessageItem == null) return "";
-                if (MessageItem.User.Contains("*"))
+                var user = MessageItem.User ?? "";
+
+                if (user.Contains("*"))
                 {
                     return "*";
                 }
 
                 if (MessageItem.Type == MessageType.Normal)
                 {
-                    return String.Format("{0}", MessageItem.User);
+                    return String.Format("{0}", user);
                 }
                 else if (MessageItem.Type == MessageType.Notice)
                 {
-                    return String.Format("->{0}<-", MessageItem.User);
+                    return String.Format("->{0}<-", user);
                 }
                 else
                 {
-                    return String.Format("* {0}", MessageItem.User);
+                    return String.Format("* {0}", user);
                 }
             }
         }

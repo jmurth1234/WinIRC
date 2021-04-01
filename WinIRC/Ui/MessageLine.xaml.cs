@@ -52,7 +52,7 @@ namespace WinIRC.Ui
             {
                 if (MessageItem == null) return "";
 
-                var user = MessageItem.Parent.User;
+                var user = MessageItem.Parent.User ?? "";
 
                 if (user.Contains("*"))
                 {

@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
+using WinIRC.Net;
 using WinIRC.Ui;
 
 namespace WinIRC.Views
@@ -152,8 +153,6 @@ namespace WinIRC.Views
             if (ChannelLoaded)
             {
                 CurrentBuffer = null;
-                store.TopicSetEvent -= ChannelView_TopicSetEvent;
-                store = null;
                 topicText.Text = "";
             }
         }
@@ -183,7 +182,6 @@ namespace WinIRC.Views
                 var chan = Channel == "Server"
                     ? IrcHandler.connectedServers[Server].ChannelList.ServerLog
                     : IrcHandler.connectedServers[Server].ChannelList[Channel];
-                store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
             var servers = IrcHandler.connectedServers;
@@ -199,7 +197,6 @@ namespace WinIRC.Views
             if (channelStore == null) return;
 
             store = channelStore.Store;
-            store.TopicSetEvent += ChannelView_TopicSetEvent;
 
             topicText.Text = store.Topic;
 
@@ -213,7 +210,7 @@ namespace WinIRC.Views
             var channelStore = GetChannel();
             if (channelStore == null) return;
 
-            var grouped = new MessageGrouper(channelStore.Buffers as ObservableCollection<Message>);
+            var grouped = new MessageGrouper((channelStore.Buffers as UWPBuffer).Collection);
 
             this.CurrentTemplate = this.Resources[Config.GetBoolean(Config.ModernChat) ? "ModernTemplate" : "ClassicTemplate"] as DataTemplate;
             this.CurrentBuffer = grouped.Grouped;

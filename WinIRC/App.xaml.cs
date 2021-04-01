@@ -399,12 +399,12 @@ namespace WinIRC
 
                 foreach (var server in servers)
                 {
-                    Debug.WriteLine("Irc server name " + server.BackgroundTaskName + " - Task name " + taskInstance.Task.Name);
+                    Debug.WriteLine("Irc server name " + server.Server.Name + " - Task name " + taskInstance.Task.Name);
 
-                    if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName)
-                    {
-                        irc = server as IrcSocket;
-                    }
+                    //if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName)
+                    //{
+                    //    irc = server as IrcSocket;
+                    //}
                 }
 
                 if (irc == null)
