@@ -8,41 +8,37 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid>
-            <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
-                <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Channels</TextBlock>
+    <StackPanel  Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Channels</TextBlock>
 
-                <TextBlock Text="Switch to channel on join" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="AutoChannelSwitch" OffContent="No" OnContent="Yes" Toggled="AutoChannelSwitch_Toggled"/>
+        <TextBlock Text="Switch to channel on join" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="AutoChannelSwitch" OffContent="No" OnContent="Yes" Toggled="AutoChannelSwitch_Toggled"/>
 
-                <TextBlock Text="Log channels to a file" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="LogChannels" OffContent="No" OnContent="Yes" Toggled="LogChannels_Toggled"/>
-                <Button x:Name="LogFolder" Click="LogFolder_Click">Change Folder</Button>
+        <TextBlock Text="Log channels to a file" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="LogChannels" OffContent="No" OnContent="Yes" Toggled="LogChannels_Toggled"/>
+        <Button x:Name="LogFolder" Click="LogFolder_Click">Change Folder</Button>
                 
-                <TextBlock Text="Use tabs to switch channels" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="TabsSwitch" OffContent="No" OnContent="Yes" Toggled="TabsSwitch_Toggled"/>
+        <TextBlock Text="Use tabs to switch channels" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="TabsSwitch" OffContent="No" OnContent="Yes" Toggled="TabsSwitch_Toggled"/>
 
-                <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Chat Area</TextBlock>
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Chat Area</TextBlock>
 
-                <TextBlock Text="When clicking on a user" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ComboBox x:Name="UserListClick" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="UserListClick_SelectionChanged"/>
+        <TextBlock Text="When clicking on a user" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ComboBox x:Name="UserListClick" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="UserListClick_SelectionChanged"/>
 
-                <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" FontSize="12" >Paste handling</TextBlock>
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" FontSize="12" >Paste handling</TextBlock>
 
-                <TextBlock Text="Image Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <TextBox Margin="0,5" x:Name="ImageUploadURL" TextChanged="ImageUploadURL_TextChanged" />
+        <TextBlock Text="Image Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <TextBox Margin="0,5" x:Name="ImageUploadURL" TextChanged="ImageUploadURL_TextChanged" />
                 
-                <TextBlock Text="Text Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <TextBox Margin="0,5" x:Name="TextUploadURL" TextChanged="TextUploadURL_TextChanged" />
+        <TextBlock Text="Text Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <TextBox Margin="0,5" x:Name="TextUploadURL" TextChanged="TextUploadURL_TextChanged" />
 
 
-                <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Other</TextBlock>
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Other</TextBlock>
 
-                <TextBlock Text="Enable Analytics" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-                <ToggleSwitch Margin="5,1" x:Name="AnalyticsSwitch" OffContent="No" OnContent="Yes" Toggled="AnalyticsSwitch_Toggled"/>
-            </StackPanel>
+        <TextBlock Text="Enable Analytics" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="AnalyticsSwitch" OffContent="No" OnContent="Yes" Toggled="AnalyticsSwitch_Toggled"/>
+    </StackPanel>
 
-        </Grid>
-    </Grid>
 </ui:BaseSettingsPage>

@@ -9,45 +9,43 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
-    <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <StackPanel Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
-            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Application</TextBlock>
+    <StackPanel Orientation="Vertical"  BorderThickness="0" Padding="10,0" >
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Application</TextBlock>
 
-            <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
+        <TextBlock Text="App Theme" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="Theme" OffContent="Light Theme" OnContent="Dark Theme" Toggled="theme_Toggled" />
 
-            <TextBlock Text="Acrylic Blurs" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Disabled" OnContent="Enabled" Toggled="BlurredBack_Toggled" />
+        <TextBlock Text="Acrylic Blurs" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="BlurredBack" OffContent="Disabled" OnContent="Enabled" Toggled="BlurredBack_Toggled" />
 
-            <TextBlock Text="Reduce Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
+        <TextBlock Text="Reduce Padding" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="Padding" OffContent="No" OnContent="Yes" Toggled="Padding_Toggled" />
 
-            <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
+        <TextBlock Text="Hide Status Bar (WP Only)" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="HideStatusBar" OffContent="No" OnContent="Yes" Toggled="HideStatusBar_Toggled" />
 
-            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Chat Area</TextBlock>
+        <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Chat Area</TextBlock>
 
-            <TextBlock Text="Display inline link metadata" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="LinkMetadata" OffContent="No" OnContent="Yes" Toggled="LinkMetadata_Toggled" />
+        <TextBlock Text="Display inline link metadata" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="LinkMetadata" OffContent="No" OnContent="Yes" Toggled="LinkMetadata_Toggled" />
 
-            <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
+        <TextBlock Text="Ignore Join/Leave Messages" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="IgnoreJoinLeave" OffContent="No" OnContent="Yes" Toggled="IgnoreJoinLeave_Toggled" />
 
-            <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                        <TextBlock FontFamily="{x:Bind}" Text="{x:Bind}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+        <TextBlock Text="Chat Font" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ComboBox x:Name="FontCombo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5" SelectionChanged="FontCombo_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <TextBlock FontFamily="{x:Bind}" Text="{x:Bind}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
-            <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <winui:NumberBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5"  Minimum="6" SpinButtonPlacementMode="Compact" LosingFocus="FontSize_LosingFocus" />
+        <TextBlock Text="Font Size" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <winui:NumberBox x:Name="FontSize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5"  Minimum="6" SpinButtonPlacementMode="Compact" LosingFocus="FontSize_LosingFocus" />
 
-            <TextBlock Text="Message Style" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-            <ToggleSwitch Margin="5,1" x:Name="ModernChatStyle" OffContent="Compact" OnContent="Modern" Toggled="ModernChatStyle_Toggled" />
+        <TextBlock Text="Message Style" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <ToggleSwitch Margin="5,1" x:Name="ModernChatStyle" OffContent="Compact" OnContent="Modern" Toggled="ModernChatStyle_Toggled" />
 
-        </StackPanel>
-    </ScrollViewer>
+    </StackPanel>
 </ui:BaseSettingsPage>

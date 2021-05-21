@@ -184,7 +184,6 @@ namespace WinIRC
             inputPane.Hiding += this.InputPaneHiding;
 
             Window.Current.SizeChanged += Current_SizeChanged;
-            SidebarFrame.Navigated += SidebarFrame_Navigated;
             WindowStates.CurrentStateChanged += WindowStates_CurrentStateChanged;
             WindowStates.CurrentStateChanging += WindowStates_CurrentStateChanging; ;
 
@@ -808,27 +807,10 @@ namespace WinIRC
 
         private void ShowSettings(Type type)
         {
-            SidebarFrame.BackStack.Clear();
-            SidebarHeader.ShowBackButton = false;
+            var dialog = new SettingsDialog(type);
+            dialog.UpdateUi += UpdateUi;
 
-            if (SidebarFrame.Content == null || !(SidebarFrame.Content.GetType() == type))
-            {
-                SidebarFrame.Navigate(type);
-                if (SidebarFrame.Content is BaseSettingsPage)
-                {
-                    var settingsView = (BaseSettingsPage)SidebarFrame.Content;
-
-                    if (settingsView != null)
-                        SidebarHeader.Title = settingsView.Title;
-                }
-                else if (type.Name == nameof(AboutView))
-                {
-                    SidebarHeader.Title = "About";
-                }
-            }
-
-            ToggleSidebar();
-            ShowingUsers = false;
+            dialog.ShowAsync();
         }
 
         private void BehaviourSettings_Click(object sender, RoutedEventArgs e)
@@ -897,14 +879,6 @@ namespace WinIRC
 
             SidebarHeader.ShowBackButton = false;
 
-        }
-
-        private void SidebarFrame_Navigated(object sender, NavigationEventArgs e)
-        {
-            if (SidebarFrame.Content is BaseSettingsPage)
-            {
-                ((BaseSettingsPage)SidebarFrame.Content).UpdateUi += UpdateUi;
-            }
         }
 
         private void ChannelListItem_ChannelCloseClicked(object sender, EventArgs e)

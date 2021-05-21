@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace WinIRC
             "About"
         };
 
-        public SettingsView()
+        public SettingsView ()
         {
             this.InitializeComponent();
 

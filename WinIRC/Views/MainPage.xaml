@@ -309,7 +309,7 @@
 
             <Button x:Name="HamburgerButton" Content="&#xE700;" FontFamily="Segoe MDL2 Assets" Click="ToggleSplitView" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="40" Background="{x:Null}"/>
 
-            <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" >
+            <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" RequestedTheme="Default">
                 <winui:MenuBarItem Title="WinIRC" AccessKey="f">
                     <MenuFlyoutSubItem Text="Connect to" x:Name="ConnectSubMenu" ToolTipService.ToolTip="This currently won't update dynamically, only on app load"/>
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>

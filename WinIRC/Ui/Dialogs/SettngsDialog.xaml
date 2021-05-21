@@ -1,0 +1,32 @@
+<ContentDialog
+    x:Class="WinIRC.Views.SettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinIRC.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    CloseButtonText="Close"
+    Background="{ThemeResource SystemControlAcrylicElementBrush}">
+
+    <ContentDialog.Resources>
+        <Thickness x:Key="ContentDialogTitleMargin">8</Thickness>
+        <Thickness x:Key="ContentDialogPadding">0,0,0,0</Thickness>
+        <Thickness x:Key="ContentDialogCommandSpaceMargin">8</Thickness>
+    </ContentDialog.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Background="{ThemeResource SystemChromeAltMediumHighColor}"  VerticalAlignment="Top">
+            <TextBlock x:Name="Header" Style="{StaticResource NavigationViewItemHeaderTextStyle}" VerticalAlignment="Center" Padding="0" Margin="9" FontSize="18" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1">
+            <Frame x:Name="Frame" />
+        </ScrollViewer>
+    </Grid>
+</ContentDialog>
