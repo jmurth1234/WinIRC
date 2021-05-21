@@ -383,66 +383,6 @@ namespace WinIRC
             }
         }
 
-        protected async override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
-        {
-            var taskInstance = args.TaskInstance;
-            var deferral = taskInstance.GetDeferral();
-            Debug.WriteLine("Attempting background execution: " + taskInstance.Task.Name);
-            try
-            {
-                var details = taskInstance.TriggerDetails as SocketActivityTriggerDetails;
-                var socketInformation = details.SocketInformation;
-
-                var servers = IrcUiHandler.Instance.connectedServers.Values;
-
-                IrcSocket irc = null;
-
-                foreach (var server in servers)
-                {
-                    Debug.WriteLine("Irc server name " + server.BackgroundTaskName + " - Task name " + taskInstance.Task.Name);
-
-                    if (server is IrcSocket && taskInstance.Task.Name == server.BackgroundTaskName)
-                    {
-                        irc = server as IrcSocket;
-                    }
-                }
-
-                if (irc == null)
-                {
-                    Debug.WriteLine("Unable to get irc server: " + taskInstance.Task.Name);
-                    return;
-                }
-
-                Debug.WriteLine("Able to get irc server: " + taskInstance.Task.Name);
-
-                switch (details.Reason)
-                {
-                    case SocketActivityTriggerReason.SocketActivity:
-                    case SocketActivityTriggerReason.KeepAliveTimerExpired:
-                        var socket = socketInformation.StreamSocket;
-                        using (DataReader reader = new DataReader(socket.InputStream))
-                        using (DataWriter writer = new DataWriter(socket.OutputStream))
-                        {
-                            reader.InputStreamOptions = InputStreamOptions.Partial;
-                            await irc.ReadFromServer(reader, writer);
-                        }
-                        break;
-                    case SocketActivityTriggerReason.SocketClosed:
-                        // implement reconnecting
-                        break;
-                    default:
-                        break;
-                }
-                deferral.Complete();
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
-                Debug.WriteLine(exception.StackTrace);
-                deferral.Complete();
-            }
-        }
-
         private void ShowToast(string title, string message)
         {
             var toast = IrcUWPBase.CreateBasicToast(title, message);

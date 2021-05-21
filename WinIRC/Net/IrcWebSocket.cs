@@ -8,18 +8,17 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Popups;
 using Windows.UI.Notifications;
 using System.Threading.Tasks;
+using IrcClientCore;
 
 namespace WinIRC.Net
 {
-    public class IrcWebSocket : IrcUWPBase
+    public class IrcWebSocket : UWPSocketBase
     {
         private MessageWebSocket messageWebSocket;
 
-        public IrcWebSocket(WinIrcServer server) : base(server)
-        {
-        }
+        public IrcWebSocket(Irc irc) : base(irc) { }
 
-        public override async void Connect()
+        public override async Task Connect()
         {
             // Make a local copy to avoid races with Closed events.
             MessageWebSocket webSocket = messageWebSocket;
@@ -50,8 +49,8 @@ namespace WinIRC.Net
                     messageWebSocket = webSocket; // Only store it after successfully connecting.
                 }
 
-                IsConnected = true;
-                IsConnecting = false;
+                parent.IsConnected = true;
+                parent.IsConnecting = false;
 
                 Debug.WriteLine("Connected!");
 
@@ -62,7 +61,7 @@ namespace WinIRC.Net
                 Debug.WriteLine(e.StackTrace);
                 var messageDialog = new MessageDialog("Could not connect to the server.");
                 await messageDialog.ShowAsync();
-                HandleDisconnect(this);
+                parent.HandleDisconnect(parent);
             }
 
         }
@@ -84,37 +83,7 @@ namespace WinIRC.Net
 
             ToastNotificationManager.CreateToastNotifier().Show(error);
 
-            DisconnectAsync(attemptReconnect: autoReconnect);
-        }
-
-        public override async void DisconnectAsync(string msg = "Powered by WinIRC", bool attemptReconnect = false)
-        {
-            WriteLine("QUIT :" + msg);
-            IsConnected = false;
-
-            if (attemptReconnect)
-            {
-                IsConnecting = true;
-                if (ConnCheck.HasInternetAccess)
-                {
-                    ReconnectionAttempts++;
-
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
-                    {
-                        if (ReconnectionAttempts < 3)
-                            await Task.Delay(1000);
-                        else
-                            await Task.Delay(60000);
-
-                        Connect();
-                    });
-                }
-            }
-            else
-            {
-                HandleDisconnect?.Invoke(this);
-                messageWebSocket.Dispose();
-            }
+            Disconnect(attemptReconnect: autoReconnect);
         }
 
         private async void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
@@ -134,15 +103,15 @@ namespace WinIRC.Net
 
                         if (receivedData == "SOCKET_CONNECTED_IRC")
                         {
-                            AttemptAuth();
+                            parent.AttemptAuth();
                             return;
                         }
 
-                        if (IsAuthed)
+                        if (parent.IsAuthed)
                         {
                             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                             {
-                                RecieveLine(receivedData);
+                                parent.RecieveLine(receivedData);
                             });
                         }
                     }

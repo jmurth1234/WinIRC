@@ -185,13 +185,7 @@ namespace WinIRC.Utils
 
         internal IrcUWPBase CreateConnection(WinIrcServer ircServer)
         {
-            Net.IrcUWPBase irc;
-            if (ircServer.webSocket)
-                irc = new Net.IrcWebSocket(ircServer);
-            else
-                irc = new Net.IrcSocket(ircServer);
-
-            return irc;
+            return new Net.IrcUWPBase(ircServer);
         }
 
         public async Task AddServer(WinIrcServer server)

@@ -13,9 +13,9 @@
     xmlns:legacy="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d">
 
-    <Windows10version1903:Page.Resources>
+    <Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="Shadow" />
-    </Windows10version1903:Page.Resources>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
@@ -40,7 +40,8 @@
             </Windows10version1903:ToggleButton>
 
             <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
-                <TextBox x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" fcu:Style="{StaticResource ChannelViewTextBox}" IsReadOnly="True"  />
+                <TextBox Text="{x:Bind store.Topic, Mode=OneWay}"
+                         x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" fcu:Style="{StaticResource ChannelViewTextBox}" IsReadOnly="True"  />
             </ScrollViewer>
         </Grid>
 

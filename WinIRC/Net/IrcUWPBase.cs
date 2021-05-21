@@ -18,25 +18,12 @@ using WinIRC.Utils;
 
 namespace WinIRC.Net
 {
-    public abstract class IrcUWPBase : Irc, IDisposable
+    public class IrcUWPBase : Irc, IDisposable
     {
-        internal StreamSocket streamSocket;
-        internal DataReader reader;
-        internal DataWriter writer;
-
-        public String BackgroundTaskName {
-            get
-            {
-                return "WinIRCBackgroundTask." + Server.Name;
-            }
-        }
-
         Windows.Storage.ApplicationDataContainer roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
 
         public string buffer;
         public string currentChannel;
-
-        internal Connection ConnCheck;
 
         private readonly int MAX_MESSAGES = 1000;
 
@@ -46,11 +33,6 @@ namespace WinIRC.Net
 
         public IrcUWPBase(WinIrcServer server) : base(server)
         {
-            ConnCheck = new Connection();
-            ConnCheck.ConnectionChanged += async (connected) =>
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConnectionChanged(connected)
-            );
-
             DebugMode = false;
         }
 
@@ -59,6 +41,16 @@ namespace WinIRC.Net
             base.Initialise();
             Mentions.CollectionChanged += Mentions_CollectionChanged;
             HandleDisplayChannelList = ShowChannels;
+        }
+
+        public override ISocket CreateConnection()
+        {
+            var server = (WinIrcServer)Server;
+            if (server.webSocket)
+            {
+                return new IrcWebSocket(this);
+            }
+            return new IrcSocket(this);
         }
 
         public override async Task ProcessLine(IrcMessage parsedLine)
@@ -102,35 +94,15 @@ namespace WinIRC.Net
             }
         }
 
-        private new void ConnectionChanged(bool connected)
-        {
-            if (connected && Config.GetBoolean(Config.AutoReconnect))
-            {
-                foreach (Channel channel in ChannelList)
-                {
-                    channel.ClientMessage("Reconnecting...");
-                }
-                Connect();
-            }
-            else
-            {
-                foreach (Channel channel in ChannelList)
-                {
-                    channel.ClientMessage("Disconnected from IRC");
-                }
-                DisconnectAsync(attemptReconnect: true);
-            }
-        }
-
         public void SendMessage(string message)
         {
             this.CommandManager.HandleCommand(currentChannel, message);
         }
 
-        public override ICollection<Message> CreateChannelBuffer(string channel)
+        public override IrcClientCore.IBuffer CreateChannelBuffer(string channel)
         {
             Debug.WriteLine("logging " + channel);
-            return new MessageCollection(1000, Server.Name, channel);
+            return new UWPBuffer(Server.Name, channel);
         }
 
         public new async Task<bool> AddChannel(string channel)
@@ -171,7 +143,7 @@ namespace WinIRC.Net
             {
                 if (currentChannel != null) ChannelList[currentChannel].CurrentlyViewing = false;
                 currentChannel = channel;
-                ircMessages = ChannelList[channel].Buffers as MessageCollection;
+                ircMessages = (ChannelList[channel].Buffers as UWPBuffer).Collection;
                 ChannelList[channel].CurrentlyViewing = true;
             }
         }
@@ -194,45 +166,6 @@ namespace WinIRC.Net
             msg.Text = text;
 
             this.AddMessage(currentChannel, msg);
-        }
-
-        public override async void WriteLine(string str)
-        {
-            Debug.WriteLine(str);
-            await WriteLine(writer, str);
-        }
-
-        public async Task WriteLine(DataWriter writer, string str)
-        {
-            if (ReadOrWriteFailed)
-                return;
-
-            try
-            {
-                if (ConnCheck.HasInternetAccess && !IsReconnecting)
-                {
-                    writer.WriteString(str + "\r\n");
-                    await writer.StoreAsync();
-                    await writer.FlushAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                ReadOrWriteFailed = true;
-                var autoReconnect = Config.GetBoolean(Config.AutoReconnect);
-
-                var msg = autoReconnect
-                    ? "Attempting to reconnect..."
-                    : "Please try again later.";
-
-                AddError("Error whilst connecting: " + e.Message + "\n" + msg);
-                AddError(e.StackTrace);
-
-                DisconnectAsync(attemptReconnect: autoReconnect);
-
-                Debug.WriteLine(e.Message);
-                Debug.WriteLine(e.StackTrace);
-            }
         }
 
         public static ToastNotification CreateBasicToast(string title, string msg)
@@ -369,16 +302,10 @@ namespace WinIRC.Net
         {
             try
             {
+                // (this.Connection as UWPSocketBase).Dispose();
                 Server = null;
 
-                if (reader != null) reader.Dispose();
-                if (writer != null) writer.Dispose();
-
-                if (streamSocket != null) streamSocket.Dispose();
-
                 HandleDisconnect = null;
-                ConnCheck.ConnectionChanged = null;
-                ConnCheck = null;
             }
             catch (NullReferenceException e)
             {

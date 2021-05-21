@@ -761,7 +761,7 @@ namespace WinIRC
 
                 foreach (var channel in IrcHandler.connectedServers[irc.Server.Name].ChannelList)
                 {
-                    channel.Buffers.Clear();
+                    (channel.Buffers as UWPBuffer).Collection.Clear();
                 }
 
                 var name = irc.Server.Name;
@@ -962,7 +962,7 @@ namespace WinIRC
             }
 
             server.Username = Config.GetString(Config.DefaultUsername);
-            var irc = new Net.IrcSocket(server);
+            var irc = new Net.IrcUWPBase(server);
             MainPage.instance.Connect(irc);
         }
 

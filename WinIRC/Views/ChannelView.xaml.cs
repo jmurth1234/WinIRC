@@ -24,6 +24,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using WinIRC.Handlers;
+using WinIRC.Net;
 using WinIRC.Ui;
 
 namespace WinIRC.Views
@@ -124,7 +125,6 @@ namespace WinIRC.Views
             if (ChannelLoaded)
             {
                 CurrentBuffer = null;
-                store.TopicSetEvent -= ChannelView_TopicSetEvent;
                 store = null;
                 topicText.Text = "";
             }
@@ -138,7 +138,6 @@ namespace WinIRC.Views
                     ? IrcHandler.connectedServers[currentServer].ChannelList.ServerLog
                     : IrcHandler.connectedServers[currentServer].ChannelList[currentChannel];
                 CurrentBuffer.CollectionChanged -= ChannelView_CollectionChanged;
-                store.TopicSetEvent -= ChannelView_TopicSetEvent;
             }
 
             var servers = IrcHandler.connectedServers;
@@ -162,12 +161,9 @@ namespace WinIRC.Views
 
             if (channel == null) return;
 
-            CurrentBuffer = channelStore.Buffers as ObservableCollection<Message>;
+            CurrentBuffer = (channelStore.Buffers as UWPBuffer).Collection;
 
             store = channelStore.Store;
-            store.TopicSetEvent += ChannelView_TopicSetEvent;
-
-            topicText.Text = store.Topic;
 
             CurrentBuffer.CollectionChanged += ChannelView_CollectionChanged;
 
@@ -180,11 +176,6 @@ namespace WinIRC.Views
         private void ChannelView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             // ScrollToBottom();
-        }
-
-        private void ChannelView_TopicSetEvent(string topic)
-        {
-            topicText.Text = topic;
         }
 
         public TextBox GetInputBox()
