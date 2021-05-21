@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.7.4 (the triggered by irc kerfuffle update)
+
+Wasn't originally planning on adding an update to the 1.7.x branch but due to recent events I felt I had to push one out rather than waiting however long it takes for me to finish the upcoming 1.8 chnages.
+
+The biggest thing in this release is updates to the clients handling of the IRC protocol, meaning: 
+
+ - IRCv3 `message-tags` and `server-time` capabilities are now supported 
+ - Fixes some bugginess around the handling of PRIVMSGs
+ - Adds /topic (and makes the topic bar not readonly finally ^_^)
+
+The following changes have been made:
+
+ - Ignores more errors when enabling the ignore ssl errors option
+ - Added Libera.Chat as a selectable default option to the first run dialog
+ - Moved the official WinIRC support channel to Libera.Chat for now
+
 ## 1.7.3
 
 Migrating from a TextBox to the NumberBox was broken -- this update fixes it.
