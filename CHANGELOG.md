@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.~~4~~5 (the triggered by irc kerfuffle update)
+## 1.7.5 (the triggered by irc kerfuffle update)
 
 Wasn't originally planning on adding an update to the 1.7.x branch but due to recent events I felt I had to push one out rather than waiting however long it takes for me to finish the upcoming 1.8 chnages.
 
