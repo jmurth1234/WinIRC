@@ -302,11 +302,12 @@ namespace WinIRC
 
         private async void OpenWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            var window = await AppWindow.TryCreateAsync();
             var currentView = GetCurrentChannelView();
 
             if (currentView != null)
             {
+                var window = await AppWindow.TryCreateAsync();
+
                 ChannelView view = new ChannelView(currentView.currentServer, currentView.currentChannel, window);
                 ElementCompositionPreview.SetAppWindowContent(window, view);
                 window.Title = $"{currentView.currentChannel} | {currentView.currentServer}";
@@ -314,9 +315,8 @@ namespace WinIRC
                 window.TitleBar.ButtonBackgroundColor = Colors.Transparent;
 
                 CloseTab_Click(sender, e);
+                await window.TryShowAsync();
             }
-
-            await window.TryShowAsync();
         }
 
         public void ConnectViaName(string args)

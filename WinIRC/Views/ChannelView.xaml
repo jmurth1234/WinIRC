@@ -13,9 +13,9 @@
     xmlns:legacy="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d">
 
-    <Page.Resources>
+    <Windows10version1903:Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="Shadow" />
-    </Page.Resources>
+    </Windows10version1903:Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>

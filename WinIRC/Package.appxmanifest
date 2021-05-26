@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.7.5.0" />
+  <Identity Name="57221rymate1234.WinIRC" Publisher="CN=1459BE74-73A4-49A3-BBEB-5E81EC67EE2A" Version="1.7.7.0" />
   <mp:PhoneIdentity PhoneProductId="1beb2626-8294-445c-9c44-2c223cd4ea86" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>WinIRC</DisplayName>
