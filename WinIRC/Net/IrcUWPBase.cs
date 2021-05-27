@@ -302,7 +302,7 @@ namespace WinIRC.Net
         {
             try
             {
-                // (this.Connection as UWPSocketBase).Dispose();
+                (this.Connection as UWPSocketBase).Dispose();
                 Server = null;
 
                 HandleDisconnect = null;

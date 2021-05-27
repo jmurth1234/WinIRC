@@ -40,7 +40,7 @@
             </Windows10version1903:ToggleButton>
 
             <ScrollViewer Grid.Column="1" Canvas.ZIndex="0" x:Name="topicScroll" Padding="5" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
-                <TextBox Text="{x:Bind store.Topic, Mode=TwoWay}"
+                <TextBox Text="{x:Bind store.Topic, Mode=TwoWay}" IsReadOnly="True"
                          x:Name="topicText" Margin="0,2" PlaceholderText="Channel Topic" fcu:Style="{StaticResource ChannelViewTextBox}"  />
             </ScrollViewer>
         </Grid>

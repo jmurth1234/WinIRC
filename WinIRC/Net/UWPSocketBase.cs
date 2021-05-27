@@ -80,7 +80,7 @@ namespace WinIRC.Net
             {
                 if (ConnCheck.HasInternetAccess && !parent.IsReconnecting)
                 {
-                    writer.WriteString(str + "\r\n");
+                    writer.WriteString(str + "\n");
                     await writer.StoreAsync();
                     await writer.FlushAsync();
                 }
