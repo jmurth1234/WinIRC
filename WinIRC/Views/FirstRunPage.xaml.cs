@@ -48,6 +48,14 @@ namespace WinIRC.Views
 
             Servers.Add(new WinIrcServer()
             {
+                Name = "Libera",
+                Hostname = "irc.libera.chat",
+                Port = 6697,
+                Ssl = true,
+            });
+
+            Servers.Add(new WinIrcServer()
+            {
                 Name = "Freenode",
                 Hostname = "chat.freenode.net",
                 Port = 6697,

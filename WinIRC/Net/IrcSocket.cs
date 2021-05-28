@@ -91,6 +91,7 @@ namespace WinIRC.Net
             {
                 streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
                 streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+                streamSocket.Control.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
             }
 
             if (task != null) streamSocket.EnableTransferOwnership(task.TaskId, SocketActivityConnectedStandbyAction.Wake);
@@ -131,6 +132,8 @@ namespace WinIRC.Net
 
         private async void ConnectionHandler()
         {
+            parent.AttemptAuth();
+
             // while loop to keep the connection open
             while (parent.IsConnected)
             {
@@ -181,55 +184,48 @@ namespace WinIRC.Net
         {
             // set the DataReader to only wait for available data
             reader.InputStreamOptions = InputStreamOptions.Partial;
-            if (!parent.IsAuthed)
+            try
             {
-                parent.AttemptAuth();
-            }
-            else
-            {
-                try
-                {
-                    await reader.LoadAsync(socketReceiveBufferSize);
+                await reader.LoadAsync(socketReceiveBufferSize);
 
-                    while (reader.UnconsumedBufferLength > 0)
+                while (reader.UnconsumedBufferLength > 0)
+                {
+                    bool breakLoop = false;
+                    byte readChar;
+                    do
                     {
-                        bool breakLoop = false;
-                        byte readChar;
-                        do
+                        if (reader.UnconsumedBufferLength > 0)
+                            readChar = reader.ReadByte();
+                        else
                         {
-                            if (reader.UnconsumedBufferLength > 0)
-                                readChar = reader.ReadByte();
-                            else
-                            {
-                                breakLoop = true;
-                                break;
-                            }
-                        } while (!dataStreamLineReader.Add(readChar));
+                            breakLoop = true;
+                            break;
+                        }
+                    } while (!dataStreamLineReader.Add(readChar));
 
-                        if (breakLoop)
-                            return;
+                    if (breakLoop)
+                        return;
 
-                        // Read next line from data stream.
-                        var line = dataStreamLineReader.SafeFlushLine();
+                    // Read next line from data stream.
+                    var line = dataStreamLineReader.SafeFlushLine();
 
-                        if (line == null) break;
-                        if (line.Length == 0) continue;
+                    if (line == null) break;
+                    if (line.Length == 0) continue;
 
-                        await parent.RecieveLine(line);
-                    }
+                    await parent.RecieveLine(line);
                 }
-                catch (Exception e)
-                {
-                    parent.AddError("Error with connection: " + e.Message);
-                    parent.AddError(e.StackTrace);
-                    parent.ReadOrWriteFailed = true;
-                    parent.IsConnected = false;
+            }
+            catch (Exception e)
+            {
+                parent.AddError("Error with connection: " + e.Message);
+                parent.AddError(e.StackTrace);
+                parent.ReadOrWriteFailed = true;
+                parent.IsConnected = false;
 
-                    if (Server != null)
-                        Disconnect(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
+                if (Server != null)
+                    Disconnect(attemptReconnect: Config.GetBoolean(Config.AutoReconnect));
 
-                    return;
-                }
+                return;
             }
         }
     }

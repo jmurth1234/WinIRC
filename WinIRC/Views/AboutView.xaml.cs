@@ -54,11 +54,11 @@ namespace WinIRC
         {
             WinIrcServer server = new WinIrcServer
             {
-                Name = "WinIRC Support (Freenode)",
-                Hostname = "chat.freenode.net",
+                Name = "WinIRC Support (Libera)",
+                Hostname = "irc.libera.chat",
                 Port = 6697,
                 Ssl = true,
-                Channels = "#winirc"
+                Channels = "#WinIRC"
             };
 
             MainPage.instance.IrcPrompt(server);
