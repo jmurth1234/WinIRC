@@ -75,6 +75,8 @@ namespace WinIRC.Handlers
                     Analytics.TrackEvent("Message Sent");
                 }
 
+                connectedServers[server].SwitchChannel(channel);
+
                 connectedServers[server].CommandManager.HandleCommand(channel, msgBox.Text);
 
                 msgBox.Text = "";

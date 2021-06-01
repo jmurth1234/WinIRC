@@ -225,8 +225,8 @@ namespace WinIRC.Ui
                     this.FontFamily = new FontFamily("Consolas");
                 } else
                 {
-                    this.FontFamily = new FontFamily(Config.GetString(Config.FontFamily));
-                    this.FontSize = Config.GetInt(Config.FontSize);
+                    this.FontFamily = new FontFamily(Config.GetString(Config.FontFamily, "Segoe UI"));
+                    this.FontSize = Config.GetInt(Config.FontSize, 14);
                 }
 
                 hyperlinkManager.SetText(MessageParagraph, MessageItem.Text);

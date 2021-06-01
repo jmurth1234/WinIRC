@@ -161,6 +161,8 @@ namespace WinIRC.Views
         {
             var servers = IrcHandler.connectedServers;
 
+            if (servers.Count == 0 || !servers.ContainsKey(Server)) return null;
+
             Channel channelStore = null;
 
             if (servers[Server].ChannelList.Contains(Channel))
@@ -214,12 +216,6 @@ namespace WinIRC.Views
 
             this.CurrentTemplate = this.Resources[Config.GetBoolean(Config.ModernChat) ? "ModernTemplate" : "ClassicTemplate"] as DataTemplate;
             this.CurrentBuffer = grouped.Grouped;
-        }
-
-
-        private void ChannelView_TopicSetEvent(string topic)
-        {
-            topicText.Text = topic;
         }
 
         public TextBox GetInputBox()

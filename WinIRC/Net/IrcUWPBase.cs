@@ -33,7 +33,7 @@ namespace WinIRC.Net
 
         public IrcUWPBase(WinIrcServer server) : base(server)
         {
-            DebugMode = false;
+            DebugMode = true;
         }
 
         public new void Initialise()
@@ -41,6 +41,18 @@ namespace WinIRC.Net
             base.Initialise();
             Mentions.CollectionChanged += Mentions_CollectionChanged;
             HandleDisplayChannelList = ShowChannels;
+            (InfoBuffer as UWPBuffer).Collection.CollectionChanged += Collection_CollectionChanged;
+        }
+
+        private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (ircMessages != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    ircMessages.Add((Message) item);
+                }
+            }
         }
 
         public override ISocket CreateConnection()
@@ -134,28 +146,17 @@ namespace WinIRC.Net
 
         public void SwitchChannel(string channel)
         {
-            if (channel == null)
-            {
-                return;
-            }
-
-            if (ChannelList.Contains(channel))
+            if (channel != null && ChannelList.Contains(channel))
             {
                 if (currentChannel != null) ChannelList[currentChannel].CurrentlyViewing = false;
                 currentChannel = channel;
                 ircMessages = (ChannelList[channel].Buffers as UWPBuffer).Collection;
                 ChannelList[channel].CurrentlyViewing = true;
+                return;
             }
-        }
 
-        public void ClientMessage(string channel, string text)
-        {
-            Message msg = new Message();
-            msg.User = "";
-            msg.Type = MessageType.Info;
-            msg.Text = text;
-
-            this.AddMessage(channel, msg);
+            currentChannel = "Server";
+            ircMessages = (ChannelList.ServerLog.Buffers as UWPBuffer).Collection;
         }
 
         public void ClientMessage(string text)
