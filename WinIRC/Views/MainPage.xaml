@@ -13,16 +13,15 @@
     xmlns:ircclientcore="using:IrcClientCore"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
-    mc:Ignorable="d" 
+    mc:Ignorable="d"
+    winui:BackdropMaterial.ApplyToRootOrPageBackground="True"
     NavigationCacheMode="Disabled">
     <Page.Resources>
-        <Windows10version1903:ThemeShadow x:Name="TitleShadow" />
-        <Windows10version1903:ThemeShadow x:Name="PaneShadow" />
+        <Windows10version1903:ThemeShadow x:Name="ContentShadow" />
 
         <Style x:Key="TabsStyle" TargetType="Pivot">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="Background" Value="{ThemeResource PivotBackground}"/>
             <Setter Property="IsTabStop" Value="False"/>
             <Setter Property="ItemsPanel">
                 <Setter.Value>
@@ -34,7 +33,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Pivot">
-                        <Grid x:Name="RootElement" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                        <Grid CornerRadius="4" x:Name="RootElement" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
                             <Grid.Resources>
                                 <Style x:Key="BaseContentControlStyle" TargetType="ContentControl">
                                     <Setter Property="FontFamily" Value="XamlAutoFontFamily"/>
@@ -215,7 +214,7 @@
                                                 <CompositeTransform x:Name="PivotLayoutElementTranslateTransform"/>
                                             </Grid.RenderTransform>
 
-                                            <Grid RequestedTheme="Dark" Height="40">
+                                            <Grid Height="40">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
@@ -247,7 +246,7 @@
                                                 <Button x:Name="NextButton" Background="Transparent" Grid.Column="1" HorizontalAlignment="Right" Height="32" IsTabStop="False" IsEnabled="False" Margin="{ThemeResource PivotNavButtonMargin}" Opacity="0" Template="{StaticResource NextTemplate}" UseSystemFocusVisuals="False" VerticalAlignment="Top" Width="20"/>
                                                 <ContentPresenter x:Name="RightHeaderPresenter"  ContentTemplate="{TemplateBinding RightHeaderTemplate}" Content="{TemplateBinding RightHeader}" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                             </Grid>
-                                            
+
                                             <ItemsPresenter x:Name="PivotItemPresenter" Grid.ColumnSpan="3" Grid.Row="1">
                                                 <ItemsPresenter.RenderTransform>
                                                     <TransformGroup>
@@ -267,7 +266,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid x:Name="mainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="mainGrid">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates" >
                 <VisualState x:Name="WideState">
@@ -300,7 +299,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="TitleContainer" Background="{StaticResource SystemControlBackgroundAccentBrush}" RequestedTheme="Dark" Windows10version1903:Shadow="{StaticResource TitleShadow}" >
+        <Grid x:Name="TitleContainer" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -309,7 +308,7 @@
 
             <Button x:Name="HamburgerButton" Content="&#xE700;" FontFamily="Segoe MDL2 Assets" Click="ToggleSplitView" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="40" Background="{x:Null}"/>
 
-            <winui:MenuBar x:Name="Menu" Grid.Column="1" Foreground="White" RequestedTheme="Default">
+            <winui:MenuBar x:Name="Menu" Grid.Column="1">
                 <winui:MenuBarItem Title="WinIRC" AccessKey="f">
                     <MenuFlyoutSubItem Text="Connect to" x:Name="ConnectSubMenu" ToolTipService.ToolTip="This currently won't update dynamically, only on app load"/>
                     <MenuFlyoutItem Text="Manage Servers" Click="ShowConnectPopup"/>
@@ -317,12 +316,12 @@
                     <MenuFlyoutItem Text="Quit" Click="QuitClient_Click"/>
                 </winui:MenuBarItem>
 
-                <winui:MenuBarItem Title="View" AccessKey="v" Foreground="White">
+                <winui:MenuBarItem Title="View" AccessKey="v" >
                     <ToggleMenuFlyoutItem Text="Topic Bar" IsChecked="{x:Bind ShowTopic, Mode=TwoWay}" Click="MenuBarToggleItem_Click" />
                     <ToggleMenuFlyoutItem Text="Show Channel Users" IsChecked="{x:Bind ShowingUsers, Mode=TwoWay}"  />
                 </winui:MenuBarItem>
 
-                <winui:MenuBarItem Title="Settings" VerticalContentAlignment="Top" Height="32" VerticalAlignment="Stretch" AccessKey="s" Foreground="White">
+                <winui:MenuBarItem Title="Settings" VerticalContentAlignment="Top" VerticalAlignment="Stretch" AccessKey="s">
                     <MenuFlyoutItem Text="Appearance" Click="AppearanceSettings_Click"/>
                     <MenuFlyoutItem Text="Connection" Click="ConnectionSettings_Click"/>
                     <MenuFlyoutItem Text="Behaviour" Click="BehaviourSettings_Click"/>
@@ -340,8 +339,7 @@
                     HorizontalAlignment="Stretch" ItemClick="ChannelList_ItemClick" Background="{x:Null}"
                     IsItemClickEnabled="True"
                     SelectionMode="Single"
-                    SingleSelectionFollowsFocus="False"
-                    Windows10version1903:Shadow="{StaticResource PaneShadow}" >
+                    SingleSelectionFollowsFocus="False" >
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
@@ -371,62 +369,55 @@
                 </ListView>
             </SplitView.Pane>
             <SplitView.Content>
-                <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed">
+                <SplitView x:Name="SidebarSplitView" Grid.Row="1" OpenPaneLength="240" PanePlacement="Right" PaneClosed="SidebarSplitView_PaneClosed" PaneBackground="Transparent">
                     <SplitView.Pane>
-                        <Grid x:Name="sidebarGrid" Windows10version1903:Shadow="{StaticResource PaneShadow}" >
+                        <Grid x:Name="sidebarGrid" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            <Grid Background="{x:Bind AccentColorAlt}" Grid.Row="0" Margin="0" Height="40" RequestedTheme="Dark" VerticalAlignment="Top">
+                            <Grid Grid.Row="0" Margin="0" Height="40" VerticalAlignment="Top">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Grid Grid.Column="0" >
-                                    <ui:HeaderBlock x:Name="SidebarHeader" ShowBackButton="False" BackButtonClicked="HeaderBlock_BackButtonClicked"/>
-                                </Grid>
-
-                                <Button RequestedTheme="Dark" Background="{x:Bind AccentColorAlt}" Grid.Column="1" 
-                                        x:Name="PinButton" Content="&#xE106;" Style="{StaticResource IconButtonStyle}" Click="PinSidebar" />
+                                <Button Grid.Column="1" x:Name="PinButton" Content="&#xE106;" Style="{StaticResource IconButtonStyle}" Click="PinSidebar" />
                             </Grid>
 
-                            <Frame Grid.Row="1" x:Name="SidebarFrame" BorderThickness="1,0,0,0" BorderBrush="{ThemeResource SystemChromeMediumColor}">
-                            </Frame>
+                            <Frame Grid.RowSpan="2" x:Name="SidebarFrame" BorderThickness="1,0,0,0" />
                         </Grid>
                     </SplitView.Pane>
                     <SplitView.Content>
-                        <Grid x:Name="MainGrid">
-                            <Rectangle x:Name="HeaderColor" VerticalAlignment="Top" Height="40" Fill="{x:Bind AccentColorAlt}" />
-
-                            <Pivot x:Name="Tabs" SelectionChanged="Tabs_SelectionChanged" Style="{StaticResource TabsStyle}" >
-                                <Pivot.HeaderTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Height="40" Orientation="Horizontal">
-                                            <TextBlock Text="{Binding}" MaxWidth="150" FontSize="16" VerticalAlignment="Center" Margin="0,-10,5,0"  />
-                                            <Button x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="14" Margin="0,-10,0,0" Padding="0,4,0,0" >
-                                                <Button.Flyout>
-                                                    <Flyout Placement="Bottom">
-                                                        <StackPanel Width="240">
-                                                            <TextBlock Text="Are you sure you want to close this tab? This won't leave the channel." Margin="0,0,0,10" TextWrapping="Wrap"/>
-                                                            <Button Click="CloseTab_Click" Content="Close Tab" Background="{ThemeResource SystemControlForegroundAccentBrush}" />
-                                                        </StackPanel>
-                                                    </Flyout>
-                                                </Button.Flyout>
-                                            </Button>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </Pivot.HeaderTemplate>
-                                <Pivot.RightHeader>
-                                    <Button Style="{ThemeResource IconButtonStyle}" x:Name="openWindowButton" FontFamily="Segoe MDL2 Assets" ToolTipService.ToolTip="Open tab in new window" Visibility="Collapsed" >
-                                        <FontIcon Glyph="&#xE2B4;" />
-                                    </Button>
-                                </Pivot.RightHeader>
-                            </Pivot>
-
-                        </Grid>
+                        <Pivot x:Name="Tabs" SelectionChanged="Tabs_SelectionChanged" Style="{StaticResource TabsStyle}" Windows10version1903:Shadow="{StaticResource ContentShadow}"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <Pivot.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Height="40" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" MaxWidth="150" FontSize="16" VerticalAlignment="Center" Margin="0,-10,5,0"  />
+                                        <Button x:Name="CloseButton" Content="&#xE10A;" Style="{StaticResource IconButtonStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="14" Margin="0,-10,0,0" Padding="0,4,0,0" >
+                                            <Button.Flyout>
+                                                <Flyout Placement="Bottom">
+                                                    <StackPanel Width="240">
+                                                        <TextBlock Text="Are you sure you want to close this tab? This won't leave the channel." Margin="0,0,0,10" TextWrapping="Wrap"/>
+                                                        <Button Click="CloseTab_Click" Content="Close Tab" Background="{ThemeResource SystemControlForegroundAccentBrush}" />
+                                                    </StackPanel>
+                                                </Flyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Pivot.HeaderTemplate>
+                            <Pivot.RightHeader>
+                                <Button Style="{ThemeResource IconButtonStyle}" x:Name="openWindowButton" FontFamily="Segoe MDL2 Assets" ToolTipService.ToolTip="Open tab in new window" Visibility="Collapsed" >
+                                    <FontIcon Glyph="&#xE2B4;" />
+                                </Button>
+                            </Pivot.RightHeader>
+                        </Pivot>
                     </SplitView.Content>
                 </SplitView>
             </SplitView.Content>
@@ -442,7 +433,7 @@
                 <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">To prevent windows from doing this, head to the <Hyperlink NavigateUri="ms-settings:batterysaver-usagedetails">Settings app</Hyperlink>, turn off 'Managed By Windows' for WinIRC and enable 'Allow app to run background tasks.'</TextBlock>
             </winui:TeachingTip.Content>
         </winui:TeachingTip>
-        
+
         <winui:TeachingTip x:Name="AnalyticsPopup"
             Title="Introducing new, more private analytics"
             Subtitle="Now powered by AppCenter"
@@ -452,7 +443,7 @@
             Closed="AnalyticsPopup_Closed"                           
             PreferredPlacement="Bottom">
             <winui:TeachingTip.Content>
-                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">These new analytics don't collect location data unlike the previous analytics, and should hopefully give me more infomation to improve the app. </TextBlock>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,16,0,0">These new analytics don't collect location data unlike the previous analytics, and should hopefully give me more infomation to improve the app.</TextBlock>
             </winui:TeachingTip.Content>
         </winui:TeachingTip>
 

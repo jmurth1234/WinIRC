@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid>
         <ListView Grid.Row="1" Margin="0,0,0,0" x:Name="usersList" Background="{x:Null}" SelectionMode="None" Tapped="{x:Bind UserRightClick.User_Tapped}" RightTapped="{x:Bind UserRightClick.User_RightTapped}"/>
     </Grid>
 </Page>

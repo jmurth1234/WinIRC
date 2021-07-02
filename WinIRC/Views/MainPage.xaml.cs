@@ -78,7 +78,6 @@ namespace WinIRC
                 }
 
                 SidebarFrame.BackStack.Clear();
-                SidebarHeader.ShowBackButton = false;
 
                 ShouldPin();
 
@@ -86,7 +85,6 @@ namespace WinIRC
                 {
                     IrcHandler.UpdateUsers(SidebarFrame, currentServer, currentChannel);
                     UpdateInfo(currentServer, currentChannel);
-                    SidebarHeader.Title = "Channel Users";
                     SidebarSplitView.IsPaneOpen = true;
                 }
 
@@ -195,7 +193,7 @@ namespace WinIRC
         private void WindowStates_CurrentStateChanging(object sender, VisualStateChangedEventArgs e)
         {
             var sidebarColor = Config.GetBoolean(Config.DarkTheme) ? ColorUtils.ParseColor("#FF111111") : ColorUtils.ParseColor("#FFEEEEEE");
-            SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
+            // SplitView.PaneBackground = new SolidColorBrush(sidebarColor);
         }
 
         private void WindowStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e)
@@ -266,12 +264,11 @@ namespace WinIRC
 
             if (ApiInformation.IsTypePresent("Windows.UI.WindowManagement.AppWindow"))
             {
-                TitleShadow.Receivers.Add(SplitView);
-                PaneShadow.Receivers.Add(MainGrid);
+                ContentShadow.Receivers.Add(SplitView);
+                ContentShadow.Receivers.Add(mainGrid);
+                ContentShadow.Receivers.Add(sidebarGrid);
 
-                TitleContainer.Translation += new Vector3(0, 0, 8);
-                channelList.Translation += new Vector3(0, 0, 16);
-                sidebarGrid.Translation += new Vector3(0, 0, 16);
+                Tabs.Translation += new Vector3(0, 0, 16);
 
                 openWindowButton.Visibility = Visibility.Visible;
                 openWindowButton.Click += OpenWindowButton_Click;
@@ -387,9 +384,9 @@ namespace WinIRC
             titleBar.ButtonHoverBackgroundColor = AccentColorAlt.Color;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = AccentColorAlt.Color;
-            titleBar.ButtonForegroundColor = foreground;
+            titleBar.ButtonForegroundColor = AccentColor.Color;
 
-            Menu.Background = AccentColor;
+            // Menu.Background = AccentColor;
         }
 
         internal void UpdateUi()
@@ -435,34 +432,45 @@ namespace WinIRC
             Brush brush;
             try
             {
-                if (Config.GetBoolean(Config.Blurred, true) && ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.AcrylicBrush"))
+                var miniView = WindowStates.CurrentState != WideState;
+
+                if (miniView)
                 {
-                    var hostBackdrop = WindowStates.CurrentState == WideState;
-                    var source = hostBackdrop ? Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.HostBackdrop : Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
-                    brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
+
+                    if (Config.GetBoolean(Config.Blurred, true) && ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.AcrylicBrush"))
                     {
-                        FallbackColor = sidebarColor,
-                        BackgroundSource = source,
-                        TintColor = sidebarColor,
-                        TintOpacity = hostBackdrop ? 0.75 : 0.55
-                    };
+                        var source = Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
+                        brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
+                        {
+                            FallbackColor = sidebarColor,
+                            BackgroundSource = source,
+                            TintColor = sidebarColor,
+                            TintOpacity = 0.55
+                        };
+                    }
+                    else
+                    {
+                        brush = new SolidColorBrush(sidebarColor);
+                    }
+
+                    SplitView.PaneBackground = brush;
                 }
                 else
                 {
-                    brush = new SolidColorBrush(sidebarColor);
+                    SplitView.PaneBackground = null;
                 }
             }
             catch (Exception e)
             {
                 brush = new SolidColorBrush(sidebarColor);
+                SplitView.PaneBackground = brush;
             }
 
-            SplitView.PaneBackground = brush;
+            // ;
 
             if (Config.Contains(Config.UseTabs))
             {
                 TabsVisible = Config.GetBoolean(Config.UseTabs) ? Visibility.Visible : Visibility.Collapsed;
-                HeaderColor.Visibility = (Config.GetBoolean(Config.UseTabs) || ShowTopic) ? Visibility.Visible : Visibility.Collapsed;
             }
 
             UiUpdated?.Invoke(this, new EventArgs());
@@ -539,9 +547,6 @@ namespace WinIRC
 
         public void SwitchChannel(string server, string channel, bool auto)
         {
-            //ChannelFrame.Navigate(typeof(ChannelView), new string[] { server, channel });
-            SidebarHeader.Title = "Channel Users";
-
             if (channel == "Server")
             {
                 if (Tabs.Items.Cast<PivotItem>().Any(item => item.Header as string == channel))
@@ -858,27 +863,6 @@ namespace WinIRC
             {
                 SidebarSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
             }
-        }
-
-
-        private void HeaderBlock_BackButtonClicked(object sender, EventArgs e)
-        {
-            if (SidebarFrame.CanGoBack)
-                SidebarFrame.GoBack();
-
-            if (SidebarFrame.Content is SettingsView)
-            {
-                var settingsView = (SettingsView)SidebarFrame.Content;
-
-                if (settingsView != null)
-                {
-                    SidebarHeader.Title = "Settings";
-                    settingsView.Header = SidebarHeader;
-                }
-            }
-
-            SidebarHeader.ShowBackButton = false;
-
         }
 
         private void ChannelListItem_ChannelCloseClicked(object sender, EventArgs e)

@@ -26,6 +26,7 @@
         </Grid.ColumnDefinitions>
 
         <controls:PersonPicture
+            RequestedTheme="Dark"
             Visibility="{x:Bind NormalMessage, Mode=OneWay}"
             DisplayName="{x:Bind Username, FallbackValue='Username', Mode=OneWay}"
             Height="40" Margin="0,0,8,0" VerticalAlignment="Top">

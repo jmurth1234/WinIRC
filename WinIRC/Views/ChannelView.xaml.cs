@@ -255,11 +255,12 @@ namespace WinIRC.Views
                 if (Config.GetBoolean(Config.Blurred, true) && ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.AcrylicBrush"))
                 {
                     var source = Microsoft.UI.Xaml.Media.AcrylicBackgroundSource.Backdrop;
+                    var acrylic = Color.FromArgb(128, sidebarColor.R, sidebarColor.G, sidebarColor.B);
                     brush = new Microsoft.UI.Xaml.Media.AcrylicBrush
                     {
                         FallbackColor = sidebarColor,
                         BackgroundSource = source,
-                        TintColor = sidebarColor,
+                        TintColor = acrylic,
                         TintOpacity = 0.55
                     };
                 }
@@ -273,14 +274,16 @@ namespace WinIRC.Views
                 brush = new SolidColorBrush(sidebarColor);
             }
 
-            TopFillArea.Fill = brush;
             BottomFillArea.Fill = brush;
 
             if (this.Window != null)
             {
+                var bg = Config.GetBoolean(Config.DarkTheme) ? ColorUtils.ParseColor("#FF111111") : ColorUtils.ParseColor("#FFEEEEEE");
+
                 Window.TitleBar.ButtonBackgroundColor = Window.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 Window.TitleBar.ButtonForegroundColor = Window.TitleBar.ButtonInactiveForegroundColor = darktheme ? Colors.White : Colors.Black;
                 Window.TitleBar.ForegroundColor = darktheme ? Colors.White : Colors.Black;
+                this.Background = new SolidColorBrush(bg);
             }
         }
 

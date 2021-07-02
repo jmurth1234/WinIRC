@@ -10,11 +10,11 @@
     mc:Ignorable="d">
 
     <Grid HorizontalAlignment="Stretch"
-          Background="{ThemeResource SystemControlBackgroundListLowBrush}"
-          CornerRadius="2"
-          Padding="10"
-          BorderThickness="1"
-          BorderBrush="{ThemeResource SystemControlBackgroundListMediumRevealBorderBrush}">
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="{StaticResource ControlCornerRadius}"
+        Padding="8" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />

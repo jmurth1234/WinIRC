@@ -6,11 +6,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="using:WinIRC.Ui"
     xmlns:net="using:IrcClientCore"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
     xmlns:legacy="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
+    winui:BackdropMaterial.ApplyToRootOrPageBackground="True"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -25,7 +27,7 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -33,11 +35,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Rectangle Grid.RowSpan="2" x:Name="TopFillArea" />
-
         <TextBlock Height="28" x:Name="titlebar" VerticalAlignment="Center" Padding="10" FontSize="12">WinIRC</TextBlock>
 
-        <Grid Grid.Row="1" Windows10version1903:Shadow="{StaticResource Shadow}" x:Name="TopArea" >
+        <Grid Grid.Row="1" x:Name="TopArea">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="1*"/>
@@ -54,16 +54,6 @@
 
         <Border x:Name="RootBorder" Padding="0,12,0,0" Grid.Row="3">
             <Grid>
-                <Windows10version1903:Border>
-                    <controls:DropShadowPanel BlurRadius="12"
-                                              Color="Black"
-                                              Opacity="0.3"
-                                              HorizontalContentAlignment="Stretch"
-                                              VerticalContentAlignment="Stretch">
-                        <Rectangle Fill="White" />
-                    </controls:DropShadowPanel>
-                </Windows10version1903:Border>
-
                 <Rectangle Grid.RowSpan="2" x:Name="BottomFillArea" />
 
                 <!-- SystemControlPageBackgroundChromeLowBrush is the default PaneBackground brush, feel free to change it to whatever you like! -->
@@ -71,8 +61,8 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.RowSpan="4" Canvas.ZIndex="-1" Padding="5" x:Name="Scroll">
-            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,75,10,50" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}" ItemTemplate="{x:Bind CurrentTemplate, Mode=OneWay}">
+        <ScrollViewer Grid.RowSpan="4" Grid.Row="2" Canvas.ZIndex="-1" Padding="5" x:Name="Scroll">
+            <ItemsControl x:Name="messagesView" FontSize="14" FontFamily="Segoe UI" Margin="0,0,10,50" ItemsSource="{x:Bind CurrentBuffer, Mode=OneWay}" ItemTemplate="{x:Bind CurrentTemplate, Mode=OneWay}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsStackPanel Orientation="Vertical" VerticalAlignment="Bottom" ItemsUpdatingScrollMode="KeepLastItemInView" CacheLength="10" />
