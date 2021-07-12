@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
@@ -169,6 +170,18 @@ namespace WinIRC.Ui
             }
         }
 
+        private string GetUploadUrl(string configKey)
+        {
+            var url = Config.GetString(configKey, "");
+
+            if (url == "")
+            {
+                url = Config.GetString(Config.UploadFile, "https://0x0.st");
+            }
+
+            return url;
+        }
+
         private (string word, string prev) Format(string word, string prev, int position)
         {
             if (prev == null) prev = "";
@@ -190,21 +203,37 @@ namespace WinIRC.Ui
             return (word, prev);
         }
 
-        public async void UploadFile(string url, IInputStream str)
+        public async Task UploadFile(string url, IInputStream str, string fileName = "upload")
         {
             HttpStreamContent streamfile = new HttpStreamContent(str);
             HttpMultipartFormDataContent httpContents = new HttpMultipartFormDataContent();
 
             httpContents.Headers.ContentType.MediaType = "multipart/form-data";
-            httpContents.Add(streamfile, "file", "upload");
+            httpContents.Add(streamfile, "file", fileName);
 
             var client = new HttpClient();
-            HttpResponseMessage result = await client.PostAsync(new Uri(url), httpContents);
+            var req = client.PostAsync(new Uri(url), httpContents);
+
+            StatusProgress.Value = 0;
+
+            req.Progress += Progress_Handler;
+
+            var result = await req;
+
             string stringReadResult = await result.Content.ReadAsStringAsync();
             msgBox.Text += stringReadResult;
             msgBox.SelectionStart += stringReadResult.Length;
             StatusText.Text = "";
             StatusArea.Visibility = Visibility.Collapsed;
+        }
+
+        private void Progress_Handler(IAsyncOperationWithProgress<HttpResponseMessage, HttpProgress> asyncInfo, HttpProgress progressInfo)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                StatusProgress.Maximum = (double)progressInfo.TotalBytesToSend;
+                StatusProgress.Value = progressInfo.BytesSent;
+            });
         }
 
         private async void msgBox_Paste(object sender, TextControlPasteEventArgs e)
@@ -225,16 +254,16 @@ namespace WinIRC.Ui
                     var messageDialog = new PasteTextDialog(text);
 
                     // Add commands to the message dialog.
-                    messageDialog.PrimaryButtonClick += (ev, i) =>
+                    messageDialog.PrimaryButtonClick += async (ev, i) =>
                     {
-                        var url = Config.GetString(Config.PasteText, "https://0x0.st");
+                        var url = GetUploadUrl(Config.PasteText);
 
                         StatusText.Text = "Pasting text...";
                         StatusArea.Visibility = Visibility.Visible;
                         byte[] byteArray = Encoding.UTF8.GetBytes(messageDialog.PasteText);
                         //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
                         MemoryStream stream = new MemoryStream(byteArray);
-                        this.UploadFile(url, stream.AsInputStream());
+                        await this.UploadFile(url, stream.AsInputStream());
                     };
 
                     await messageDialog.ShowAsync();
@@ -281,12 +310,31 @@ namespace WinIRC.Ui
 
                         await encoder.FlushAsync(); // Write data to the stream
 
-                        var url = Config.GetString(Config.PasteImage, "https://0x0.st");
+                        var url = GetUploadUrl(Config.PasteImage);
 
-                        this.UploadFile(url, outStream);
+                        await this.UploadFile(url, outStream, "upload.png");
                     };
 
                     await messageDialog.ShowAsync();
+                }
+            }
+        }
+
+        private async void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.FileTypeFilter.Add("*");
+
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                StatusText.Text = $"Uploading {file.Name}...";
+                StatusArea.Visibility = Visibility.Visible;
+
+                using (var stream = await file.OpenReadAsync())
+                {
+                    var url = GetUploadUrl(Config.UploadFile);
+                    await this.UploadFile(url, stream, file.Name);
                 }
             }
         }

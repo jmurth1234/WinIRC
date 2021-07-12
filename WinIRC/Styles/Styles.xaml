@@ -7,12 +7,17 @@
             <SolidColorBrush x:Key="StatusTextColour" Color="#FFAAAAAA" />
             <SolidColorBrush x:Key="ChatTextColour" Color="#FFFFFFFF" />
             <winui:RevealBorderBrush x:Key="TextBoxRevealBrush" Color="Transparent" TargetTheme="Dark" />
+
+            <winui:AcrylicBrush x:Key="BackgroundBrush" TintOpacity="0.8" BackgroundSource="HostBackdrop" TintColor="#000000"  FallbackColor="#000000" />
+
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="StatusTextColour" Color="#FF444444" />
             <SolidColorBrush x:Key="ChatTextColour" Color="#FF000000" />
             <winui:RevealBorderBrush x:Key="TextBoxRevealBrush" Color="Transparent" TargetTheme="Light" />
+
+            <winui:AcrylicBrush x:Key="BackgroundBrush" TintOpacity="0.8" BackgroundSource="HostBackdrop" TintColor="#eee"  FallbackColor="#eee" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

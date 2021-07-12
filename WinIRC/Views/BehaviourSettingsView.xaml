@@ -28,11 +28,14 @@
 
         <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" FontSize="12" >Paste handling</TextBlock>
 
+        <TextBlock Text="File Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
+        <TextBox Margin="0,5" x:Name="FileUploadURL" TextChanged="FileUploadURL_TextChanged" />
+
         <TextBlock Text="Image Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-        <TextBox Margin="0,5" x:Name="ImageUploadURL" TextChanged="ImageUploadURL_TextChanged" />
+        <TextBox Margin="0,5" PlaceholderText="{x:Bind FileUploadURL.Text, Mode=TwoWay}" x:Name="ImageUploadURL" TextChanged="ImageUploadURL_TextChanged" />
                 
         <TextBlock Text="Text Upload URL" RenderTransformOrigin="-0.3,0.95" VerticalAlignment="Center" Margin="0,5,0,0" />
-        <TextBox Margin="0,5" x:Name="TextUploadURL" TextChanged="TextUploadURL_TextChanged" />
+        <TextBox Margin="0,5" PlaceholderText="{x:Bind FileUploadURL.Text, Mode=TwoWay}" x:Name="TextUploadURL" TextChanged="TextUploadURL_TextChanged" />
 
 
         <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" >Other</TextBlock>

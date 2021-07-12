@@ -79,24 +79,24 @@ namespace WinIRC
                 this.LogChannels.IsOn = false;
             }
 
-            if (Config.Contains(Config.PasteImage))
+            if (Config.Contains(Config.UploadFile))
             {
-                ImageUploadURL.Text = Config.GetString(Config.PasteImage);
+                FileUploadURL.Text = Config.GetString(Config.UploadFile);
             }
             else
             {
-                Config.SetString(Config.PasteImage, "https://0x0.st");
-                ImageUploadURL.Text = "https://0x0.st";
+                Config.SetString(Config.UploadFile, "https://0x0.st");
+                FileUploadURL.Text = "https://0x0.st";
+            }
+
+            if (Config.Contains(Config.PasteImage))
+            {
+                ImageUploadURL.Text = Config.GetString(Config.PasteImage);
             }
 
             if (Config.Contains(Config.PasteText))
             {
                 TextUploadURL.Text = Config.GetString(Config.PasteText);
-            }
-            else
-            {
-                Config.SetString(Config.PasteText, "https://0x0.st");
-                TextUploadURL.Text = "https://0x0.st";
             }
 
             this.AnalyticsSwitch.IsOn = await Analytics.IsEnabledAsync();
@@ -189,6 +189,14 @@ namespace WinIRC
                 return;
 
             Config.SetString(Config.PasteText, TextUploadURL.Text);
+        }
+
+        private void FileUploadURL_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!SettingsLoaded)
+                return;
+
+            Config.SetString(Config.UploadFile, FileUploadURL.Text);
         }
     }
 

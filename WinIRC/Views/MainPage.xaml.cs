@@ -379,11 +379,14 @@ namespace WinIRC
             var backgroundInactive = ColorUtils.ParseColor("#FF2B2B2B");
             var foreground = ColorUtils.ParseColor("#FFFFFFFF");
 
+            var inactive = AccentColorAlt.Color;
+            inactive.A = 128;
+
             titleBar.BackgroundColor = _AccentColor.Color;
             titleBar.InactiveBackgroundColor = backgroundInactive;
             titleBar.ButtonHoverBackgroundColor = AccentColorAlt.Color;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = AccentColorAlt.Color;
+            titleBar.ButtonInactiveBackgroundColor = inactive;
             titleBar.ButtonForegroundColor = AccentColor.Color;
 
             // Menu.Background = AccentColor;
@@ -454,19 +457,20 @@ namespace WinIRC
                     }
 
                     SplitView.PaneBackground = brush;
+                    SidebarSplitView.PaneBackground = brush;
                 }
                 else
                 {
                     SplitView.PaneBackground = null;
+                    SidebarSplitView.PaneBackground = null;
                 }
             }
             catch (Exception e)
             {
                 brush = new SolidColorBrush(sidebarColor);
                 SplitView.PaneBackground = brush;
+                SidebarSplitView.PaneBackground = brush;
             }
-
-            // ;
 
             if (Config.Contains(Config.UseTabs))
             {

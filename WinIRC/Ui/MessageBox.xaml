@@ -14,16 +14,31 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Column="0" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked" VerticalAlignment="Center" IsTabStop="False" Width="48" Height="40" />
-        <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch" PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" VerticalContentAlignment="Center" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch" Paste="msgBox_Paste"/>
+        <Button Grid.Column="0"
+                Margin="5,0,-8,0"
+                x:Name="AddButton"
+                Content="" Style="{StaticResource IconButtonStyle}"
+                ToolTipService.ToolTip="Upload File"  FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" IsTabStop="False" Width="40" Height="40" Click="AddButton_Click" />
 
-        <StackPanel Background="{ThemeResource SystemControlAcrylicElementBrush}" Grid.Row="1" Grid.ColumnSpan="2" x:Name="StatusArea" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0" Visibility="Collapsed" Opacity="0.8">
+       <TextBox fcu:Style="{StaticResource ChannelViewTextBox}" Grid.Column="1" x:Name="msgBox" HorizontalAlignment="Stretch"
+                PlaceholderText="Enter Message here..." KeyDown="ircMsgBox_KeyDown" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Margin="5,0" HorizontalContentAlignment="Stretch" Paste="msgBox_Paste"/>
+
+        <Button Grid.Column="2" x:Name="TabButton" Content="&#xE11A;" Style="{StaticResource IconButtonStyle}"
+                ToolTipService.ToolTip="Tab Complete Username"  FontSize="16" HorizontalAlignment="Left" Click="TabButton_Clicked"
+                VerticalAlignment="Center" IsTabStop="False" Width="40" Height="40" Margin="-8,0,5,0" />
+
+
+        <Grid Background="{ThemeResource SystemControlAcrylicElementBrush}" Grid.ColumnSpan="3" x:Name="StatusArea" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Opacity="0.8" Visibility="Collapsed">
             <TextBlock Margin="5,0,5,5" x:Name="StatusText" FontSize="12" VerticalAlignment="Center" />
-        </StackPanel>
+
+            <ProgressBar VerticalAlignment="Bottom" x:Name="StatusProgress" />
+        </Grid>
     </Grid>
 </UserControl>

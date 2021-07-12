@@ -12,12 +12,15 @@
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     xmlns:ircclientcore="using:IrcClientCore"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:win11="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 13)"
     xmlns:Windows10version1903="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 8)"
+    xmlns:win10="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract, 13)" xmlns:media="using:Microsoft.UI.Xaml.Media"
     mc:Ignorable="d"
     winui:BackdropMaterial.ApplyToRootOrPageBackground="True"
     NavigationCacheMode="Disabled">
     <Page.Resources>
         <Windows10version1903:ThemeShadow x:Name="ContentShadow" />
+
 
         <Style x:Key="TabsStyle" TargetType="Pivot">
             <Setter Property="Margin" Value="0"/>
@@ -266,7 +269,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid x:Name="mainGrid">
+    <Grid x:Name="mainGrid" win11:Background="{ThemeResource SystemControlTransparentBrush}" win10:Background="{ThemeResource BackgroundBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates" >
                 <VisualState x:Name="WideState">
@@ -394,7 +397,7 @@
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"
-                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            Windows10version1903:CornerRadius="{StaticResource ControlCornerRadius}">
                             <Pivot.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Height="40" Orientation="Horizontal">

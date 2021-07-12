@@ -119,10 +119,10 @@ namespace WinIRC
         {
             if (AppLaunched)
             {
-                Frame rootFrame = Window.Current.Content as Frame;
+                FrameworkElement rootFrame = Window.Current.Content as FrameworkElement;
                 if (Config.Contains(Config.DarkTheme))
                 {
-                    MainPage.instance.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light;
+                    MainPage.instance.RequestedTheme = rootFrame.RequestedTheme = Config.GetBoolean(Config.DarkTheme) ? ElementTheme.Dark : ElementTheme.Light;
                 }
                 else
                 {
