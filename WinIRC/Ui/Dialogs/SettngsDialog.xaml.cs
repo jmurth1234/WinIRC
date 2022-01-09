@@ -34,8 +34,8 @@ namespace WinIRC.Views
     {
         public Type Type { get; private set; }
         public Action UpdateUi { get; internal set; }
-        public double NavWidth { get; private set; } = double.NaN;
-        public double NavHeight { get; private set; } = double.NaN;
+        public double NavWidth { get; private set; } = 800;
+        public double NavHeight { get; private set; } = 600;
         private CoreWindow window = CoreWindow.GetForCurrentThread();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -55,7 +55,7 @@ namespace WinIRC.Views
 
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
-            CalculateWidth();
+            // CalculateWidth();
         }
 
         private void CalculateWidth()
@@ -66,7 +66,7 @@ namespace WinIRC.Views
             var margin = Header.Margin;
 
 
-            if (windowSize.Width < 500)
+            if (windowSize.Width <= 800)
             {
                 width = double.NaN;
                 height = double.NaN;
@@ -92,7 +92,7 @@ namespace WinIRC.Views
 
         private void ConnectView_Loaded(object sender, RoutedEventArgs e)
         {
-            this.CalculateWidth();
+            // this.CalculateWidth();
             this.Frame.Navigate(Type);
         }
 

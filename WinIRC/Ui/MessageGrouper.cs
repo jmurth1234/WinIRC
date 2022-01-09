@@ -55,7 +55,7 @@ namespace WinIRC.Ui
             {
                 var CurrentItem = Grouped.Last();
 
-                if (CurrentItem.Parent.User == message.User && CurrentItem.Parent.Type == message.Type)
+                if (CurrentItem.Parent.User == message.User && CurrentItem.Parent.Type == message.Type && CurrentItem.Parent.Date.Hour == message.Date.Hour)
                 {
                     CurrentItem.Children.Add(message);
                     return;
