@@ -41,7 +41,20 @@ namespace WinIRC.Net
             base.Initialise();
             Mentions.CollectionChanged += Mentions_CollectionChanged;
             HandleDisplayChannelList = ShowChannels;
+            (InfoBuffer as UWPBuffer).Collection.CollectionChanged += Collection_CollectionChanged;
         }
+
+        private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (ircMessages != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    ircMessages.Add((Message)item);
+                }
+            }
+        }
+
 
         public override ISocket CreateConnection()
         {
