@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.13
+## 1.7.14
 
 This fixes issue #21 and updates to the latest stable release of WinUI 2 and the latest IrcClientCore code to handle stuff like moderated channels
 
