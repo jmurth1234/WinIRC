@@ -415,14 +415,20 @@ namespace WinIRC
                     string channel = qryStr["channel"];
                     string server = qryStr["server"];
                     string username = qryStr["username"];
-                    var message = args.UserInput["tbReply"];
+                    var message = args.UserInput["tbReply"].ToString();
                     if (!ircHandler.connectedServersList.Contains(server))
                     {
                         return;
                     }
 
                     if (mainPage != null)
-                        mainPage.MentionReply(server, channel, username + ": " + message);
+                    {
+                        string replyMessage = channel.StartsWith("#")
+                            ? (username + ": " + message)
+                            : message;
+
+                        mainPage.MentionReply(server, channel, replyMessage);
+                    }
                     if (!mainPage.currentChannel.Equals(channel))
                         mainPage.SwitchChannel(server, channel, false);
                 }
