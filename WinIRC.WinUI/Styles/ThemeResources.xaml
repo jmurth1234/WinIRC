@@ -1,0 +1,39 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="ShellPaneBrush" Color="#1F1F1F1F" />
+            <SolidColorBrush x:Key="ShellRightPaneBrush" Color="#1A1F1F1F" />
+            <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFF7F4EE" />
+            <SolidColorBrush x:Key="ShellRailBackgroundBrush" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="ShellRailBorderBrush" Color="#1A000000" />
+            <SolidColorBrush x:Key="ShellWindowBackgroundBrush" Color="#FFF7F4EE" />
+            <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#1A000000" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="ShellPaneBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="ShellRightPaneBrush" Color="#26FFFFFF" />
+            <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FF111315" />
+            <SolidColorBrush x:Key="ShellRailBackgroundBrush" Color="#FF161616" />
+            <SolidColorBrush x:Key="ShellRailBorderBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="ShellWindowBackgroundBrush" Color="#FF111315" />
+            <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FF161616" />
+            <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#33FFFFFF" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Default">
+            <SolidColorBrush x:Key="ShellPaneBrush" Color="#1F1F1F1F" />
+            <SolidColorBrush x:Key="ShellRightPaneBrush" Color="#1A1F1F1F" />
+            <SolidColorBrush x:Key="ShellSurfaceBrush" Color="#FFF7F4EE" />
+            <SolidColorBrush x:Key="ShellRailBackgroundBrush" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="ShellRailBorderBrush" Color="#1A000000" />
+            <SolidColorBrush x:Key="ShellWindowBackgroundBrush" Color="#FFF7F4EE" />
+            <SolidColorBrush x:Key="ShellPanelBackgroundBrush" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="ShellPanelBorderBrush" Color="#1A000000" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

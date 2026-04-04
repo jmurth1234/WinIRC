@@ -1,0 +1,289 @@
+<Page
+    x:Class="WinIRC.WinUI.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:models="using:WinIRC.Core.Models"
+    xmlns:uiModels="using:WinIRC.WinUI.Models"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <SolidColorBrush x:Key="SidebarUnreadBadgeBrush" Color="#FF666666" />
+        <SolidColorBrush x:Key="SidebarMentionBadgeBrush" Color="#FFD13438" />
+
+        <DataTemplate x:Key="SidebarFactTemplate" x:DataType="uiModels:ChannelFactItem">
+            <Grid Margin="0,0,0,6" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Opacity="0.72"
+                    Text="{x:Bind Label, Mode=OneWay}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Text="{x:Bind Value, Mode=OneWay}"
+                    TextWrapping="WrapWholeWords" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SidebarRosterTemplate" x:DataType="x:String">
+            <TextBlock
+                Margin="0,0,0,2"
+                Padding="8,4"
+                FontSize="14"
+                Text="{Binding}"
+                TextWrapping="NoWrap"
+                TextTrimming="CharacterEllipsis" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SidebarTreeContentTemplate" x:DataType="uiModels:SidebarTreeItem">
+            <Grid>
+                <StackPanel Spacing="1">
+                    <TextBlock FontSize="14" Text="{x:Bind DisplayName, Mode=OneWay}" />
+                    <TextBlock
+                        FontSize="11"
+                        Opacity="0.68"
+                        Text="{x:Bind SecondaryText, Mode=OneWay}"
+                        Visibility="{x:Bind SecondaryVisibility, Mode=OneWay}" />
+                </StackPanel>
+
+                <Border
+                    MinWidth="24"
+                    Height="24"
+                    Margin="-34,0,0,0"
+                    Padding="7,0"
+                    HorizontalAlignment="Left"
+                    Background="{StaticResource SidebarUnreadBadgeBrush}"
+                    CornerRadius="12"
+                    VerticalAlignment="Center"
+                    Visibility="{x:Bind UnreadOnlyVisibility, Mode=OneWay}">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Text="{x:Bind UnreadBadgeText, Mode=OneWay}" />
+                </Border>
+
+                <Border
+                    MinWidth="24"
+                    Height="24"
+                    Margin="-34,0,0,0"
+                    Padding="7,0"
+                    HorizontalAlignment="Left"
+                    Background="{StaticResource SidebarMentionBadgeBrush}"
+                    CornerRadius="12"
+                    VerticalAlignment="Center"
+                    Visibility="{x:Bind MentionVisibility, Mode=OneWay}">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Text="{x:Bind UnreadBadgeText, Mode=OneWay}" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SidebarTreeTemplate" x:DataType="uiModels:SidebarTreeItem">
+            <controls:TreeViewItem
+                Content="{x:Bind}"
+                ContentTemplate="{StaticResource SidebarTreeContentTemplate}"
+                IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}"
+                ItemsSource="{x:Bind Children}" />
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid
+        x:Name="RootGrid"
+        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftRailColumn" Width="240" MinWidth="160" MaxWidth="360" />
+            <ColumnDefinition x:Name="LeftSplitterColumn" Width="4" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="RightSplitterColumn" Width="4" />
+            <ColumnDefinition x:Name="RightRailColumn" Width="240" MinWidth="160" MaxWidth="360" />
+        </Grid.ColumnDefinitions>
+
+        <Border
+            x:Name="TitleBarHost"
+            Grid.ColumnSpan="5"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="152" />
+                </Grid.ColumnDefinitions>
+
+                <MenuBar
+                    x:Name="ShellMenuBar"
+                    Grid.Column="1"
+                    Background="Transparent">
+                    <MenuBarItem Title="WinIRC">
+                        <MenuFlyoutSubItem x:Name="ConnectSubMenu" Text="Connect to" />
+                        <MenuFlyoutItem Click="ManageNetworksMenuItem_Click" Text="Manage Servers" />
+                        <MenuFlyoutItem Click="NewWelcomeTab_Click" Text="New Welcome Tab" />
+                        <MenuFlyoutItem
+                            x:Name="DetachMenuItem"
+                            Click="Detach_Click"
+                            IsEnabled="{x:Bind CanDetachSelectedTab, Mode=OneWay}"
+                            Text="Detach Window" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Click="QuitClient_Click" Text="Quit" />
+                    </MenuBarItem>
+                    <MenuBarItem Title="View">
+                        <ToggleMenuFlyoutItem
+                            x:Name="TopicBarMenuItem"
+                            Click="TopicBarMenuItem_Click"
+                            IsChecked="{x:Bind IsTopicBarEnabled, Mode=OneWay}"
+                            IsEnabled="{x:Bind CanToggleTopicBar, Mode=OneWay}"
+                            Text="Topic Bar" />
+                        <ToggleMenuFlyoutItem
+                            x:Name="SidebarMenuItem"
+                            Click="SidebarMenuItem_Click"
+                            IsChecked="{x:Bind IsSidebarEnabled, Mode=OneWay}"
+                            Text="Show Channel Users" />
+                    </MenuBarItem>
+                    <MenuBarItem Title="Settings">
+                        <MenuFlyoutItem Click="AppearanceSettingsMenuItem_Click" Text="Appearance" />
+                        <MenuFlyoutItem Click="ConnectionSettingsMenuItem_Click" Text="Connection" />
+                        <MenuFlyoutItem Click="BehaviourSettingsMenuItem_Click" Text="Behaviour" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Click="AboutMenuItem_Click" Text="About" />
+                    </MenuBarItem>
+                </MenuBar>
+
+                <Grid
+                    x:Name="TitleBarDragRegion"
+                    Grid.Column="2"
+                    Background="Transparent" />
+            </Grid>
+        </Border>
+
+        <Border
+            x:Name="LeftRail"
+            Grid.Row="1"
+            Grid.Column="0"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12" Spacing="14">
+                    <TextBlock
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Opacity="0.72"
+                        Text="Networks" />
+                    <controls:TreeView
+                        x:Name="SidebarTreeView"
+                        ItemInvoked="SidebarTreeView_ItemInvoked"
+                        ItemTemplate="{StaticResource SidebarTreeTemplate}"
+                        ItemsSource="{x:Bind SidebarTreeItems}"
+                        RightTapped="SidebarTreeView_RightTapped"
+                        SelectionMode="Single" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Border
+            x:Name="LeftPaneSplitter"
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="4"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{ThemeResource DividerStrokeColorDefaultBrush}"
+            PointerPressed="PaneSplitter_PointerPressed"
+            PointerMoved="PaneSplitter_PointerMoved"
+            PointerReleased="PaneSplitter_PointerReleased"
+            PointerCaptureLost="PaneSplitter_PointerCaptureLost" />
+
+        <Grid Grid.Row="1" Grid.Column="2">
+            <controls:TabView
+                x:Name="SessionTabs"
+                Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                IsAddTabButtonVisible="False"
+                SelectionChanged="SessionTabs_SelectionChanged"
+                TabCloseRequested="SessionTabs_TabCloseRequested" />
+        </Grid>
+
+        <Border
+            x:Name="RightPaneSplitter"
+            Grid.Row="1"
+            Grid.Column="3"
+            Width="4"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{ThemeResource DividerStrokeColorDefaultBrush}"
+            PointerPressed="PaneSplitter_PointerPressed"
+            PointerMoved="PaneSplitter_PointerMoved"
+            PointerReleased="PaneSplitter_PointerReleased"
+            PointerCaptureLost="PaneSplitter_PointerCaptureLost" />
+
+        <Border
+            x:Name="RightRail"
+            Grid.Row="1"
+            Grid.Column="4"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1,0,0,0"
+            Visibility="{x:Bind SidebarVisibility, Mode=OneWay}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12" Spacing="10">
+                    <TextBlock
+                        FontSize="20"
+                        FontWeight="SemiBold"
+                        Text="{x:Bind SelectedSidebarTitle, Mode=OneWay}" />
+                    <TextBlock
+                        FontSize="12"
+                        Opacity="0.68"
+                        Text="{x:Bind SelectedSidebarSubtitle, Mode=OneWay}"
+                        TextWrapping="WrapWholeWords"
+                        Visibility="{x:Bind SelectedSidebarSubtitleVisibility, Mode=OneWay}" />
+                    <TextBlock
+                        FontSize="12"
+                        Opacity="0.68"
+                        MaxLines="4"
+                        Text="{x:Bind SelectedSidebarStatus, Mode=OneWay}"
+                        TextWrapping="WrapWholeWords"
+                        Visibility="{x:Bind SelectedSidebarStatusVisibility, Mode=OneWay}" />
+                    <StackPanel
+                        Spacing="6"
+                        Visibility="{x:Bind SelectedSidebarSecondaryVisibility, Mode=OneWay}">
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Opacity="0.72" Text="{x:Bind SelectedSidebarSecondaryHeader, Mode=OneWay}" />
+                        <ListView
+                            x:Name="SidebarRosterList"
+                            Background="{x:Null}"
+                            IsItemClickEnabled="{x:Bind CanActivateSelectedSidebarSecondaryItem, Mode=OneWay}"
+                            ItemClick="SidebarRosterList_ItemClick"
+                            RightTapped="SidebarRosterList_RightTapped"
+                            ItemTemplate="{StaticResource SidebarRosterTemplate}"
+                            ItemsSource="{x:Bind SelectedSidebarSecondaryItems, Mode=OneWay}"
+                            SelectionMode="None"
+                            SingleSelectionFollowsFocus="False" />
+                    </StackPanel>
+                    <StackPanel
+                        Spacing="6"
+                        Visibility="{x:Bind SelectedSidebarPrimaryVisibility, Mode=OneWay}">
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Opacity="0.72" Text="{x:Bind SelectedSidebarPrimaryHeader, Mode=OneWay}" />
+                        <ItemsControl ItemTemplate="{StaticResource SidebarFactTemplate}" ItemsSource="{x:Bind SelectedSidebarPrimaryItems, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Page>

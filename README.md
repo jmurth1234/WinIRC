@@ -1,44 +1,98 @@
-# What is WinIRC?
+# WinIRC
 
-WinIRC is a C# IRC Client for Windows 10. It's written as a UWP application, so don't expect this to be ported to Windows 8.1 or below.
+WinIRC is an IRC client for Windows. This repository currently contains both the original UWP application and an in-progress WinUI 3 desktop port.
 
-## What features does it have?
+## Current Project State
 
-* Joining onto irc servers, both ZNCs and standard irc servers
-* Supports a direct irc connection and connection via a websocket connection (this is hosted on your own server to get around any pesky filters)
-* Join and parting channels
-* /help to list supported commands
-* Various irc commands, including /query and /whois
-* Basic channel moderation features (/mode, /kick, /ban, /mute, ect.)
-* A few configuration options
-* Responsive UI
+The repository is in a migration phase:
 
-## How do I get it?
+- [`WinIRC`](./WinIRC) is the legacy UWP app and remains the reference implementation.
+- [`WinIRC.WinUI`](./WinIRC.WinUI) is the new packaged WinUI 3 desktop app.
+- [`WinIRC.Core`](./WinIRC.Core) contains shared models, workspace logic, and the live IRC runtime.
 
-For autoupdating, the easiest way to get it is from the [Microsoft Store](https://www.microsoft.com/en-us/store/apps/winirc/9nblggh2p0rf). 
+The WinUI app is already capable of:
 
-If you downloaded the sideloadable package, make sure you enabled developer mode in `Settings -> Update & Security -> For developers -> Developer mode`. Once this is done, on the latest insider builds and on Windows 10 phones you should be able to double click the appxbundle to install it.
+- loading and saving servers from JSON storage
+- migrating app data from prior WinIRC package state
+- connecting to real IRC/ZNC servers
+- joining channels and opening queries
+- rendering live channel transcripts
+- showing channel users, topics, and session state
+- tracking unread messages and mentions
+- using a left server/channel tree with a center tabbed session host
 
-## Building from source
+It is not fully at parity yet, but it is beyond the bootstrap stage and is the main focus of active development.
 
-You'll need the following:
+## Repository Layout
 
-* Windows 10 Anniversary Update or later
-* Viual Studio 2017 
+- [`WinIRC.sln`](./WinIRC.sln)  
+  Main solution containing the UWP app, WinUI app, and shared core library.
+- [`WinIRC`](./WinIRC)  
+  Legacy UWP application.
+- [`WinIRC.Core`](./WinIRC.Core)  
+  Shared non-UI logic.
+- [`WinIRC.WinUI`](./WinIRC.WinUI)  
+  New packaged WinUI 3 desktop app.
 
-Once you've downloaded the project (either via a git clone, the "Open in Visual Studio" button in github, or via some other method) and opened in visual studio the compilation steps are as follows:
+## Building From Source
 
-1. Clean solution
-2. Ensure you have a certificate for deploying the app - 
-    * Go to `Package.appmanifest -> Packaging -> Choose Certificate`
-	* In the dialog, click `Configure Certificate -> Create Test Certificate`
-	* Keep the default settings, then click ok and ok again
-3. Build solution
-4. Using the top toolbar, select the architecture and the device you want to deploy the app on
-5. And that should be it!
+### Recommended Environment
+
+- Windows 11 or a recent Windows 10 build
+- Visual Studio 2022 / 2026-era preview tooling with WinUI 3 and Windows App SDK support
+- .NET 10 SDK
+
+### Recommended Build Command
+
+```powershell
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' `
+  'C:\Users\Jess\source\repos\WinIRC\WinIRC.WinUI\WinIRC.WinUI.csproj' `
+  /restore /t:Build `
+  /p:Configuration=Debug `
+  /p:Platform=x64 `
+  /p:AppxPackage=false `
+  /p:UapAppxPackageBuildMode=SideloadOnly
+```
+
+You can also build from Visual Studio by opening [`WinIRC.sln`](./WinIRC.sln).
+
+## Debugging Notes
+
+The WinUI debug package is intentionally set up to run side-by-side with the original dev package so local app state is less likely to be lost during deploy/debug.
+
+If Visual Studio shows a dialog saying the existing app will be uninstalled and its state deleted, stop and verify the manifest identity before continuing.
+
+## Features
+
+### Already Present In The Project
+
+- direct IRC and websocket-backed connections
+- join and part channels
+- `/help`, `/query`, `/whois`, and other IRC commands
+- basic moderation commands
+- saved servers and configuration
+- responsive desktop UI
+
+### WinUI Port Highlights
+
+- packaged WinUI 3 desktop shell
+- title-bar `MenuBar`
+- resizable left and right panes
+- server/channel tree
+- session tabs
+- live chat transcript with compact and modern message styles
+- nick colouring
+- unread and mention indicators
+
+## Project Tracking
+
+For current migration status and known issues, see:
+
+- [`PORT_STATUS.md`](./PORT_STATUS.md)
+- [`AGENTS.md`](./AGENTS.md)
 
 ## Contributing
 
-Contributions are welcome, so feel free to make changes and submit a pull request!
+Contributions are welcome.
 
-There's no real code style guidelines, just make sure the code is properly indented and has the same brackets layout as the rest of the application. 
+The main expectation is to preserve the product's original behavior and UI where practical while moving implementation details over to WinUI 3 and shared core code.
