@@ -1,0 +1,309 @@
+<Page
+    x:Class="WinIRC.WinUI.Views.ChannelPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:WinIRC.WinUI.Models"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="ChatTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="WrapWholeWords" />
+            <Setter Property="LineHeight" Value="{x:Bind ChatLineHeight, Mode=OneWay}" />
+        </Style>
+
+        <Style x:Key="ChatListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="UseSystemFocusVisuals" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ListViewItemPresenter
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            ContentMargin="0"
+                            SelectionCheckMarkVisualEnabled="False"
+                            PointerOverBackground="Transparent"
+                            PressedBackground="Transparent"
+                            SelectedBackground="Transparent"
+                            SelectedPointerOverBackground="Transparent"
+                            FocusSecondaryBorderBrush="Transparent"
+                            FocusVisualMargin="0" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="ModernMessageLineTemplate" x:DataType="models:ChannelMessageItem">
+            <TextBlock
+                Style="{StaticResource ChatTextBlockStyle}"
+                Text="{x:Bind Text, Mode=OneWay}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ModernMessageTemplate" x:DataType="models:ChannelMessageGroupItem">
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Width="26"
+                    Height="26"
+                    Margin="0,2,10,0"
+                    Background="{x:Bind Parent.MonogramBackgroundBrush, Mode=OneWay}"
+                    CornerRadius="13"
+                    VerticalAlignment="Top"
+                    Visibility="{x:Bind MessageVisibility, Mode=OneTime}">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{Binding ElementName=RootPage, Path=ChatFontFamily}"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{x:Bind Parent.AuthorBrush, Mode=OneWay}"
+                        Text="{x:Bind Monogram, Mode=OneWay}" />
+                </Border>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Spacing="3"
+                    Visibility="{x:Bind MessageVisibility, Mode=OneTime}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock
+                            Foreground="{x:Bind Parent.AuthorBrush, Mode=OneWay}"
+                            FontFamily="{Binding ElementName=RootPage, Path=ChatFontFamily}"
+                            FontSize="{Binding ElementName=RootPage, Path=ChatFontSize}"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind Author, Mode=OneWay}" />
+                        <TextBlock
+                            FontFamily="{Binding ElementName=RootPage, Path=ChatFontFamily}"
+                            FontSize="{Binding ElementName=RootPage, Path=ChatFontSize}"
+                            Margin="0,-1,0,0"
+                            Opacity="0.58"
+                            Text="{x:Bind TimestampText, Mode=OneTime}" />
+                    </StackPanel>
+
+                    <ItemsControl
+                        ItemTemplate="{StaticResource ModernMessageLineTemplate}"
+                        ItemsSource="{x:Bind Lines, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+
+                <TextBlock
+                    Grid.ColumnSpan="2"
+                    Margin="36,0,0,0"
+                    Opacity="0.72"
+                    Style="{StaticResource ChatTextBlockStyle}"
+                    Visibility="{x:Bind StatusVisibility, Mode=OneTime}">
+                    <Run Text="*** " />
+                    <Run Text="{x:Bind Parent.Text, Mode=OneWay}" />
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CompactMessageLineTemplate" x:DataType="models:ChannelMessageItem">
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="56" />
+                    <ColumnDefinition Width="104" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    HorizontalAlignment="Right"
+                    Opacity="0.58"
+                    Style="{StaticResource ChatTextBlockStyle}"
+                    Text="{x:Bind TimestampText, Mode=OneTime}"
+                    VerticalAlignment="Top"
+                    Visibility="{x:Bind MessageVisibility, Mode=OneTime}" />
+
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="0,0,12,0"
+                    Foreground="{x:Bind AuthorBrush, Mode=OneWay}"
+                    FontWeight="SemiBold"
+                    Style="{StaticResource ChatTextBlockStyle}"
+                    Text="{x:Bind Author, Mode=OneWay}"
+                    TextAlignment="Right"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Top"
+                    Visibility="{x:Bind MessageVisibility, Mode=OneTime}" />
+
+                <TextBlock
+                    Grid.Column="2"
+                    Style="{StaticResource ChatTextBlockStyle}"
+                    Text="{x:Bind Text, Mode=OneTime}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CompactMessageTemplate" x:DataType="models:ChannelMessageGroupItem">
+            <ItemsControl ItemsSource="{x:Bind Lines, Mode=OneWay}" ItemTemplate="{StaticResource CompactMessageLineTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FactTemplate" x:DataType="models:ChannelFactItem">
+            <StackPanel Margin="0,0,0,12" Spacing="2">
+                <TextBlock FontSize="12" FontWeight="SemiBold" Opacity="0.72" Text="{x:Bind Label, Mode=OneTime}" />
+                <TextBlock Text="{x:Bind Value, Mode=OneTime}" TextWrapping="WrapWholeWords" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="RosterTemplate" x:DataType="x:String">
+            <Border
+                Margin="0,0,0,8"
+                Padding="10,8"
+                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                CornerRadius="10">
+                <TextBlock Text="{Binding}" TextWrapping="WrapWholeWords" />
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="{x:Bind PagePadding, Mode=OneWay}" RowSpacing="{x:Bind SectionSpacing, Mode=OneWay}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Visibility="{x:Bind HeaderVisibility, Mode=OneWay}"
+            Padding="{x:Bind HeaderPadding, Mode=OneWay}"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Grid ColumnSpacing="10" RowSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Spacing="2" Visibility="{x:Bind HeaderIdentityVisibility, Mode=OneWay}">
+                    <TextBlock FontSize="22" FontWeight="SemiBold" Text="{x:Bind TitleText, Mode=OneTime}" />
+                    <TextBlock
+                        FontSize="12"
+                        Opacity="0.72"
+                        Text="{x:Bind SubtitleText, Mode=OneTime}"
+                        TextWrapping="WrapWholeWords"
+                        Visibility="{x:Bind SubtitleVisibility, Mode=OneWay}" />
+                </StackPanel>
+
+                <Button
+                    Grid.Column="1"
+                    VerticalAlignment="Top"
+                    Visibility="{x:Bind ProtocolActionVisibility, Mode=OneTime}"
+                    Click="OpenUri_Click"
+                    Content="Open URI Externally" />
+
+                <Border
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Padding="{x:Bind TopicBarPadding, Mode=OneWay}"
+                    Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="{x:Bind TopicVisibility, Mode=OneWay}">
+                    <TextBlock
+                        FontSize="{x:Bind TopicBarFontSize, Mode=OneWay}"
+                        Opacity="0.9"
+                        Text="{x:Bind TopicText, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="12">
+            <Grid RowSpacing="{x:Bind ConversationRowSpacing, Mode=OneWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Padding="{x:Bind ConversationHeaderPadding, Mode=OneWay}" Spacing="2">
+                    <TextBlock FontWeight="SemiBold" Text="Conversation" />
+                    <TextBlock
+                        Opacity="0.72"
+                        Text="{x:Bind DescriptionText, Mode=OneTime}"
+                        TextWrapping="WrapWholeWords"
+                        Visibility="{x:Bind DescriptionVisibility, Mode=OneWay}" />
+                </StackPanel>
+
+                <ListView
+                    x:Name="MessagesList"
+                    Grid.Row="1"
+                    Padding="{x:Bind MessagesPadding, Mode=OneWay}"
+                    FontFamily="{x:Bind ChatFontFamily, Mode=OneWay}"
+                    FontSize="{x:Bind ChatFontSize, Mode=OneWay}"
+                    ItemContainerStyle="{StaticResource ChatListViewItemStyle}"
+                    ItemsSource="{x:Bind Messages}"
+                    ItemTemplate="{x:Bind MessageTemplate, Mode=OneWay}"
+                    SelectionMode="None" />
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Padding="{x:Bind ComposerPadding, Mode=OneWay}"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="12">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Click="AttachNote_Click" Content="Attach" />
+
+                <TextBox
+                    x:Name="ComposerTextBox"
+                    Grid.Column="1"
+                    FontFamily="{x:Bind ChatFontFamily, Mode=OneWay}"
+                    FontSize="{x:Bind ChatFontSize, Mode=OneWay}"
+                    PlaceholderText="{x:Bind ComposerPlaceholderText, Mode=OneTime}"
+                    KeyDown="ComposerTextBox_KeyDown"
+                    TextWrapping="Wrap"
+                    AcceptsReturn="False" />
+
+                <Button
+                    Grid.Column="2"
+                    Click="Send_Click"
+                    Content="Send" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

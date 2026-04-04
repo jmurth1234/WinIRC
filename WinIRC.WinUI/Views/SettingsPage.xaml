@@ -1,0 +1,140 @@
+<UserControl
+    x:Class="WinIRC.WinUI.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer x:Name="RootScrollViewer">
+        <StackPanel Padding="12,0" Spacing="0">
+            <TextBlock x:Name="AppearanceSection" Text="Application" Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10" />
+
+            <TextBlock Text="App Theme" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="DarkThemeToggle"
+                Margin="5,1"
+                OffContent="Light Theme"
+                OnContent="Dark Theme"
+                Toggled="DarkThemeToggle_Toggled" />
+
+            <TextBlock Text="Reduce Padding" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="ReducedPaddingToggle"
+                Margin="5,1"
+                OffContent="No"
+                OnContent="Yes"
+                Toggled="ReducedPaddingToggle_Toggled" />
+
+            <TextBlock x:Name="BehaviourSection" Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10">Chat Area</TextBlock>
+
+            <TextBlock Text="Ignore Join/Leave Messages" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="IgnoreJoinLeaveToggle"
+                Margin="5,1"
+                OffContent="No"
+                OnContent="Yes"
+                Toggled="IgnoreJoinLeaveToggle_Toggled" />
+
+            <TextBlock Text="User List Click" Margin="0,5,0,0" />
+            <ComboBox
+                x:Name="UserListClickComboBox"
+                Margin="0,5"
+                ItemsSource="{x:Bind UserListClickModes, Mode=OneWay}"
+                SelectionChanged="UserListClickComboBox_SelectionChanged" />
+
+            <TextBlock Text="Chat Font" Margin="0,5,0,0" />
+            <ComboBox
+                x:Name="FontComboBox"
+                Margin="0,5"
+                ItemsSource="{x:Bind ChatFonts, Mode=OneWay}"
+                SelectionChanged="FontComboBox_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <TextBlock FontFamily="{x:Bind}" Text="{x:Bind}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Text="Font Size" Margin="0,5,0,0" />
+            <NumberBox
+                x:Name="FontSizeNumberBox"
+                Margin="0,5"
+                Minimum="8"
+                Maximum="30"
+                SmallChange="1"
+                SpinButtonPlacementMode="Compact"
+                ValueChanged="FontSizeNumberBox_ValueChanged" />
+
+            <TextBlock Text="Message Style" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="ModernChatToggle"
+                Margin="5,1"
+                OffContent="Compact"
+                OnContent="Modern"
+                Toggled="ModernChatToggle_Toggled" />
+
+            <TextBlock x:Name="ConnectionSection" Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10">Connection</TextBlock>
+
+            <TextBlock Text="Default Username" Margin="0,5,0,0" />
+            <TextBox
+                x:Name="DefaultUsernameTextBox"
+                Margin="0,5"
+                LostFocus="DefaultUsernameTextBox_LostFocus" />
+            <Button
+                x:Name="DefaultUsernameButton"
+                Margin="0,0,0,5"
+                HorizontalAlignment="Left"
+                Click="DefaultUsernameButton_Click"
+                Content="Set" />
+
+            <TextBlock Text="Ignore SSL Errors" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="IgnoreSslToggle"
+                Margin="5,1"
+                OffContent="No"
+                OnContent="Yes"
+                Toggled="IgnoreSslToggle_Toggled" />
+
+            <TextBlock Text="Reconnect when disconnected" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="AutoReconnectToggle"
+                Margin="5,1"
+                OffContent="No"
+                OnContent="Yes"
+                Toggled="AutoReconnectToggle_Toggled" />
+
+            <TextBlock Text="Log channels to a file" Margin="0,5,0,0" />
+            <ToggleSwitch
+                x:Name="EnableLogsToggle"
+                Margin="5,1"
+                OffContent="No"
+                OnContent="Yes"
+                Toggled="EnableLogsToggle_Toggled" />
+            <Button
+                x:Name="ChooseLogsFolderButton"
+                Margin="0,0,0,5"
+                HorizontalAlignment="Left"
+                Click="ChooseLogsFolder_Click"
+                Content="Change Folder" />
+            <TextBlock
+                x:Name="LogsFolderLabel"
+                Margin="0,0,0,5"
+                Opacity="0.72"
+                Text="{x:Bind LogsFolderText, Mode=OneWay}"
+                TextWrapping="WrapWholeWords" />
+
+            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Padding="0,10">About</TextBlock>
+            <StackPanel x:Name="AboutSection" Spacing="10" Margin="0,5,0,0">
+                <TextBlock Text="WinIRC" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="Made by rymate1234." />
+                <TextBlock Opacity="0.72" Text="{x:Bind AboutVersionText, Mode=OneWay}" />
+                <Button HorizontalAlignment="Left" Content="Visit my Website" Click="VisitWebsite_Click" />
+                <Button HorizontalAlignment="Left" Content="Give feedback on GitHub" Click="VisitGithub_Click" />
+                <Button HorizontalAlignment="Left" Content="Join our support channel" Click="JoinSupport_Click" />
+                <HyperlinkButton Content="Privacy Policy" Click="PrivacyPolicy_Click" />
+                <Button HorizontalAlignment="Left" Content="Test Notification" Click="TestNotification_Click" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
