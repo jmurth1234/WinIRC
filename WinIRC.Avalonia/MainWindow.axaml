@@ -16,6 +16,9 @@
         <Style Selector="Grid.messageLine.joinPart TextBlock">
             <Setter Property="Foreground" Value="Gray" />
         </Style>
+        <Style Selector="Grid.messageLine.motd TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
     </Window.Styles>
 
     <DockPanel>
@@ -29,6 +32,8 @@
                 <MenuItem Header="_Part Current Channel" Click="PartChannel_Click" />
                 <MenuItem Header="_Reconnect Current" Click="Reconnect_Click" />
                 <MenuItem Header="_Disconnect Current" Click="Disconnect_Click" />
+                <Separator />
+                <MenuItem Header="_About WinIRC" Click="About_Click" />
                 <Separator />
                 <MenuItem Header="_Quit" Click="Quit_Click" />
             </MenuItem>
@@ -97,14 +102,16 @@
                          Grid.Row="1"
                          ItemsSource="{Binding CurrentMessages}"
                          Padding="8"
-                         FontSize="{Binding ChatFontSize}">
+                         FontSize="{Binding ChatFontSize}"
+                         FontFamily="{Binding ChatFontFamily}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid ColumnDefinitions="54,120,*"
-                                  Margin="0,2"
+                                  Margin="{Binding LineMargin}"
                                   Classes="messageLine"
                                   Classes.mention="{Binding IsMention}"
                                   Classes.joinPart="{Binding IsJoinPart}"
+                                  Classes.motd="{Binding IsMotd}"
                                   Opacity="{Binding Opacity}">
                                 <Grid.ContextMenu>
                                     <ContextMenu>
@@ -113,9 +120,20 @@
                                         <MenuItem Header="Open Link" Click="OpenLink_Click" CommandParameter="{Binding}" IsEnabled="{Binding HasLink}" />
                                     </ContextMenu>
                                 </Grid.ContextMenu>
-                                <TextBlock Grid.Column="0" Text="{Binding Time}" Opacity="0.65" />
-                                <TextBlock Grid.Column="1" Text="{Binding User}" FontWeight="{Binding FontWeight}" Margin="8,0,8,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding Text}" FontWeight="{Binding FontWeight}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Column="0" Text="{Binding Time}" IsVisible="{Binding ShowHeader}" Opacity="0.65" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding User}"
+                                           IsVisible="{Binding ShowHeader}"
+                                           FontWeight="{Binding FontWeight}"
+                                           FontStyle="{Binding FontStyle}"
+                                           Foreground="{Binding UserBrush}"
+                                           Margin="8,0,8,0" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding Text}"
+                                           FontWeight="{Binding FontWeight}"
+                                           FontStyle="{Binding FontStyle}"
+                                           Foreground="{Binding TextBrush}"
+                                           TextWrapping="Wrap" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

@@ -41,7 +41,10 @@ public sealed class MainWindowViewModel : ObservableObject
     private bool showTopic;
     private bool ignoreJoinLeave;
     private bool darkTheme;
+    private bool modernChat;
+    private bool reducedPadding;
     private int chatFontSize;
+    private string chatFontFamily;
 
     public MainWindowViewModel(JsonSettingsStore settings, ServerStore serverStore)
     {
@@ -57,7 +60,15 @@ public sealed class MainWindowViewModel : ObservableObject
         showTopic = Settings.GetBoolean(ConfigKeys.ShowTopicBar, true);
         ignoreJoinLeave = Settings.GetBoolean(ConfigKeys.IgnoreJoinLeave);
         darkTheme = Settings.GetBoolean(ConfigKeys.DarkTheme);
+        modernChat = Settings.GetBoolean(ConfigKeys.ModernChat);
+        reducedPadding = Settings.GetBoolean(ConfigKeys.ReducedPadding);
         chatFontSize = Settings.GetInt(ConfigKeys.FontSize, 14);
+        chatFontFamily = Settings.GetString(ConfigKeys.FontFamily, "Inter");
+        if (string.IsNullOrWhiteSpace(chatFontFamily))
+        {
+            chatFontFamily = "Inter";
+        }
+
         ApplyTheme(darkTheme);
     }
 
@@ -270,6 +281,33 @@ public sealed class MainWindowViewModel : ObservableObject
             {
                 Settings.SetBoolean(ConfigKeys.DarkTheme, value);
                 ApplyTheme(value);
+                RefreshCurrentBuffer();
+            }
+        }
+    }
+
+    public bool ModernChat
+    {
+        get => modernChat;
+        set
+        {
+            if (SetProperty(ref modernChat, value))
+            {
+                Settings.SetBoolean(ConfigKeys.ModernChat, value);
+                RefreshCurrentBuffer();
+            }
+        }
+    }
+
+    public bool ReducedPadding
+    {
+        get => reducedPadding;
+        set
+        {
+            if (SetProperty(ref reducedPadding, value))
+            {
+                Settings.SetBoolean(ConfigKeys.ReducedPadding, value);
+                RefreshCurrentBuffer();
             }
         }
     }
@@ -283,6 +321,19 @@ public sealed class MainWindowViewModel : ObservableObject
             if (SetProperty(ref chatFontSize, value))
             {
                 Settings.SetInt(ConfigKeys.FontSize, value);
+            }
+        }
+    }
+
+    public string ChatFontFamily
+    {
+        get => chatFontFamily;
+        set
+        {
+            value = string.IsNullOrWhiteSpace(value) ? "Inter" : value.Trim();
+            if (SetProperty(ref chatFontFamily, value))
+            {
+                Settings.SetString(ConfigKeys.FontFamily, value);
             }
         }
     }
@@ -327,6 +378,21 @@ public sealed class MainWindowViewModel : ObservableObject
         {
             await ConnectAsync(server);
         }
+    }
+
+    public Task ConnectSupportAsync()
+    {
+        return ConnectAsync(new WinIrcServer
+        {
+            Name = "WinIRC Support (Libera)",
+            Hostname = "irc.libera.chat",
+            Port = 6697,
+            Ssl = true,
+            Channels = "#WinIRC",
+            Username = string.IsNullOrWhiteSpace(DefaultUsername)
+                ? "winircuser"
+                : DefaultUsername
+        });
     }
 
     public async Task RequestChannelListAsync()
@@ -780,9 +846,8 @@ public sealed class MainWindowViewModel : ObservableObject
             : $"{session.Server.Name} / {SelectedItem.Channel}";
         CurrentTopic = SelectedItem.IsServer ? "Server log" : session.GetTopic(SelectedItem.Channel);
 
-        CurrentMessages.AddRange(session.GetMessages(SelectedItem.Channel)
-            .Where(ShouldDisplay)
-            .Select(message => new MessageViewModel(message)));
+        CurrentMessages.AddRange(CreateMessageViewModels(session.GetMessages(SelectedItem.Channel)
+            .Where(ShouldDisplay)));
         TrimCurrentMessages();
 
         ReplaceUsers(session.GetUsers(SelectedItem.Channel));
@@ -908,7 +973,7 @@ public sealed class MainWindowViewModel : ObservableObject
 
         var messages = pendingCurrentMessages
             .Where(message => message.Session == item.Session && string.Equals(message.Channel, item.Channel, StringComparison.OrdinalIgnoreCase))
-            .Select(message => new MessageViewModel(message.Message))
+            .Select(message => message.Message)
             .ToList();
 
         pendingCurrentMessages.Clear();
@@ -918,8 +983,23 @@ public sealed class MainWindowViewModel : ObservableObject
             return;
         }
 
-        CurrentMessages.AddRange(messages);
+        CurrentMessages.AddRange(CreateMessageViewModels(messages, CurrentMessages.LastOrDefault()));
         TrimCurrentMessages();
+    }
+
+    private List<MessageViewModel> CreateMessageViewModels(IEnumerable<Message> messages, MessageViewModel? previous = null)
+    {
+        var viewModels = new List<MessageViewModel>();
+        var last = previous;
+
+        foreach (var message in messages)
+        {
+            var viewModel = new MessageViewModel(message, last, ModernChat, DarkTheme, ReducedPadding);
+            viewModels.Add(viewModel);
+            last = viewModel;
+        }
+
+        return viewModels;
     }
 
     private void ScheduleSidebarRefresh(IrcSession session)

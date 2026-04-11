@@ -15,6 +15,9 @@ public sealed class JsonSettingsStoreTests
         store.SetInt(ConfigKeys.UserListClick, 1);
         store.SetString(ConfigKeys.UploadFile, "https://uploads.example");
         store.SetString(ConfigKeys.LogsFolder, Path.Combine(directory, "logs"));
+        store.SetBoolean(ConfigKeys.ModernChat, true);
+        store.SetBoolean(ConfigKeys.ReducedPadding, true);
+        store.SetString(ConfigKeys.FontFamily, "Inter");
 
         var reloaded = new JsonSettingsStore(directory);
 
@@ -22,6 +25,9 @@ public sealed class JsonSettingsStoreTests
         Assert.Equal(1, reloaded.GetInt(ConfigKeys.UserListClick));
         Assert.Equal("https://uploads.example", reloaded.GetString(ConfigKeys.UploadFile));
         Assert.Equal(Path.Combine(directory, "logs"), reloaded.GetString(ConfigKeys.LogsFolder));
+        Assert.True(reloaded.GetBoolean(ConfigKeys.ModernChat));
+        Assert.True(reloaded.GetBoolean(ConfigKeys.ReducedPadding));
+        Assert.Equal("Inter", reloaded.GetString(ConfigKeys.FontFamily));
     }
 
     private static string CreateTempDirectory()

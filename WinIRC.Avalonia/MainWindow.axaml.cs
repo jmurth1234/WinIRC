@@ -55,6 +55,15 @@ public partial class MainWindow : Window
         await dialog.ShowDialog(this);
     }
 
+    private async void About_Click(object? sender, RoutedEventArgs e)
+    {
+        var dialog = new AboutDialog();
+        if (await dialog.ShowDialog<bool>(this))
+        {
+            await viewModel.ConnectSupportAsync();
+        }
+    }
+
     private async void ConnectAll_Click(object? sender, RoutedEventArgs e)
     {
         await viewModel.ConnectAllSavedAsync();
