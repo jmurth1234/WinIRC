@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WinIRC.Avalonia.ServerDialog"
+        Title="Manage Servers"
+        Width="540"
+        Height="620"
+        MinWidth="480"
+        MinHeight="560"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+            <Button Content="Import" Click="Import_Click" />
+            <Button Content="New" Click="New_Click" />
+            <Button Content="Delete" Click="Delete_Click" />
+            <Button Content="Save" Click="Save_Click" />
+            <Button Content="Connect" Click="Connect_Click" />
+            <Button Content="Cancel" Click="Cancel_Click" />
+        </StackPanel>
+
+        <ScrollViewer>
+            <StackPanel Spacing="10">
+                <TextBlock Text="Saved Servers" FontWeight="SemiBold" />
+                <ComboBox ItemsSource="{Binding SavedServers}"
+                          SelectedItem="{Binding SelectedServer}"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Text="Server" FontWeight="SemiBold" Margin="0,10,0,0" />
+                <TextBox PlaceholderText="Server Name" Text="{Binding Name, Mode=TwoWay}" />
+                <TextBox PlaceholderText="Hostname or IP" Text="{Binding Hostname, Mode=TwoWay}" />
+                <TextBox PlaceholderText="Port" Text="{Binding Port, Mode=TwoWay}" />
+
+                <StackPanel Orientation="Horizontal" Spacing="18">
+                    <CheckBox Content="Use TLS" IsChecked="{Binding Ssl, Mode=TwoWay}" />
+                    <CheckBox Content="Use websocket forwarder" IsChecked="{Binding WebSocket, Mode=TwoWay}" />
+                </StackPanel>
+
+                <TextBlock Text="Identity" FontWeight="SemiBold" Margin="0,10,0,0" />
+                <TextBox PlaceholderText="Username / Nick" Text="{Binding Username, Mode=TwoWay}" />
+                <TextBox PlaceholderText="Server Password" PasswordChar="*" Text="{Binding Password, Mode=TwoWay}" />
+                <TextBox PlaceholderText="NickServ Password" PasswordChar="*" Text="{Binding NickservPassword, Mode=TwoWay}" />
+                <TextBox PlaceholderText="Channels, for example #winirc,#linux" Text="{Binding Channels, Mode=TwoWay}" />
+
+                <TextBlock Text="{Binding ErrorText}"
+                           Foreground="IndianRed"
+                           TextWrapping="Wrap"
+                           MinHeight="24" />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

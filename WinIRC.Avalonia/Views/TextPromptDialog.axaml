@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WinIRC.Avalonia.TextPromptDialog"
+        Title="Join Channel"
+        Width="360"
+        Height="150"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+            <Button Content="Join" Click="Ok_Click" />
+            <Button Content="Cancel" Click="Cancel_Click" />
+        </StackPanel>
+        <StackPanel Spacing="8">
+            <TextBlock x:Name="PromptText" Text="Channel" />
+            <TextBox x:Name="InputBox" PlaceholderText="#channel" />
+        </StackPanel>
+    </DockPanel>
+</Window>
