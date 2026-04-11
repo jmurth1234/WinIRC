@@ -3,6 +3,7 @@ using Avalonia.Collections;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using IrcClientCore;
+using System.Text;
 using WinIRC.Avalonia.Services;
 using WinIRC.Core.Configuration;
 using WinIRC.Core.Events;
@@ -141,6 +142,26 @@ public sealed class MainWindowViewModel : ObservableObject
         }
     }
 
+    public bool SwitchOnJoin
+    {
+        get => Settings.GetBoolean(ConfigKeys.SwitchOnJoin, true);
+        set
+        {
+            Settings.SetBoolean(ConfigKeys.SwitchOnJoin, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public int UserListClickIndex
+    {
+        get => Math.Clamp(Settings.GetInt(ConfigKeys.UserListClick, 0), 0, 2);
+        set
+        {
+            Settings.SetInt(ConfigKeys.UserListClick, Math.Clamp(value, 0, 2));
+            OnPropertyChanged();
+        }
+    }
+
     public bool EnableLogs
     {
         get => Settings.GetBoolean(ConfigKeys.EnableLogs);
@@ -151,9 +172,57 @@ public sealed class MainWindowViewModel : ObservableObject
         }
     }
 
-    public string LogsFolderPath => Settings.GetString(
-        ConfigKeys.LogsFolder,
-        Path.Combine(AppDataPaths.GetAppDataDirectory(), "logs"));
+    public string LogsFolderPath
+    {
+        get => Settings.GetString(
+            ConfigKeys.LogsFolder,
+            Path.Combine(AppDataPaths.GetAppDataDirectory(), "logs"));
+        set
+        {
+            Settings.SetString(ConfigKeys.LogsFolder, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string DefaultUsername
+    {
+        get => Settings.GetString(ConfigKeys.DefaultUsername);
+        set
+        {
+            Settings.SetString(ConfigKeys.DefaultUsername, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string UploadFileUrl
+    {
+        get => Settings.GetString(ConfigKeys.UploadFile, "https://0x0.st");
+        set
+        {
+            Settings.SetString(ConfigKeys.UploadFile, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string PasteTextUrl
+    {
+        get => Settings.GetString(ConfigKeys.PasteText, UploadFileUrl);
+        set
+        {
+            Settings.SetString(ConfigKeys.PasteText, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string PasteImageUrl
+    {
+        get => Settings.GetString(ConfigKeys.PasteImage, UploadFileUrl);
+        set
+        {
+            Settings.SetString(ConfigKeys.PasteImage, value);
+            OnPropertyChanged();
+        }
+    }
 
     public bool ShowUsers
     {
@@ -290,38 +359,23 @@ public sealed class MainWindowViewModel : ObservableObject
 
     public async Task UploadFileToInputAsync(Stream stream, string fileName)
     {
-        var uploadUrl = Settings.GetString(ConfigKeys.UploadFile, "https://0x0.st");
-        if (!Uri.TryCreate(uploadUrl, UriKind.Absolute, out var uri) ||
-            uri.Scheme is not ("http" or "https"))
-        {
-            StatusText = "Upload URL must be an absolute HTTP or HTTPS URL.";
-            return;
-        }
+        await UploadContentToInputAsync(stream, fileName, UploadFileUrl, $"Uploading {fileName}...");
+    }
 
-        StatusText = $"Uploading {fileName}...";
+    public async Task UploadTextToInputAsync(string text)
+    {
+        await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        await UploadContentToInputAsync(stream, "paste.txt", PasteTextUrl, "Uploading paste...");
+    }
 
-        try
-        {
-            using var form = new MultipartFormDataContent();
-            using var fileContent = new StreamContent(stream);
-            form.Add(fileContent, "file", fileName);
+    public void AppendPastedTextToInput(string text)
+    {
+        AppendToInput(text.ReplaceLineEndings(" ").Trim());
+    }
 
-            using var response = await UploadClient.PostAsync(uri, form);
-            var responseText = (await response.Content.ReadAsStringAsync()).Trim();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                StatusText = $"Upload failed: {(int)response.StatusCode} {response.ReasonPhrase}";
-                return;
-            }
-
-            AppendToInput(responseText);
-            StatusText = "Upload complete.";
-        }
-        catch (Exception ex)
-        {
-            StatusText = "Upload failed: " + ex.Message;
-        }
+    public void SetLogsFolderPath(string path)
+    {
+        LogsFolderPath = path;
     }
 
     public void AppendToInput(string text)
@@ -459,6 +513,23 @@ public sealed class MainWindowViewModel : ObservableObject
         await SendUserCommandAsync("/kick", user);
     }
 
+    public async Task ActivateUserAsync(string user)
+    {
+        switch (UserListClickIndex)
+        {
+            case 1:
+                await QueryUserAsync(user);
+                break;
+
+            case 2:
+                break;
+
+            default:
+                MentionUser(user);
+                break;
+        }
+    }
+
     public async Task SendCurrentAsync()
     {
         var item = SelectedItem;
@@ -563,6 +634,41 @@ public sealed class MainWindowViewModel : ObservableObject
         await SelectedItem.Session.SendAsync(SelectedItem.Channel, $"{command} {user}");
     }
 
+    private async Task UploadContentToInputAsync(Stream stream, string fileName, string uploadUrl, string statusText)
+    {
+        if (!Uri.TryCreate(uploadUrl, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("http" or "https"))
+        {
+            StatusText = "Upload URL must be an absolute HTTP or HTTPS URL.";
+            return;
+        }
+
+        StatusText = statusText;
+
+        try
+        {
+            using var form = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(stream);
+            form.Add(fileContent, "file", fileName);
+
+            using var response = await UploadClient.PostAsync(uri, form);
+            var responseText = (await response.Content.ReadAsStringAsync()).Trim();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                StatusText = $"Upload failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+                return;
+            }
+
+            AppendToInput(responseText);
+            StatusText = "Upload complete.";
+        }
+        catch (Exception ex)
+        {
+            StatusText = "Upload failed: " + ex.Message;
+        }
+    }
+
     private void Session_SessionEvent(object? sender, IrcSessionEventArgs e)
     {
         if (sender is not IrcSession session)
@@ -593,6 +699,7 @@ public sealed class MainWindowViewModel : ObservableObject
                 if (!string.IsNullOrWhiteSpace(e.Channel))
                 {
                     AddSidebarItem(session, e.Channel);
+                    SelectJoinedChannel(session, e.Channel);
                 }
                 break;
 
@@ -707,6 +814,27 @@ public sealed class MainWindowViewModel : ObservableObject
         };
 
         SidebarItems.Add(item);
+    }
+
+    private void SelectJoinedChannel(IrcSession session, string channel)
+    {
+        if (!SwitchOnJoin || channel == IrcSession.ServerBufferName)
+        {
+            return;
+        }
+
+        if (SelectedItem?.Session != session)
+        {
+            return;
+        }
+
+        var item = SidebarItems.FirstOrDefault(existing =>
+            existing.Session == session &&
+            string.Equals(existing.Channel, channel, StringComparison.OrdinalIgnoreCase));
+        if (item != null)
+        {
+            SelectedItem = item;
+        }
     }
 
     private void RemoveSidebarItem(IrcSession session, string? channel)

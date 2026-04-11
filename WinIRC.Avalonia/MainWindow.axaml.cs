@@ -49,6 +49,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void Settings_Click(object? sender, RoutedEventArgs e)
+    {
+        var dialog = new SettingsDialog(viewModel);
+        await dialog.ShowDialog(this);
+    }
+
     private async void ConnectAll_Click(object? sender, RoutedEventArgs e)
     {
         await viewModel.ConnectAllSavedAsync();
@@ -166,6 +172,36 @@ public partial class MainWindow : Window
                 textBox.CaretIndex = caret.Value;
             }
         }
+    }
+
+    private async void InputBox_PastingFromClipboard(object? sender, RoutedEventArgs e)
+    {
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+        var text = clipboard == null ? null : await clipboard.TryGetTextAsync();
+        if (string.IsNullOrEmpty(text) || !HasMultipleLines(text))
+        {
+            return;
+        }
+
+        e.Handled = true;
+        var dialog = new PasteTextDialog(text);
+        var result = await dialog.ShowDialog<PasteTextResult?>(this);
+        if (result == null || result.Action == PasteTextAction.Cancel)
+        {
+            return;
+        }
+
+        if (result.Action == PasteTextAction.Upload)
+        {
+            await viewModel.UploadTextToInputAsync(result.Text);
+        }
+        else
+        {
+            viewModel.AppendPastedTextToInput(result.Text);
+        }
+
+        InputBox.Focus();
+        InputBox.CaretIndex = viewModel.InputText.Length;
     }
 
     private async void CopyMessage_Click(object? sender, RoutedEventArgs e)
@@ -288,6 +324,16 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void UsersList_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (UsersList.SelectedItem is string user)
+        {
+            await viewModel.ActivateUserAsync(user);
+            InputBox.Focus();
+            InputBox.CaretIndex = viewModel.InputText.Length;
+        }
+    }
+
     private async void QueryUser_Click(object? sender, RoutedEventArgs e)
     {
         if (GetUser(sender) is { } user)
@@ -376,5 +422,10 @@ public partial class MainWindow : Window
     private static string? GetUser(object? sender)
     {
         return sender is MenuItem { CommandParameter: string user } ? user : null;
+    }
+
+    private static bool HasMultipleLines(string text)
+    {
+        return text.Contains('\n') || text.Contains('\r');
     }
 }

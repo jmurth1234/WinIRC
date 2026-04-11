@@ -22,6 +22,7 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_WinIRC">
                 <MenuItem Header="_Manage Servers" Click="ManageServers_Click" />
+                <MenuItem Header="_Settings" Click="Settings_Click" />
                 <MenuItem Header="_Connect All Saved Servers" Click="ConnectAll_Click" />
                 <MenuItem Header="_Join Channel" Click="JoinChannel_Click" />
                 <MenuItem Header="Channel _List" Click="ChannelList_Click" />
@@ -125,6 +126,7 @@
                              Grid.Column="0"
                              Text="{Binding InputText, Mode=TwoWay}"
                              PlaceholderText="Type a message or /join #channel"
+                             PastingFromClipboard="InputBox_PastingFromClipboard"
                              KeyDown="InputBox_KeyDown" />
                     <Button Grid.Column="1"
                             Content="Upload"
@@ -145,7 +147,9 @@
                                Text="Users"
                                FontWeight="SemiBold"
                                Padding="12,10" />
-                    <ListBox ItemsSource="{Binding CurrentUsers}">
+                    <ListBox x:Name="UsersList"
+                             ItemsSource="{Binding CurrentUsers}"
+                             DoubleTapped="UsersList_DoubleTapped">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" Padding="8,4">
