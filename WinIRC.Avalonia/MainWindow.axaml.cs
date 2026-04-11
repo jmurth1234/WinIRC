@@ -155,6 +155,7 @@ public partial class MainWindow : Window
         if (e.Key == Key.Enter)
         {
             e.Handled = true;
+            viewModel.ResetTabCompletion();
             await viewModel.SendCurrentAsync();
             return;
         }
@@ -171,16 +172,23 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (e.Key == Key.Tab && sender is TextBox textBox)
+        if (e.Key == Key.Tab)
         {
-            var caret = viewModel.TryApplyTabCompletion(textBox.CaretIndex);
-            if (caret.HasValue)
+            if (sender is TextBox textBox)
             {
-                e.Handled = true;
-                textBox.Text = viewModel.InputText;
-                textBox.CaretIndex = caret.Value;
+                var caret = viewModel.TryApplyTabCompletion(textBox.CaretIndex);
+                if (caret.HasValue)
+                {
+                    e.Handled = true;
+                    textBox.Text = viewModel.InputText;
+                    textBox.CaretIndex = caret.Value;
+                }
             }
+
+            return;
         }
+
+        viewModel.ResetTabCompletion();
     }
 
     private async void InputBox_PastingFromClipboard(object? sender, RoutedEventArgs e)

@@ -119,6 +119,20 @@ public sealed class IrcClientCoreSessionTests
         Assert.Equal(new[] { "#large", "#small" }, entries.Select(entry => entry.Channel));
     }
 
+    [Fact]
+    public async Task TabCompletionIncludesCommandsAndUsers()
+    {
+        var fixture = CreateFixture();
+
+        await fixture.Session.ConnectAsync();
+        await fixture.Session.Client.AddChannel("#winirc");
+        await fixture.Session.Client.RecieveLine(":irc.example.net 353 tester = #winirc :@alice +bob tester");
+        await fixture.Session.Client.RecieveLine(":irc.example.net 366 tester #winirc :End of names");
+
+        Assert.Contains("/join", fixture.Session.GetTabCompletions(IrcSession.ServerBufferName, "/jo", 3));
+        Assert.Equal(new[] { "alice" }, fixture.Session.GetTabCompletions("#winirc", "al", 2));
+    }
+
     private static Fixture CreateFixture(WinIrcServer? server = null)
     {
         var socket = new FakeSocket();

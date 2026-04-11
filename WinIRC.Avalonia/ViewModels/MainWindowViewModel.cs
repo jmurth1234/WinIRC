@@ -30,6 +30,10 @@ public sealed class MainWindowViewModel : ObservableObject
     private int messageFlushScheduled;
     private int sidebarRefreshScheduled;
     private int inputHistoryIndex = -1;
+    private int tabCompletionOriginalStart;
+    private int tabCompletionOriginalEnd;
+    private int tabCompletionLastCaret = -1;
+    private int tabCompletionIndex = -1;
     private string currentTitle = "WinIRC";
     private string currentTopic = "Connect to a server to start chatting.";
     private string statusText = "Ready";
@@ -37,6 +41,9 @@ public sealed class MainWindowViewModel : ObservableObject
     private string channelListSearch = "";
     private string channelListStatus = "Request a channel list from the current server.";
     private string pendingHistoryInput = "";
+    private string tabCompletionOriginalText = "";
+    private string tabCompletionLastText = "";
+    private IReadOnlyList<string> tabCompletionOptions = Array.Empty<string>();
     private bool showUsers;
     private bool showTopic;
     private bool ignoreJoinLeave;
@@ -617,6 +624,7 @@ public sealed class MainWindowViewModel : ObservableObject
             return false;
         }
 
+        ResetTabCompletion();
         if (previous)
         {
             if (inputHistoryIndex == -1)
@@ -655,33 +663,88 @@ public sealed class MainWindowViewModel : ObservableObject
     public int? TryApplyTabCompletion(int caretIndex)
     {
         var item = SelectedItem;
-        if (item == null || item.IsServer || string.IsNullOrWhiteSpace(InputText))
+        if (item == null || string.IsNullOrWhiteSpace(InputText))
         {
+            ResetTabCompletion();
             return null;
         }
 
         caretIndex = Math.Clamp(caretIndex, 0, InputText.Length);
+
+        if (tabCompletionOptions.Count > 0 &&
+            caretIndex == tabCompletionLastCaret &&
+            string.Equals(InputText, tabCompletionLastText, StringComparison.Ordinal))
+        {
+            tabCompletionIndex = (tabCompletionIndex + 1) % tabCompletionOptions.Count;
+        }
+        else
+        {
+            var word = GetCurrentInputWord(InputText, caretIndex);
+            if (string.IsNullOrWhiteSpace(word.Text))
+            {
+                ResetTabCompletion();
+                return null;
+            }
+
+            tabCompletionOptions = item.Session
+                .GetTabCompletions(item.Channel, InputText, caretIndex)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (tabCompletionOptions.Count == 0)
+            {
+                ResetTabCompletion();
+                return null;
+            }
+
+            tabCompletionOriginalText = InputText;
+            tabCompletionOriginalStart = word.Start;
+            tabCompletionOriginalEnd = caretIndex;
+            tabCompletionIndex = 0;
+        }
+
+        var replacement = FormatCompletion(
+            tabCompletionOptions[tabCompletionIndex],
+            tabCompletionOriginalText,
+            tabCompletionOriginalStart);
+        InputText = tabCompletionOriginalText[..tabCompletionOriginalStart] +
+            replacement +
+            tabCompletionOriginalText[tabCompletionOriginalEnd..];
+
+        tabCompletionLastCaret = tabCompletionOriginalStart + replacement.Length;
+        tabCompletionLastText = InputText;
+        return tabCompletionLastCaret;
+    }
+
+    public void ResetTabCompletion()
+    {
+        tabCompletionOptions = Array.Empty<string>();
+        tabCompletionOriginalText = "";
+        tabCompletionLastText = "";
+        tabCompletionOriginalStart = 0;
+        tabCompletionOriginalEnd = 0;
+        tabCompletionLastCaret = -1;
+        tabCompletionIndex = -1;
+    }
+
+    private static (string Text, int Start) GetCurrentInputWord(string input, int caretIndex)
+    {
         var start = caretIndex;
-        while (start > 0 && !char.IsWhiteSpace(InputText[start - 1]))
+        while (start > 0 && !char.IsWhiteSpace(input[start - 1]))
         {
             start--;
         }
 
-        var currentWord = InputText[start..caretIndex];
-        if (string.IsNullOrWhiteSpace(currentWord))
+        return (input[start..caretIndex], start);
+    }
+
+    private static string FormatCompletion(string completion, string originalText, int start)
+    {
+        if (originalText.StartsWith("/", StringComparison.Ordinal) || completion.StartsWith("/", StringComparison.Ordinal))
         {
-            return null;
+            return completion + " ";
         }
 
-        var completion = item.Session.GetTabCompletions(item.Channel, InputText, caretIndex).FirstOrDefault();
-        if (completion == null)
-        {
-            return null;
-        }
-
-        var suffix = start == 0 ? ": " : " ";
-        InputText = InputText[..start] + completion + suffix + InputText[caretIndex..];
-        return start + completion.Length + suffix.Length;
+        return start == 0 ? completion + ": " : completion + " ";
     }
 
     private async Task SendUserCommandAsync(string command, string user)

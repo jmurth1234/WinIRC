@@ -139,13 +139,38 @@ public sealed class IrcSession : IDisposable
 
     public IReadOnlyList<string> GetTabCompletions(string channel, string message, int caretPosition)
     {
-        if (channel == ServerBufferName)
+        var context = GetCurrentWordContext(message, caretPosition);
+        var word = context.Word;
+        if (string.IsNullOrWhiteSpace(word))
         {
             return Array.Empty<string>();
         }
 
-        var word = GetCurrentWord(message, caretPosition);
-        if (string.IsNullOrWhiteSpace(word))
+        if (message.StartsWith("/", StringComparison.Ordinal))
+        {
+            if (context.WordIndex == 0)
+            {
+                return Client.CommandManager.CommandList
+                    .Select(command => command.StartsWith("/", StringComparison.Ordinal) ? command : "/" + command)
+                    .Where(command => command.StartsWith(word, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(command => command, StringComparer.OrdinalIgnoreCase)
+                    .Take(20)
+                    .ToList();
+            }
+
+            var command = message.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+            var commandCompletions = Client.CommandManager
+                .GetCompletions(channel == ServerBufferName ? "" : channel, command, word)
+                .Where(completion => !string.IsNullOrWhiteSpace(completion))
+                .Take(20)
+                .ToList();
+            if (commandCompletions.Count > 0)
+            {
+                return commandCompletions;
+            }
+        }
+
+        if (channel == ServerBufferName)
         {
             return Array.Empty<string>();
         }
@@ -365,11 +390,11 @@ public sealed class IrcSession : IDisposable
         SessionEvent?.Invoke(this, args);
     }
 
-    private static string GetCurrentWord(string message, int caretPosition)
+    private static (string Word, int WordIndex) GetCurrentWordContext(string message, int caretPosition)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
-            return "";
+            return ("", -1);
         }
 
         caretPosition = Math.Clamp(caretPosition, 0, message.Length);
@@ -379,6 +404,10 @@ public sealed class IrcSession : IDisposable
             start--;
         }
 
-        return message[start..caretPosition];
+        var index = message[..start]
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Length;
+
+        return (message[start..caretPosition], index);
     }
 }
