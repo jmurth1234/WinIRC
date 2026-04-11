@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WinIRC.Avalonia.ChannelListDialog"
+        Title="Channel List"
+        Width="720"
+        Height="560"
+        MinWidth="520"
+        MinHeight="360"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Top" Spacing="8">
+            <TextBlock Text="{Binding ChannelListStatus}" />
+            <TextBox PlaceholderText="Search channels"
+                     Text="{Binding ChannelListSearch, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+            <Button Content="Refresh" Click="Refresh_Click" />
+            <Button Content="Join" Click="Join_Click" />
+            <Button Content="Close" Click="Close_Click" />
+        </StackPanel>
+
+        <ListBox x:Name="ChannelsList"
+                 ItemsSource="{Binding ChannelListItems}"
+                 Margin="0,12,0,0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="80,160,*" Margin="0,4">
+                        <TextBlock Grid.Column="0" Text="{Binding Users}" Opacity="0.7" />
+                        <TextBlock Grid.Column="1" Text="{Binding Channel}" FontWeight="SemiBold" Margin="8,0" />
+                        <TextBlock Grid.Column="2" Text="{Binding Topic}" TextWrapping="Wrap" Opacity="0.8" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

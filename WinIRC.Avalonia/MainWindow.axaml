@@ -22,7 +22,9 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_WinIRC">
                 <MenuItem Header="_Manage Servers" Click="ManageServers_Click" />
+                <MenuItem Header="_Connect All Saved Servers" Click="ConnectAll_Click" />
                 <MenuItem Header="_Join Channel" Click="JoinChannel_Click" />
+                <MenuItem Header="Channel _List" Click="ChannelList_Click" />
                 <MenuItem Header="_Part Current Channel" Click="PartChannel_Click" />
                 <MenuItem Header="_Reconnect Current" Click="Reconnect_Click" />
                 <MenuItem Header="_Disconnect Current" Click="Disconnect_Click" />
@@ -37,6 +39,9 @@
                 <Separator />
                 <MenuItem Header="Larger Text" Click="LargerText_Click" />
                 <MenuItem Header="Smaller Text" Click="SmallerText_Click" />
+                <Separator />
+                <MenuItem Header="Log Messages" ToggleType="CheckBox" IsChecked="{Binding EnableLogs, Mode=TwoWay}" />
+                <MenuItem Header="Open Logs Folder" Click="OpenLogsFolder_Click" />
             </MenuItem>
             <MenuItem Header="_Connection">
                 <MenuItem Header="_Auto Reconnect" ToggleType="CheckBox" IsChecked="{Binding AutoReconnect, Mode=TwoWay}" />
@@ -115,13 +120,18 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Grid Grid.Row="2" ColumnDefinitions="*,96" Margin="10">
+                <Grid Grid.Row="2" ColumnDefinitions="*,86,96" Margin="10">
                     <TextBox x:Name="InputBox"
                              Grid.Column="0"
                              Text="{Binding InputText, Mode=TwoWay}"
                              PlaceholderText="Type a message or /join #channel"
                              KeyDown="InputBox_KeyDown" />
                     <Button Grid.Column="1"
+                            Content="Upload"
+                            Margin="8,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            Click="UploadFile_Click" />
+                    <Button Grid.Column="2"
                             Content="Send"
                             Margin="8,0,0,0"
                             HorizontalAlignment="Stretch"
@@ -142,7 +152,22 @@
                                     <TextBlock.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Mention User" Click="MentionUser_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Send Private Message" Click="QueryUser_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Whois User" Click="WhoisUser_Click" CommandParameter="{Binding}" />
                                             <MenuItem Header="Copy Nick" Click="CopyUser_Click" CommandParameter="{Binding}" />
+                                            <Separator />
+                                            <MenuItem Header="Operator Actions">
+                                                <MenuItem Header="Op" Click="OpUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Deop" Click="DeopUser_Click" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Voice" Click="VoiceUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Devoice" Click="DevoiceUser_Click" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Mute" Click="MuteUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Unmute" Click="UnmuteUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Kick" Click="KickUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Ban and Kick" Click="BanUser_Click" CommandParameter="{Binding}" />
+                                            </MenuItem>
                                         </ContextMenu>
                                     </TextBlock.ContextMenu>
                                 </TextBlock>

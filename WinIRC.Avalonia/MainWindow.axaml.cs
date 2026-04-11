@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using WinIRC.Avalonia.ViewModels;
 using WinIRC.Core.Persistence;
@@ -48,6 +49,11 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void ConnectAll_Click(object? sender, RoutedEventArgs e)
+    {
+        await viewModel.ConnectAllSavedAsync();
+    }
+
     private async void Disconnect_Click(object? sender, RoutedEventArgs e)
     {
         await viewModel.DisconnectSelectedAsync();
@@ -61,6 +67,13 @@ public partial class MainWindow : Window
     private async void JoinChannel_Click(object? sender, RoutedEventArgs e)
     {
         await PromptJoinChannelAsync();
+    }
+
+    private async void ChannelList_Click(object? sender, RoutedEventArgs e)
+    {
+        var dialog = new ChannelListDialog(viewModel);
+        await viewModel.RequestChannelListAsync();
+        await dialog.ShowDialog(this);
     }
 
     private async Task PromptJoinChannelAsync()
@@ -85,6 +98,12 @@ public partial class MainWindow : Window
         viewModel.DecreaseFontSize();
     }
 
+    private void OpenLogsFolder_Click(object? sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(viewModel.LogsFolderPath);
+        Process.Start(new ProcessStartInfo(viewModel.LogsFolderPath) { UseShellExecute = true });
+    }
+
     private void Quit_Click(object? sender, RoutedEventArgs e)
     {
         Close();
@@ -95,12 +114,45 @@ public partial class MainWindow : Window
         await viewModel.SendCurrentAsync();
     }
 
+    private async void UploadFile_Click(object? sender, RoutedEventArgs e)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Upload File",
+            AllowMultiple = false,
+            FileTypeFilter = [FilePickerFileTypes.All]
+        });
+
+        var file = files.FirstOrDefault();
+        if (file == null)
+        {
+            return;
+        }
+
+        await using var stream = await file.OpenReadAsync();
+        await viewModel.UploadFileToInputAsync(stream, file.Name);
+        InputBox.Focus();
+        InputBox.CaretIndex = viewModel.InputText.Length;
+    }
+
     private async void InputBox_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
             e.Handled = true;
             await viewModel.SendCurrentAsync();
+            return;
+        }
+
+        if (e.Key == Key.Up || e.Key == Key.Down)
+        {
+            if (viewModel.TryNavigateInputHistory(e.Key == Key.Up) && sender is TextBox historyTextBox)
+            {
+                e.Handled = true;
+                historyTextBox.Text = viewModel.InputText;
+                historyTextBox.CaretIndex = viewModel.InputText.Length;
+            }
+
             return;
         }
 
@@ -233,6 +285,86 @@ public partial class MainWindow : Window
         if (GetUser(sender) is { } user)
         {
             await CopyTextAsync(user);
+        }
+    }
+
+    private async void QueryUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.QueryUserAsync(user);
+        }
+    }
+
+    private async void WhoisUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.WhoisUserAsync(user);
+        }
+    }
+
+    private async void OpUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.OpUserAsync(user);
+        }
+    }
+
+    private async void DeopUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.DeopUserAsync(user);
+        }
+    }
+
+    private async void VoiceUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.VoiceUserAsync(user);
+        }
+    }
+
+    private async void DevoiceUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.DevoiceUserAsync(user);
+        }
+    }
+
+    private async void MuteUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.MuteUserAsync(user);
+        }
+    }
+
+    private async void UnmuteUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.UnmuteUserAsync(user);
+        }
+    }
+
+    private async void KickUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.KickUserAsync(user);
+        }
+    }
+
+    private async void BanUser_Click(object? sender, RoutedEventArgs e)
+    {
+        if (GetUser(sender) is { } user)
+        {
+            await viewModel.BanUserAsync(user);
         }
     }
 

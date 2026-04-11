@@ -1,8 +1,10 @@
 using System.Collections.Specialized;
 using IrcClientCore;
+using IrcClientCore.Handlers.BuiltIn;
 using WinIRC.Core.Configuration;
 using WinIRC.Core.Dispatching;
 using WinIRC.Core.Events;
+using WinIRC.Core.Logging;
 using WinIRC.Core.Models;
 using WinIRC.Core.Networking;
 
@@ -16,6 +18,7 @@ public sealed class IrcSession : IDisposable
     private readonly HashSet<string> knownChannels = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, INotifyCollectionChanged> watchedMessageCollections = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, INotifyCollectionChanged> watchedUserCollections = new(StringComparer.OrdinalIgnoreCase);
+    private MessageLogWriter? logWriter;
     private int refreshScheduled;
     private bool initialised;
 
@@ -26,6 +29,7 @@ public sealed class IrcSession : IDisposable
         server.ShouldReconnect = settings.GetBoolean(ConfigKeys.AutoReconnect, true);
         Client = new CoreIrcClient(server, connectionFactory, dispatcher ?? new ImmediateDispatcher());
         Client.HandleDisconnect = _ => Raise(new IrcSessionEventArgs(IrcSessionEventKind.Disconnected));
+        Client.HandleDisplayChannelList = HandleChannelList;
         Client.StateChanged += (_, _) => ScheduleRefreshFromClient();
     }
 
@@ -73,6 +77,12 @@ public sealed class IrcSession : IDisposable
 
         Client.CommandManager.HandleCommand(target == ServerBufferName ? "" : target, input);
         Client.NotifyStateChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task RequestChannelListAsync(CancellationToken cancellationToken = default)
+    {
+        Client.CommandManager.HandleCommand("", "/list");
         return Task.CompletedTask;
     }
 
@@ -195,6 +205,7 @@ public sealed class IrcSession : IDisposable
         }
 
         (Client.Connection as IDisposable)?.Dispose();
+        logWriter?.Dispose();
     }
 
     private void RefreshFromClient()
@@ -279,6 +290,7 @@ public sealed class IrcSession : IDisposable
 
         foreach (Message message in e.NewItems)
         {
+            LogMessage(channel, message);
             Raise(new IrcSessionEventArgs(IrcSessionEventKind.MessageAdded, channel, message));
         }
     }
@@ -290,6 +302,17 @@ public sealed class IrcSession : IDisposable
         {
             Raise(new IrcSessionEventArgs(IrcSessionEventKind.UsersUpdated, channel, users: GetUsers(channel)));
         }
+    }
+
+    private void HandleChannelList(List<ChannelListItem> items)
+    {
+        var entries = items
+            .Select(item => new ChannelListEntry(item.Channel, item.Topic, item.Users))
+            .OrderByDescending(item => item.Users)
+            .ThenBy(item => item.Channel, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        Raise(new IrcSessionEventArgs(IrcSessionEventKind.ChannelListReceived, channelList: entries));
     }
 
     private IrcClientCore.Buffer? GetBuffer(string channel)
@@ -324,6 +347,17 @@ public sealed class IrcSession : IDisposable
     private void AddClientMessage(string channel, string text)
     {
         Client.AddClientMessage(channel, text);
+    }
+
+    private void LogMessage(string channel, Message message)
+    {
+        if (!settings.GetBoolean(ConfigKeys.EnableLogs))
+        {
+            return;
+        }
+
+        logWriter ??= new MessageLogWriter(Server.Name, settings.GetString(ConfigKeys.LogsFolder));
+        logWriter.Add(channel, message);
     }
 
     private void Raise(IrcSessionEventArgs args)

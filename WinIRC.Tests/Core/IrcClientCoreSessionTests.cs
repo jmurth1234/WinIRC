@@ -1,4 +1,5 @@
 using IrcClientCore;
+using IrcClientCore.Handlers.BuiltIn;
 using WinIRC.Core.Configuration;
 using WinIRC.Core.Irc;
 using WinIRC.Core.Models;
@@ -92,6 +93,30 @@ public sealed class IrcClientCoreSessionTests
         await fixture.Session.Client.RecieveLine(":irc.example.net 366 tester #winirc :End of names");
 
         Assert.Equal(new[] { "alice", "bob", "tester" }, fixture.Session.GetUsers("#winirc"));
+    }
+
+    [Fact]
+    public async Task ChannelListCallbackRaisesSortedEntries()
+    {
+        var fixture = CreateFixture();
+        IReadOnlyList<ChannelListEntry>? entries = null;
+        fixture.Session.SessionEvent += (_, args) =>
+        {
+            if (args.Kind == WinIRC.Core.Events.IrcSessionEventKind.ChannelListReceived)
+            {
+                entries = args.ChannelList;
+            }
+        };
+
+        await fixture.Session.ConnectAsync();
+        fixture.Session.Client.HandleDisplayChannelList?.Invoke(new List<ChannelListItem>
+        {
+            new() { Channel = "#small", Topic = "quiet", Users = 1 },
+            new() { Channel = "#large", Topic = "busy", Users = 50 }
+        });
+
+        Assert.NotNull(entries);
+        Assert.Equal(new[] { "#large", "#small" }, entries.Select(entry => entry.Channel));
     }
 
     private static Fixture CreateFixture(WinIrcServer? server = null)

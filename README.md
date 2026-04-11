@@ -54,6 +54,7 @@ dotnet run --project WinIRC.Avalonia
 ```
 
 Saved servers and settings are stored as JSON under the OS app-data directory, such as `~/.config/WinIRC` on Linux.
+When message logging is enabled in the View menu, channel logs are written under `logs` in that same app-data directory by default.
 
 ## Contributing
 

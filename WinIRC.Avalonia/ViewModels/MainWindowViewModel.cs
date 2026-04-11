@@ -15,18 +15,27 @@ namespace WinIRC.Avalonia.ViewModels;
 
 public sealed class MainWindowViewModel : ObservableObject
 {
+    private static readonly HttpClient UploadClient = new();
+
     private readonly IrcConnectionFactoryHolder connectionFactoryHolder = new();
     private readonly List<IrcSession> sessions = new();
     private readonly List<PendingMessage> pendingCurrentMessages = new();
     private readonly HashSet<IrcSession> pendingSidebarRefreshes = new();
+    private readonly List<string> inputHistory = new();
+    private readonly List<ChannelListEntry> channelListEntries = new();
     private SidebarItemViewModel? selectedItem;
+    private IrcSession? channelListSession;
     private bool refreshingCurrentBuffer;
     private int messageFlushScheduled;
     private int sidebarRefreshScheduled;
+    private int inputHistoryIndex = -1;
     private string currentTitle = "WinIRC";
     private string currentTopic = "Connect to a server to start chatting.";
     private string statusText = "Ready";
     private string inputText = "";
+    private string channelListSearch = "";
+    private string channelListStatus = "Request a channel list from the current server.";
+    private string pendingHistoryInput = "";
     private bool showUsers;
     private bool showTopic;
     private bool ignoreJoinLeave;
@@ -56,6 +65,7 @@ public sealed class MainWindowViewModel : ObservableObject
     public AvaloniaList<SidebarItemViewModel> SidebarItems { get; } = new();
     public AvaloniaList<MessageViewModel> CurrentMessages { get; } = new();
     public AvaloniaList<string> CurrentUsers { get; } = new();
+    public AvaloniaList<ChannelListEntryViewModel> ChannelListItems { get; } = new();
 
     public SidebarItemViewModel? SelectedItem
     {
@@ -93,6 +103,24 @@ public sealed class MainWindowViewModel : ObservableObject
         set => SetProperty(ref inputText, value);
     }
 
+    public string ChannelListSearch
+    {
+        get => channelListSearch;
+        set
+        {
+            if (SetProperty(ref channelListSearch, value))
+            {
+                RefreshChannelList();
+            }
+        }
+    }
+
+    public string ChannelListStatus
+    {
+        get => channelListStatus;
+        private set => SetProperty(ref channelListStatus, value);
+    }
+
     public bool AutoReconnect
     {
         get => Settings.GetBoolean(ConfigKeys.AutoReconnect, true);
@@ -112,6 +140,20 @@ public sealed class MainWindowViewModel : ObservableObject
             OnPropertyChanged();
         }
     }
+
+    public bool EnableLogs
+    {
+        get => Settings.GetBoolean(ConfigKeys.EnableLogs);
+        set
+        {
+            Settings.SetBoolean(ConfigKeys.EnableLogs, value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string LogsFolderPath => Settings.GetString(
+        ConfigKeys.LogsFolder,
+        Path.Combine(AppDataPaths.GetAppDataDirectory(), "logs"));
 
     public bool ShowUsers
     {
@@ -205,6 +247,95 @@ public sealed class MainWindowViewModel : ObservableObject
         await session.ConnectAsync();
     }
 
+    public async Task ConnectAllSavedAsync()
+    {
+        if (ServerStore.Servers.Count == 0)
+        {
+            await ServerStore.LoadAsync();
+        }
+
+        foreach (var server in ServerStore.Servers.ToList())
+        {
+            await ConnectAsync(server);
+        }
+    }
+
+    public async Task RequestChannelListAsync()
+    {
+        var session = SelectedItem?.Session ?? sessions.FirstOrDefault();
+        if (session == null)
+        {
+            StatusText = "Connect to a server before requesting the channel list.";
+            return;
+        }
+
+        channelListSession = session;
+        channelListEntries.Clear();
+        ChannelListItems.Clear();
+        ChannelListStatus = "Waiting for the server channel list...";
+        StatusText = $"{session.Server.Name}: requesting channel list";
+        await session.RequestChannelListAsync();
+    }
+
+    public async Task JoinListedChannelAsync(ChannelListEntryViewModel? channel)
+    {
+        var session = channelListSession ?? SelectedItem?.Session ?? sessions.FirstOrDefault();
+        if (session == null || channel == null)
+        {
+            return;
+        }
+
+        await session.SendAsync(IrcSession.ServerBufferName, "/join " + channel.Channel);
+    }
+
+    public async Task UploadFileToInputAsync(Stream stream, string fileName)
+    {
+        var uploadUrl = Settings.GetString(ConfigKeys.UploadFile, "https://0x0.st");
+        if (!Uri.TryCreate(uploadUrl, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("http" or "https"))
+        {
+            StatusText = "Upload URL must be an absolute HTTP or HTTPS URL.";
+            return;
+        }
+
+        StatusText = $"Uploading {fileName}...";
+
+        try
+        {
+            using var form = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(stream);
+            form.Add(fileContent, "file", fileName);
+
+            using var response = await UploadClient.PostAsync(uri, form);
+            var responseText = (await response.Content.ReadAsStringAsync()).Trim();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                StatusText = $"Upload failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+                return;
+            }
+
+            AppendToInput(responseText);
+            StatusText = "Upload complete.";
+        }
+        catch (Exception ex)
+        {
+            StatusText = "Upload failed: " + ex.Message;
+        }
+    }
+
+    public void AppendToInput(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        InputText = string.IsNullOrWhiteSpace(InputText)
+            ? text
+            : InputText.TrimEnd() + " " + text;
+    }
+
     public async Task DisconnectSelectedAsync()
     {
         var session = SelectedItem?.Session;
@@ -277,6 +408,57 @@ public sealed class MainWindowViewModel : ObservableObject
             : InputText.TrimEnd() + " " + user + " ";
     }
 
+    public Task QueryUserAsync(string user)
+    {
+        return SendUserCommandAsync("/query", user);
+    }
+
+    public Task WhoisUserAsync(string user)
+    {
+        return SendUserCommandAsync("/whois", user);
+    }
+
+    public Task OpUserAsync(string user)
+    {
+        return SendUserCommandAsync("/op", user);
+    }
+
+    public Task DeopUserAsync(string user)
+    {
+        return SendUserCommandAsync("/deop", user);
+    }
+
+    public Task VoiceUserAsync(string user)
+    {
+        return SendUserCommandAsync("/voice", user);
+    }
+
+    public Task DevoiceUserAsync(string user)
+    {
+        return SendUserCommandAsync("/devoice", user);
+    }
+
+    public Task MuteUserAsync(string user)
+    {
+        return SendUserCommandAsync("/mute", user);
+    }
+
+    public Task UnmuteUserAsync(string user)
+    {
+        return SendUserCommandAsync("/unmute", user);
+    }
+
+    public Task KickUserAsync(string user)
+    {
+        return SendUserCommandAsync("/kick", user);
+    }
+
+    public async Task BanUserAsync(string user)
+    {
+        await SendUserCommandAsync("/ban", user);
+        await SendUserCommandAsync("/kick", user);
+    }
+
     public async Task SendCurrentAsync()
     {
         var item = SelectedItem;
@@ -287,7 +469,50 @@ public sealed class MainWindowViewModel : ObservableObject
 
         var message = InputText;
         InputText = "";
+        AddInputHistory(message);
         await item.Session.SendAsync(item.Channel, message);
+    }
+
+    public bool TryNavigateInputHistory(bool previous)
+    {
+        if (inputHistory.Count == 0)
+        {
+            return false;
+        }
+
+        if (previous)
+        {
+            if (inputHistoryIndex == -1)
+            {
+                pendingHistoryInput = InputText;
+                inputHistoryIndex = inputHistory.Count - 1;
+            }
+            else
+            {
+                inputHistoryIndex = Math.Max(0, inputHistoryIndex - 1);
+            }
+
+            InputText = inputHistory[inputHistoryIndex];
+            return true;
+        }
+
+        if (inputHistoryIndex == -1)
+        {
+            return false;
+        }
+
+        inputHistoryIndex++;
+        if (inputHistoryIndex >= inputHistory.Count)
+        {
+            inputHistoryIndex = -1;
+            InputText = pendingHistoryInput;
+        }
+        else
+        {
+            InputText = inputHistory[inputHistoryIndex];
+        }
+
+        return true;
     }
 
     public int? TryApplyTabCompletion(int caretIndex)
@@ -320,6 +545,22 @@ public sealed class MainWindowViewModel : ObservableObject
         var suffix = start == 0 ? ": " : " ";
         InputText = InputText[..start] + completion + suffix + InputText[caretIndex..];
         return start + completion.Length + suffix.Length;
+    }
+
+    private async Task SendUserCommandAsync(string command, string user)
+    {
+        if (SelectedItem == null || SelectedItem.IsServer || string.IsNullOrWhiteSpace(user))
+        {
+            return;
+        }
+
+        user = CleanUser(user);
+        if (string.IsNullOrWhiteSpace(user))
+        {
+            return;
+        }
+
+        await SelectedItem.Session.SendAsync(SelectedItem.Channel, $"{command} {user}");
     }
 
     private void Session_SessionEvent(object? sender, IrcSessionEventArgs e)
@@ -383,6 +624,17 @@ public sealed class MainWindowViewModel : ObservableObject
                 if (SelectedItem?.Session == session && SameChannel(SelectedItem.Channel, e.Channel))
                 {
                     CurrentTopic = e.Text ?? "";
+                }
+                break;
+
+            case IrcSessionEventKind.ChannelListReceived:
+                if (e.ChannelList != null)
+                {
+                    channelListSession = session;
+                    channelListEntries.Clear();
+                    channelListEntries.AddRange(e.ChannelList);
+                    RefreshChannelList();
+                    StatusText = $"{session.Server.Name}: received {channelListEntries.Count} channels";
                 }
                 break;
 
@@ -586,6 +838,57 @@ public sealed class MainWindowViewModel : ObservableObject
     private bool ShouldDisplay(Message message)
     {
         return !IgnoreJoinLeave || message.Type != MessageType.JoinPart;
+    }
+
+    private void RefreshChannelList()
+    {
+        var query = ChannelListSearch.Trim();
+        var matches = string.IsNullOrWhiteSpace(query)
+            ? channelListEntries
+            : channelListEntries.Where(entry =>
+                entry.Channel.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                entry.Topic.Contains(query, StringComparison.OrdinalIgnoreCase));
+
+        var viewItems = matches
+            .OrderByDescending(entry => entry.Users)
+            .ThenBy(entry => entry.Channel, StringComparer.OrdinalIgnoreCase)
+            .Take(500)
+            .Select(entry => new ChannelListEntryViewModel(entry))
+            .ToList();
+
+        ChannelListItems.Clear();
+        ChannelListItems.AddRange(viewItems);
+
+        ChannelListStatus = channelListEntries.Count == 0
+            ? "Request a channel list from the current server."
+            : $"Showing {viewItems.Count} of {channelListEntries.Count} channels.";
+    }
+
+    private void AddInputHistory(string message)
+    {
+        message = message.Trim();
+        if (message.Length == 0)
+        {
+            return;
+        }
+
+        if (inputHistory.Count == 0 || inputHistory[^1] != message)
+        {
+            inputHistory.Add(message);
+        }
+
+        while (inputHistory.Count > 200)
+        {
+            inputHistory.RemoveAt(0);
+        }
+
+        inputHistoryIndex = -1;
+        pendingHistoryInput = "";
+    }
+
+    private static string CleanUser(string user)
+    {
+        return user.Trim().TrimStart('@', '+', '%', '&', '~');
     }
 
     private static void ApplyTheme(bool useDarkTheme)
