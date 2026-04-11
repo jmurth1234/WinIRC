@@ -441,6 +441,11 @@ public sealed class MainWindowViewModel : ObservableObject
         await UploadContentToInputAsync(stream, "paste.txt", PasteTextUrl, "Uploading paste...");
     }
 
+    public async Task UploadImageToInputAsync(Stream stream)
+    {
+        await UploadContentToInputAsync(stream, "upload.png", PasteImageUrl, "Uploading image...");
+    }
+
     public void AppendPastedTextToInput(string text)
     {
         AppendToInput(text.ReplaceLineEndings(" ").Trim());

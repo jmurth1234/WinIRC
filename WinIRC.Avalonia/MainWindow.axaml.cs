@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using WinIRC.Avalonia.ViewModels;
@@ -194,7 +195,20 @@ public partial class MainWindow : Window
     private async void InputBox_PastingFromClipboard(object? sender, RoutedEventArgs e)
     {
         var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        var text = clipboard == null ? null : await clipboard.TryGetTextAsync();
+        if (clipboard == null)
+        {
+            return;
+        }
+
+        var bitmap = await clipboard.TryGetBitmapAsync();
+        if (bitmap != null)
+        {
+            e.Handled = true;
+            await ConfirmAndUploadPastedImageAsync(bitmap);
+            return;
+        }
+
+        var text = await clipboard.TryGetTextAsync();
         if (string.IsNullOrEmpty(text) || !HasMultipleLines(text))
         {
             return;
@@ -216,6 +230,23 @@ public partial class MainWindow : Window
         {
             viewModel.AppendPastedTextToInput(result.Text);
         }
+
+        InputBox.Focus();
+        InputBox.CaretIndex = viewModel.InputText.Length;
+    }
+
+    private async Task ConfirmAndUploadPastedImageAsync(Bitmap bitmap)
+    {
+        var dialog = new PasteImageDialog(bitmap);
+        if (!await dialog.ShowDialog<bool>(this))
+        {
+            return;
+        }
+
+        using var stream = new MemoryStream();
+        bitmap.Save(stream);
+        stream.Position = 0;
+        await viewModel.UploadImageToInputAsync(stream);
 
         InputBox.Focus();
         InputBox.CaretIndex = viewModel.InputText.Length;
