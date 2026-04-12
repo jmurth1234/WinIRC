@@ -1,0 +1,86 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="WinIRC.Avalonia.SettingsDialog"
+        Title="Settings"
+        Width="560"
+        Height="620"
+        MinWidth="480"
+        MinHeight="460"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+            <Button Content="Close" Click="Close_Click" />
+        </StackPanel>
+
+        <TabControl>
+            <TabItem Header="Connection">
+                <ScrollViewer>
+                    <StackPanel Spacing="10" Margin="0,10">
+                        <TextBlock Text="Default Username" FontWeight="SemiBold" />
+                        <TextBox Text="{Binding DefaultUsername, Mode=TwoWay}" />
+
+                        <CheckBox Content="Reconnect when disconnected" IsChecked="{Binding AutoReconnect, Mode=TwoWay}" />
+                        <CheckBox Content="Ignore TLS certificate errors" IsChecked="{Binding IgnoreSsl, Mode=TwoWay}" />
+                        <CheckBox Content="Switch to a channel when it joins" IsChecked="{Binding SwitchOnJoin, Mode=TwoWay}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Appearance">
+                <ScrollViewer>
+                    <StackPanel Spacing="10" Margin="0,10">
+                        <CheckBox Content="Dark theme" IsChecked="{Binding DarkTheme, Mode=TwoWay}" />
+                        <CheckBox Content="Show topic bar" IsChecked="{Binding ShowTopic, Mode=TwoWay}" />
+                        <CheckBox Content="Show users pane" IsChecked="{Binding ShowUsers, Mode=TwoWay}" />
+                        <CheckBox Content="Hide join and leave messages" IsChecked="{Binding IgnoreJoinLeave, Mode=TwoWay}" />
+                        <CheckBox Content="Group consecutive messages" IsChecked="{Binding ModernChat, Mode=TwoWay}" />
+                        <CheckBox Content="Compact message spacing" IsChecked="{Binding ReducedPadding, Mode=TwoWay}" />
+
+                        <TextBlock Text="Chat Font" FontWeight="SemiBold" Margin="0,8,0,0" />
+                        <TextBox Text="{Binding ChatFontFamily, Mode=TwoWay}" />
+
+                        <TextBlock Text="Chat Font Size" FontWeight="SemiBold" Margin="0,8,0,0" />
+                        <Grid ColumnDefinitions="100,90,90" ColumnSpacing="8">
+                            <TextBlock Grid.Column="0" Text="{Binding ChatFontSize}" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="Smaller" Click="SmallerText_Click" />
+                            <Button Grid.Column="2" Content="Larger" Click="LargerText_Click" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Behavior">
+                <ScrollViewer>
+                    <StackPanel Spacing="10" Margin="0,10">
+                        <TextBlock Text="When double-clicking a user" FontWeight="SemiBold" />
+                        <ComboBox SelectedIndex="{Binding UserListClickIndex, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                            <ComboBoxItem Content="Mention user in channel" />
+                            <ComboBoxItem Content="Open private message" />
+                            <ComboBoxItem Content="Do nothing" />
+                        </ComboBox>
+
+                        <CheckBox Content="Log messages" IsChecked="{Binding EnableLogs, Mode=TwoWay}" Margin="0,8,0,0" />
+                        <TextBlock Text="Logs Folder" FontWeight="SemiBold" />
+                        <TextBox Text="{Binding LogsFolderPath, Mode=TwoWay}" />
+                        <Button Content="Choose Folder" Click="ChooseLogsFolder_Click" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Uploads">
+                <ScrollViewer>
+                    <StackPanel Spacing="10" Margin="0,10">
+                        <TextBlock Text="File Upload URL" FontWeight="SemiBold" />
+                        <TextBox Text="{Binding UploadFileUrl, Mode=TwoWay}" />
+
+                        <TextBlock Text="Text Paste Upload URL" FontWeight="SemiBold" Margin="0,8,0,0" />
+                        <TextBox Text="{Binding PasteTextUrl, Mode=TwoWay}" />
+
+                        <TextBlock Text="Image Paste Upload URL" FontWeight="SemiBold" Margin="0,8,0,0" />
+                        <TextBox Text="{Binding PasteImageUrl, Mode=TwoWay}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

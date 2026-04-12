@@ -37,6 +37,25 @@ Once you've downloaded the project (either via a git clone, the "Open in Visual 
 4. Using the top toolbar, select the architecture and the device you want to deploy the app on
 5. And that should be it!
 
+## Linux / cross-platform preview
+
+The repository now includes a separate .NET desktop port that keeps the existing UWP app intact:
+
+* `WinIRC.Core` contains cross-platform storage, socket transports, and the `IrcClientCore` adapter.
+* `WinIRC.Avalonia` is the Linux/Windows Avalonia desktop UI.
+* `WinIRC.Tests` covers the portable storage and IRC adapter behavior.
+
+To build and run the cross-platform app:
+
+```bash
+dotnet build WinIRC.CrossPlatform.sln
+dotnet test WinIRC.CrossPlatform.sln
+dotnet run --project WinIRC.Avalonia
+```
+
+Saved servers and settings are stored as JSON under the OS app-data directory, such as `~/.config/WinIRC` on Linux.
+When message logging is enabled in the View menu, channel logs are written under `logs` in that same app-data directory by default.
+
 ## Contributing
 
 Contributions are welcome, so feel free to make changes and submit a pull request!

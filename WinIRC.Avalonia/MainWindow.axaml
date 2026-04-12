@@ -1,0 +1,203 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="760"
+        x:Class="WinIRC.Avalonia.MainWindow"
+        Title="WinIRC"
+        Width="1200"
+        Height="760"
+        MinWidth="840"
+        MinHeight="520">
+    <Window.Styles>
+        <Style Selector="Grid.messageLine.mention TextBlock">
+            <Setter Property="Foreground" Value="IndianRed" />
+        </Style>
+        <Style Selector="Grid.messageLine.joinPart TextBlock">
+            <Setter Property="Foreground" Value="Gray" />
+        </Style>
+        <Style Selector="Grid.messageLine.motd TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_WinIRC">
+                <MenuItem Header="_Manage Servers" Click="ManageServers_Click" />
+                <MenuItem Header="_Settings" Click="Settings_Click" />
+                <MenuItem Header="_Connect All Saved Servers" Click="ConnectAll_Click" />
+                <MenuItem Header="_Join Channel" Click="JoinChannel_Click" />
+                <MenuItem Header="Channel _List" Click="ChannelList_Click" />
+                <MenuItem Header="_Part Current Channel" Click="PartChannel_Click" />
+                <MenuItem Header="_Reconnect Current" Click="Reconnect_Click" />
+                <MenuItem Header="_Disconnect Current" Click="Disconnect_Click" />
+                <Separator />
+                <MenuItem Header="_About WinIRC" Click="About_Click" />
+                <Separator />
+                <MenuItem Header="_Quit" Click="Quit_Click" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="Dark Theme" ToggleType="CheckBox" IsChecked="{Binding DarkTheme, Mode=TwoWay}" />
+                <MenuItem Header="Topic Bar" ToggleType="CheckBox" IsChecked="{Binding ShowTopic, Mode=TwoWay}" />
+                <MenuItem Header="Users Pane" ToggleType="CheckBox" IsChecked="{Binding ShowUsers, Mode=TwoWay}" />
+                <MenuItem Header="Hide Join/Leave Messages" ToggleType="CheckBox" IsChecked="{Binding IgnoreJoinLeave, Mode=TwoWay}" />
+                <Separator />
+                <MenuItem Header="Larger Text" Click="LargerText_Click" />
+                <MenuItem Header="Smaller Text" Click="SmallerText_Click" />
+                <Separator />
+                <MenuItem Header="Log Messages" ToggleType="CheckBox" IsChecked="{Binding EnableLogs, Mode=TwoWay}" />
+                <MenuItem Header="Open Logs Folder" Click="OpenLogsFolder_Click" />
+            </MenuItem>
+            <MenuItem Header="_Connection">
+                <MenuItem Header="_Auto Reconnect" ToggleType="CheckBox" IsChecked="{Binding AutoReconnect, Mode=TwoWay}" />
+                <MenuItem Header="_Ignore TLS Certificate Errors" ToggleType="CheckBox" IsChecked="{Binding IgnoreSsl, Mode=TwoWay}" />
+            </MenuItem>
+        </Menu>
+
+        <TextBlock DockPanel.Dock="Bottom"
+                   Text="{Binding StatusText}"
+                   Padding="10,6"
+                   Background="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+
+        <Grid ColumnDefinitions="240,*,190">
+            <Border Grid.Column="0" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Servers"
+                               FontWeight="SemiBold"
+                               Padding="12,10" />
+                    <ListBox ItemsSource="{Binding SidebarItems}"
+                             SelectedItem="{Binding SelectedItem}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" Padding="8,5">
+                                    <TextBlock.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Join Channel" Click="SidebarJoin_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Part Channel" Click="SidebarPart_Click" CommandParameter="{Binding}" IsEnabled="{Binding IsChannel}" />
+                                            <Separator />
+                                            <MenuItem Header="Reconnect" Click="SidebarReconnect_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Disconnect" Click="SidebarDisconnect_Click" CommandParameter="{Binding}" />
+                                            <Separator />
+                                            <MenuItem Header="Copy Name" Click="CopySidebarName_Click" CommandParameter="{Binding}" />
+                                        </ContextMenu>
+                                    </TextBlock.ContextMenu>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
+                <Border Grid.Row="0" Padding="14,10" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1">
+                    <StackPanel>
+                        <TextBlock Text="{Binding CurrentTitle}" FontSize="18" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding CurrentTopic}" IsVisible="{Binding ShowTopic}" Opacity="0.75" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <ListBox x:Name="MessagesList"
+                         Grid.Row="1"
+                         ItemsSource="{Binding CurrentMessages}"
+                         Padding="8"
+                         FontSize="{Binding ChatFontSize}"
+                         FontFamily="{Binding ChatFontFamily}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="54,120,*"
+                                  Margin="{Binding LineMargin}"
+                                  Classes="messageLine"
+                                  Classes.mention="{Binding IsMention}"
+                                  Classes.joinPart="{Binding IsJoinPart}"
+                                  Classes.motd="{Binding IsMotd}"
+                                  Opacity="{Binding Opacity}">
+                                <Grid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Copy Message" Click="CopyMessage_Click" CommandParameter="{Binding}" />
+                                        <MenuItem Header="Copy Link" Click="CopyLink_Click" CommandParameter="{Binding}" IsEnabled="{Binding HasLink}" />
+                                        <MenuItem Header="Open Link" Click="OpenLink_Click" CommandParameter="{Binding}" IsEnabled="{Binding HasLink}" />
+                                    </ContextMenu>
+                                </Grid.ContextMenu>
+                                <TextBlock Grid.Column="0" Text="{Binding Time}" IsVisible="{Binding ShowHeader}" Opacity="0.65" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding User}"
+                                           IsVisible="{Binding ShowHeader}"
+                                           FontWeight="{Binding FontWeight}"
+                                           FontStyle="{Binding FontStyle}"
+                                           Foreground="{Binding UserBrush}"
+                                           Margin="8,0,8,0" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding Text}"
+                                           FontWeight="{Binding FontWeight}"
+                                           FontStyle="{Binding FontStyle}"
+                                           Foreground="{Binding TextBrush}"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid Grid.Row="2" ColumnDefinitions="*,86,96" Margin="10">
+                    <TextBox x:Name="InputBox"
+                             Grid.Column="0"
+                             Text="{Binding InputText, Mode=TwoWay}"
+                             PlaceholderText="Type a message or /join #channel"
+                             PastingFromClipboard="InputBox_PastingFromClipboard"
+                             KeyDown="InputBox_KeyDown" />
+                    <Button Grid.Column="1"
+                            Content="Upload"
+                            Margin="8,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            Click="UploadFile_Click" />
+                    <Button Grid.Column="2"
+                            Content="Send"
+                            Margin="8,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            Click="SendButton_Click" />
+                </Grid>
+            </Grid>
+
+            <Border Grid.Column="2" IsVisible="{Binding ShowUsers}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1,0,0,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Users"
+                               FontWeight="SemiBold"
+                               Padding="12,10" />
+                    <ListBox x:Name="UsersList"
+                             ItemsSource="{Binding CurrentUsers}"
+                             DoubleTapped="UsersList_DoubleTapped">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Padding="8,4">
+                                    <TextBlock.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Mention User" Click="MentionUser_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Send Private Message" Click="QueryUser_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Whois User" Click="WhoisUser_Click" CommandParameter="{Binding}" />
+                                            <MenuItem Header="Copy Nick" Click="CopyUser_Click" CommandParameter="{Binding}" />
+                                            <Separator />
+                                            <MenuItem Header="Operator Actions">
+                                                <MenuItem Header="Op" Click="OpUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Deop" Click="DeopUser_Click" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Voice" Click="VoiceUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Devoice" Click="DevoiceUser_Click" CommandParameter="{Binding}" />
+                                                <Separator />
+                                                <MenuItem Header="Mute" Click="MuteUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Unmute" Click="UnmuteUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Kick" Click="KickUser_Click" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Ban and Kick" Click="BanUser_Click" CommandParameter="{Binding}" />
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </TextBlock.ContextMenu>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
